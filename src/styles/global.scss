@@ -1,7 +1,30 @@
-// src/styles/global.scss
+@import 'variables';
+@import 'mixins';
+
+// Reset
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background-color: $background-color;
+  color: $text-color;
+  line-height: 1.5;
+  transition: background-color 0.3s ease;
+}
+
+// Dark mode
+body.dark-mode {
+  --background-color: #111827;
+  --sidebar-color: #1f2937;
+  --text-color: #f9fafb;
+  --text-light: #d1d5db;
+  --border-color: #374151;
+  --message-bg-user: #374151;
+  --message-bg-bot: #1f2937;
+  --dropdown-bg: #1f2937;
+  --dropdown-hover: #374151;
+}
