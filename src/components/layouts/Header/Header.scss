@@ -1,0 +1,85 @@
+@import "../../../styles/variables.scss"; // Variables SCSS globales
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: var(--background-color);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  height: 60px;
+
+  /* Icône Sidebar */
+  .sidebarToggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    transition: color 0.2s ease;
+    padding: 0.5rem; /* Améliore la surface de clic */
+  
+    &.active {
+      color: var(--primary-color);
+    }
+  
+    &:hover {
+      color: var(--primary-hover);
+    }
+  
+    /* Responsivité : Affichage mobile */
+    @media (max-width: 768px) {
+      position: absolute;
+      left: 1.5rem; /* Assure qu'il soit bien espacé à gauche */
+    }
+  }
+  
+  /* Logo centré */
+  .logoContainer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+  
+    .logo {
+      width: 40px;
+      height: auto;
+    }
+  
+    @media (max-width: 768px) {
+      position: static; /* Pas absolue */
+      transform: none;
+      justify-content: center;
+    }
+  }
+  
+  /* Bouton Menu */
+  .menuButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    transition: color 0.2s ease;
+    padding: 0.5rem;
+  
+    &:hover {
+      color: var(--primary-hover);
+    }
+  }
+  
+  /* Responsivité */
+  @media (max-width: 768px) {
+    .sidebarToggle {
+      position: absolute;
+      left: 1rem;
+    }
+
+    .logoContainer {
+      position: static;
+      transform: none;
+    }
+  }
+}

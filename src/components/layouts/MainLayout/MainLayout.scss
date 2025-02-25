@@ -1,0 +1,22 @@
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  .layout-container {
+    display: flex;
+    height: 100vh;
+    transition: margin-left 0.3s ease;
+
+    &.sidebar-open {
+      margin-left: 280px; /* Largeur de la Sidebar ouverte */
+    }
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background-color: var(--background-color);
+  }
+}
