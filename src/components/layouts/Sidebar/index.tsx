@@ -1,2 +1,2 @@
-// src/components/layouts/Sidebar/index.tsx
-export { default } from './Sidebar';
+export { Sidebar } from './Sidebar';
+export type { SidebarProps } from './Sidebar.types';
