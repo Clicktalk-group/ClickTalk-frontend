@@ -10,52 +10,29 @@
   position: relative;
   height: 60px;
 
-  /* Icône Sidebar */
-  .sidebarToggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: var(--text-color);
-    transition: color 0.2s ease;
-    padding: 0.5rem; /* Améliore la surface de clic */
-  
-    &.active {
-      color: var(--primary-color);
-    }
-  
-    &:hover {
-      color: var(--primary-hover);
-    }
-  
-    /* Responsivité : Affichage mobile */
-    @media (max-width: 768px) {
-      position: absolute;
-      left: 1.5rem; /* Assure qu'il soit bien espacé à gauche */
-    }
-  }
-  
-  /* Logo centré */
+  /* Conteneur pour le logo */
   .logoContainer {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    margin: 0 auto; /* Centrer grâce au flex parent */
+    position: static;
     display: flex;
     align-items: center;
-  
+
     .logo {
-      width: 40px;
+      width: 60px;
       height: auto;
     }
-  
+
     @media (max-width: 768px) {
-      position: static; /* Pas absolue */
-      transform: none;
       justify-content: center;
+      .logo {
+        width: 50px;
+        height: auto;
+      }
+  
     }
   }
-  
-  /* Bouton Menu */
+
+  /* Bouton Menu Burger */
   .menuButton {
     background: none;
     border: none;
@@ -64,22 +41,25 @@
     color: var(--text-color);
     transition: color 0.2s ease;
     padding: 0.5rem;
-  
+    margin-right: 1rem; /* Ajouter du padding à droite */
+
     &:hover {
       color: var(--primary-hover);
     }
+
+    @media (max-width: 768px) {
+      margin-right: 0.75rem;
+    }
   }
-  
+
   /* Responsivité */
   @media (max-width: 768px) {
     .sidebarToggle {
-      position: absolute;
       left: 1rem;
     }
 
     .logoContainer {
-      position: static;
-      transform: none;
+      margin: 0 auto;
     }
   }
 }

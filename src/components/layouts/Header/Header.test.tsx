@@ -52,12 +52,18 @@ describe("Header Component", () => {
     expect(menuButton).toHaveStyle("padding: 0.5rem");
   });
 
-  // Vérifie l'espacement (padding) du chevron du toggle sidebar
-  it("applies correct padding for the sidebar toggle button", () => {
+  it("applies correct padding and margin to the Menu button", () => {
     render(<Header isSidebarOpen={false} toggleSidebar={mockToggleSidebar} />);
-    const sidebarToggle = screen.getByRole("button", {
-      name: /Agrandir la barre latérale/i,
-    });
-    expect(sidebarToggle).toHaveStyle("padding: 0.5rem");
+    const menuButton = screen.getByRole("button", { name: /Menu/i });
+    expect(menuButton).toHaveStyle("margin-right: 1rem");
+    expect(menuButton).toHaveStyle("padding: 0.5rem");
   });
+  
+  it("centers the logo correctly with flexbox", () => {
+    render(<Header isSidebarOpen={false} toggleSidebar={mockToggleSidebar} />);
+    const logoContainer = screen.getByTestId("logo-container");
+    expect(logoContainer).toHaveStyle("margin: 0 auto");
+    expect(logoContainer).toHaveStyle("position: static");
+  });
+  
 });

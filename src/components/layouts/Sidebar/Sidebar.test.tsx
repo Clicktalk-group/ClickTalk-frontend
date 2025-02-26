@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react"; // Import `screen`
 import { Sidebar } from "./Sidebar";
 
 const mockFunctions = {
@@ -13,6 +13,7 @@ const mockFunctions = {
   onRenameProject: jest.fn(),
   onDeleteProject: jest.fn(),
   onLogout: jest.fn(),
+  onToggleSidebar: jest.fn(),
 };
 
 const conversations = [
@@ -35,16 +36,68 @@ describe("Sidebar Component", () => {
         {...mockFunctions}
       />
     );
+
+    // Test if conversation titles are rendered
+    conversations.forEach((conversation) => {
+      expect(screen.getByText(conversation.title)).toBeInTheDocument();
+    });
+
+    // Test if project titles are rendered
+    projects.forEach((project) => {
+      expect(screen.getByText(project.title)).toBeInTheDocument();
+    });
   });
 
-  it("handles conversation actions", () => {
+  it("handles sidebar toggle and renders closed state", () => {
     render(
       <Sidebar
-        isOpen={false}
+        isOpen={false} // Sidebar fermée
         conversations={conversations}
         projects={projects}
         {...mockFunctions}
       />
     );
+
+    // Test que les titres des projets ne sont PAS visibles dans l'état fermé
+    projects.forEach((project) => {
+      expect(screen.queryByText(project.title)).not.toBeInTheDocument();
+    });
+
+    // Vérifie si la fonction "onToggleSidebar" est définie
+    expect(mockFunctions.onToggleSidebar).toBeDefined();
+  });
+
+  it("calls onNewConversation when clicking New Conversation button", () => {
+    render(
+      <Sidebar
+        isOpen={true}
+        conversations={conversations}
+        projects={projects}
+        {...mockFunctions}
+      />
+    );
+
+    const newConvoButton = screen.getByText("+ Nouvelle Conversation");
+    newConvoButton.click();
+
+    // Vérifie si onNewConversation est appelé
+    expect(mockFunctions.onNewConversation).toHaveBeenCalled();
+  });
+
+  it("calls onNewProject when clicking New Project button", () => {
+    render(
+      <Sidebar
+        isOpen={true}
+        conversations={conversations}
+        projects={projects}
+        {...mockFunctions}
+      />
+    );
+
+    const newProjectButton = screen.getByText("+ Nouveau Projet");
+    newProjectButton.click();
+
+    // Vérifie si onNewProject est appelé
+    expect(mockFunctions.onNewProject).toHaveBeenCalled();
   });
 });

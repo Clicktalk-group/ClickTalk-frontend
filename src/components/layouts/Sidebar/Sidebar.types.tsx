@@ -12,4 +12,5 @@ export interface SidebarProps {
   onRenameProject: (id: string, newTitle: string) => void;
   onDeleteProject: (id: string) => void;
   onLogout: () => void;
+  onToggleSidebar: () => void;
 }

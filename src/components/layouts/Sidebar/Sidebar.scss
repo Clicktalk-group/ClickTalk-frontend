@@ -1,93 +1,151 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
 
 .sidebar {
-  width: 280px;
-  background-color: var(--sidebar-color);
-  color: var(--text-light);
-  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 350px;
+  background-color: $sidebar-color;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); // Ajout d'ombre
+  color: $text-light;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  z-index: 50;
+  padding: 3.5rem 1rem;
+  transform: translateX(-100%); // Sidebar initialement fermée
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); // Animation fluide
+  z-index: 500;
 
   &.open {
-    transform: translateX(0);
+    transform: translateX(0); // Sidebar ouverte
   }
 
-  &.closed {
-    transform: translateX(-100%);
+  .section {
+    margin-bottom: 2rem;
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .add-btn {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: $primary-color;
+      color: $text-light;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: $primary-hover;
+      }
+    }
+
+    .section-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .list-item {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        background-color: lighten($sidebar-color, 5%);
+        border-radius: $radius-sm;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: $primary-hover;
+          color: $text-light;
+        }
+      }
+    }
+  }
+
+  .divider {
+    border: 0;
+    height: 1px;
+    background-color: $text-light;
+    opacity: 0.2;
+  }
+
+  .logout-btn {
+    margin-top: auto;
+    padding: 0.5rem 1rem;
+    background-color: $danger-color;
+    color: $text-light;
+    border: none;
+    border-radius: $radius-sm;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: darken($danger-color, 10%);
+    }
+
+    .logout-icon {
+      font-size: 1.2rem;
+    }
   }
 }
 
-  .sidebar-header {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-align: center;
-    color: var(--primary-color);
+// Bouton de toggle de la Sidebar
+.sidebar-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem; // Position par défaut
+  z-index: 1000;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: none;
+  color: $sidebar-color;
+  border: none;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $primary-hover;
   }
-  
-  .section-title {
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    margin: 1rem 0 0.5rem;
-    color: var(--text-light);
+
+  &.open {
+    left: calc(350px + 1rem); // Bouton déplacé (Sidebar ouverte)
   }
-  
-  .list-item {
-    padding: 0.75rem;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .list-item:hover {
-    background-color: var(--sidebar-hover);
-  }
-  
-  .list-item.active {
-    background-color: var(--primary-color);
-    color: white;
-  }
-  
-  .item-options {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    background-color: var(--dropdown-bg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-md);
-    border-radius: var(--radius-md);
-    top: 50%;
-    right: 100%;
-    transform: translate(0, -50%);
-  }
-  
-  .list-item:hover .item-options {
-    display: flex;
-  }
-  
-  .logout-btn {
-    margin-top: auto;
-    padding: 1rem;
-    color: var(--text-light);
-    background: var(--background-color);
-    border: none;
-    transition: all 0.2s;
-  }
-  
-  .logout-btn:hover {
-    background-color: var(--sidebar-hover);
-    color: white;
-  }
-  
-  @media (max-width: 768px) {
-    .sidebar {
-      width: 240px;
+}
+// Responsive : Sidebar adaptée au mobile
+@media (max-width: $tablet) {
+  .sidebar {
+    width: 100vw; // La Sidebar prend toute la largeur sur mobile
+    transform: translateX(-100%); // Initialement cachée
+
+    &.open {
+      transform: translateX(0); // Sidebar visible
     }
   }
-  
+
+  .sidebar-toggle {
+    left: 1rem; // Toujours fixe à gauche pour mobile
+
+    &.open {
+      left: calc(100vw - 3rem); // Se repositionne sur le bord droit (mobile)
+    }
+  }
+}

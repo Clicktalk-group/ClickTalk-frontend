@@ -1,3 +1,6 @@
+@import "../../../styles/variables";
+@import "../../../styles/mixins";
+
 .main-layout {
   display: flex;
   flex-direction: column;
@@ -9,14 +12,55 @@
     transition: margin-left 0.3s ease;
 
     &.sidebar-open {
-      margin-left: 280px; /* Largeur de la Sidebar ouverte */
+      margin-left: 350px; // Largeur de la Sidebar ouverte
     }
   }
 
   .main-content {
     flex: 1;
-    padding: 1rem;
     overflow-y: auto;
-    background-color: var(--background-color);
+    background-color: $background-color;
+  }
+
+  @media (max-width: $mobile) {
+    // .main-content {
+    //   padding: 1rem;
+    // }
+  }
+
+  /* Bouton Toggle Sidebar */
+  .sidebar-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    height: 2rem;
+    width: 2rem;
+    // background-color: $background-btn;
+    // border: 1px solid $border-color;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    .toggle-icon {
+      font-size: 1.5rem;
+      color: $sidebar-color;
+    }
+
+    &:hover {
+      background-color: $primary-hover;
+    }
+
+    &.open {
+      // left: calc(350px + 1rem); // Bouton déplacé avec la Sidebar
+      background-color: $secondary-color;
+
+      .toggle-icon {
+        color: lighten($sidebar-color, 20%);
+      }
+    }
   }
 }

@@ -1,30 +1,70 @@
 @import 'variables';
 @import 'mixins';
 
-// Reset
+// Reset CSS
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
-  background-color: $background-color;
-  color: $text-color;
-  line-height: 1.5;
-  transition: background-color 0.3s ease;
+html {
+  font-size: 16px;
+  @supports (scroll-behavior: smooth) {
+    scroll-behavior: smooth; // Meilleure navigation
+  }
 }
 
-// Dark mode
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
+  color: $text-color; // Couleur principale du texte
+  background-color: $background-color; // Couleur de fond principale
+  line-height: 1.6; // Meilleure lisibilité
+  transition: all 0.3s ease-in-out;
+}
+
+// Titres généraux
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: $text-color;
+}
+
+// Liens
+a {
+  text-decoration: none;
+  color: $primary-color;
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+  color: $primary-hover;
+}
+
+// Boutons
+button {
+  font-family: inherit;
+  cursor: pointer;
+  font-size: inherit;
+  transition: all 0.3s ease;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+// Classes générales
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; // Garantie que le conteneur occupe tout l'écran
+}
+
+// Thème sombre
 body.dark-mode {
-  --background-color: #111827;
-  --sidebar-color: #1f2937;
-  --text-color: #f9fafb;
-  --text-light: #d1d5db;
-  --border-color: #374151;
-  --message-bg-user: #374151;
-  --message-bg-bot: #1f2937;
-  --dropdown-bg: #1f2937;
-  --dropdown-hover: #374151;
+  background-color: $sidebar-color; // Couleur sombre de fond
+  color: $text-light; // Texte clair
 }
