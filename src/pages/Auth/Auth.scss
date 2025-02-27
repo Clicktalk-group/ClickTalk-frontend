@@ -1,0 +1,39 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.auth-page {
+  @include flex-center;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $background-color;
+
+  .auth-container {
+    background: $color-light;
+    padding: $sp-lg;
+    border-radius: $radius-md;
+    box-shadow: $shadow-md;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+
+    .auth-title {
+      font-size: $fs-lg;
+      margin-bottom: $sp-md;
+      color: $color-text-primary;
+    }
+
+    .auth-footer {
+      margin-top: $sp-lg;
+      font-size: $fs-sm;
+
+      a {
+        color: $primary-color;
+        text-decoration: underline;
+
+        &:hover {
+          color: $primary-hover;
+        }
+      }
+    }
+  }
+}

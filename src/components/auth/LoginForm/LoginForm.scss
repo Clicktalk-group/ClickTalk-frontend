@@ -1,0 +1,12 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-md;
+
+  button {
+    margin-top: $sp-md;
+  }
+}
