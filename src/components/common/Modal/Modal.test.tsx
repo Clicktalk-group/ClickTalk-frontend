@@ -2,11 +2,11 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Modal } from './Modal';
 
-describe('Modal', () => {
+describe('Modal Component', () => {
   const defaultProps = {
     isOpen: true,
     onClose: jest.fn(),
-    children: <div>Test Content</div>
+    children: <div>Test Content</div>,
   };
 
   beforeEach(() => {
@@ -24,28 +24,37 @@ describe('Modal', () => {
     expect(screen.queryByText('Test Content')).not.toBeInTheDocument();
   });
 
-  it('calls onClose when clicking outside', () => {
+  it('calls onClose when clicking outside of the modal', () => {
     render(<Modal {...defaultProps} />);
     const modalBackdrop = screen.getByRole('dialog');
     fireEvent.click(modalBackdrop);
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  it('calls onClose when pressing Escape', () => {
+  it('calls onClose when Escape key is pressed', () => {
     render(<Modal {...defaultProps} />);
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  it('applies correct size class', () => {
+  it('assigns appropriate size class', () => {
     render(<Modal {...defaultProps} size="sm" />);
     const modalContent = screen.getByTestId('modal-content');
     expect(modalContent).toHaveClass('modal-content', 'sm');
   });
 
-  it('renders close button', () => {
+  it('renders close button and calls onClose when clicked', () => {
     render(<Modal {...defaultProps} />);
     const closeButton = screen.getByRole('button', { name: /close modal/i });
     expect(closeButton).toBeInTheDocument();
+    fireEvent.click(closeButton);
+    expect(defaultProps.onClose).toHaveBeenCalled();
+  });
+
+  it('does not call onClose if clicking inside the modal content', () => {
+    render(<Modal {...defaultProps} />);
+    const modalContent = screen.getByTestId('modal-content');
+    fireEvent.click(modalContent);
+    expect(defaultProps.onClose).not.toHaveBeenCalled();
   });
 });
