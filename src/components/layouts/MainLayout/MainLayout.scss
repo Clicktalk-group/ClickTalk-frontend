@@ -1,5 +1,8 @@
-@import "../../../styles/variables";
-@import "../../../styles/mixins";
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
 
 .main-layout {
   display: flex;
@@ -12,7 +15,7 @@
     transition: margin-left 0.3s ease;
 
     &.sidebar-open {
-      margin-left: 350px; // Largeur de la Sidebar ouverte
+      margin-left: $sidebar-width;
     }
   }
 
@@ -22,45 +25,58 @@
     background-color: $background-color;
   }
 
+  /* --- Responsivité pour les appareils mobiles --- */
   @media (max-width: $mobile) {
-    // .main-content {
-    //   padding: 1rem;
-    // }
+    .layout-container {
+      flex-direction: column; // Priorité à la colonne pour mieux afficher le contenu
+    }
+
+    .main-content {
+      margin-left: 0; // Annulation du décalage dû à la Sidebar
+    }
+
+    .toggle-sidebar {
+      top: $sp-xs; // Réduction de l'espacement pour les petits écrans
+      left: $sp-xs; // Placement légèrement ajusté
+      height: 2.5rem; // Bouton plus petit
+      width: 2.5rem;
+
+      // Changements de styles spécifiques
+      font-size: $fs-sm; 
+    }
   }
 
-  /* Bouton Toggle Sidebar */
-  .sidebar-toggle {
+
+  /* --- Styles des boutons d'ouverture et de fermeture de la Sidebar --- */
+  .toggle-sidebar {
     position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 1000;
-    height: 2rem;
-    width: 2rem;
-    // background-color: $background-btn;
-    // border: 1px solid $border-color;
-    border-radius: $radius-md;
+    top: $sp-md; // Toujours en haut avec une marge configurée
+    left: $sp-md; // Toujours en haut gauche
+    z-index: 2000; // Toujours au-dessus des autres éléments
+    height: 3rem;
+    width: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: $color-bg-dark;
+    color: white;
+    border-radius: $radius-md;
     cursor: pointer;
+    border: none;
     transition: all 0.3s ease;
 
-    .toggle-icon {
-      font-size: 1.5rem;
-      color: $sidebar-color;
+    /* Bouton visible quand la Sidebar est fermée */
+    &.open {
+      background-color: $primary-color;
+    }
+
+    /* Bouton visible quand la Sidebar est ouverte */
+    &.close {
+      background-color: $secondary-color;
     }
 
     &:hover {
       background-color: $primary-hover;
-    }
-
-    &.open {
-      // left: calc(350px + 1rem); // Bouton déplacé avec la Sidebar
-      background-color: $secondary-color;
-
-      .toggle-icon {
-        color: lighten($sidebar-color, 20%);
-      }
     }
   }
 }

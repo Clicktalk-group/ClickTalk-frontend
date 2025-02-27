@@ -1,40 +1,62 @@
 // Palette de couleurs principales
 $primary-color: #7c3aed; // Couleur principale (violet)
-$primary-hover: #6d28d9; // Hover (plus sombre)
+$primary-hover: #6d28d9; // Hover sur boutons principaux
 $secondary-color: #9333ea; // Couleur secondaire
 
 // Fonds et arrière-plans
 $background-color: #f3f4f6; // Arrière-plan principal
-$background-btn: #e7e7e7; // Fond pour boutons/gris clair
-$background-btn-grey: #f9fafb; // Fond pour boutons/gris très clair
-$sidebar-color: #1f2937; // Couleur sombre sidebar
-$sidebar-hover: #374151; // Hover pour sidebar
+$background-btn: #e7e7e7; // Fond pour boutons (gris clair)
+$background-btn-grey: #f9fafb; // Fond pour boutons gris très clair
+$color-bg-dark: #1f2937; // Fond sombre global
+$color-bg-dark-hover: #374151; // Hover pour fonds sombres
+$color-bg-light: darken($background-color, 5%); // Variation pour les composants clairs
+$sidebar-color: $color-bg-dark; // Couleur principale de la Sidebar
 
 // Texte et bordures
-$text-color: #111827; // Couleur principale texte
-$text-light: #9ca3af; // Texte secondaire/plus clair
-$border-color: #383838; // Bordure principale
+$color-text-primary: #111827; // Couleur principale texte
+$color-text-secondary: lighten($color-text-primary, 30%); // Texte secondaire/moins contrasté
+$color-text-light: #9ca3af; // Texte clair pour fonds sombres
+$border-color: #383838; // Couleur des bordures générales
 
 // Messages
-$message-bg-user: #eef2ff; // Fond message utilisateur
-$message-bg-bot: #ffffff; // Fond message chatbot
+$message-bg-user: #eef2ff; // Fond pour messages utilisateur
+$message-bg-bot: #ffffff; // Fond pour messages chatbot
 
 // Menus déroulants (dropdown)
-$dropdown-bg: #ffffff; // Fond du menu
-$dropdown-hover: #f3f4f6; // Hover du menu
+$dropdown-bg: #ffffff; // Fond des menus dropdown
+$dropdown-hover: #f3f4f6; // Hover sur items dropdown
+
+// Danger et états d'alerte
+$danger-color: #770b0d !default; // Exemples : rouge pour messages d'erreur
+$danger-hover: darken($danger-color, 10%); // Hover pour boutons rouges
 
 // Ombres
 $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05); // Ombre légère
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1); // Ombre modérée
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2); // Ombre plus forte
 
-// Radius pour bordures (coins arrondis)
-$radius-sm: 0.375rem; // Petit rayon
-$radius-md: 0.5rem; // Rayon moyen
-$radius-lg: 0.75rem; // Grand rayon
+// Radius (coins arrondis)
+$radius-sm: 0.25rem; // Rayon pour petits éléments
+$radius-md: 0.5rem; // Rayon pour éléments moyens
+$radius-lg: 0.75rem; // Rayon pour grands éléments
 
-// Points de rupture pour responsivité
-$mobile: 480px; // Mobile max
-$tablet: 768px; // Tablette max
-$desktop: 1024px; // Desktop max
+// Espacements
+$sp-xs: 0.25rem; // Petit espacement
+$sp-sm: 0.5rem; // Moyen
+$sp-md: 1rem; // Standard
+$sp-lg: 1.5rem; // Large
+$sp-xl: 2rem; // Très large
 
-$danger-color: #770b0d; // Exemple : rouge pour les messages d'erreur
+// Typographie
+$fs-sm: 0.875rem; // Texte petit
+$fs-md: 1rem; // Texte par défaut
+$fs-lg: 1.25rem; // Gros texte
+$fs-xl: 1.5rem; // Très gros texte
+
+// Points de rupture (breakpoints)
+$mobile: 480px; // Max-width = taille mobile
+$tablet: 768px; // Max-width = taille tablette
+$desktop: 1024px; // Max-width = desktop standard
+
+$sidebar-width: 350px; // Largeur standard de la Sidebar
+$color-light: #ffffff !default; // Exemple pour $color-light
