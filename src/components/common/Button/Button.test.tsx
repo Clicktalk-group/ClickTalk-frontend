@@ -30,9 +30,24 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
-  it('renders with icon', () => {
+  it('renders with only an icon', () => {
+    const icon = <span data-testid="test-icon">icon</span>;
+    render(<Button icon={icon} />);
+    expect(screen.getByTestId('test-icon')).toBeInTheDocument();
+  });
+
+  it('renders with an icon and text', () => {
     const icon = <span data-testid="test-icon">icon</span>;
     render(<Button icon={icon}>Click me</Button>);
     expect(screen.getByTestId('test-icon')).toBeInTheDocument();
+    expect(screen.getByText(/click me/i)).toBeInTheDocument();
+  });
+
+  it('logs a warning if no children or icon is provided', () => {
+    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+    render(<Button />);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Button component should have at least either text (children) or an icon.'
+    );
   });
 });

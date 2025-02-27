@@ -1,37 +1,46 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
-
 .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  @include flex-center; // Centralisation horizontale et verticale
+  display: inline-flex; // Flexibilité tout en maintenant une bonne mise en page
+  gap: $sp-sm; // Espace entre icônes et texte
   border: none;
-  border-radius: $radius-md;
-  cursor: pointer;
+  border-radius: $radius-sm; // Rayon par défaut (standard)
+  padding: $sp-sm $sp-md; // Espacements par défaut
   font-weight: 500;
-  transition: all 0.2s ease;
+  font-size: $fs-sm; // Taille par défaut pour du texte
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
 
-  // Variants
+  &:focus {
+    outline: 2px solid $primary-hover; // Mise en avant lors du focus (accessibilité)
+    outline-offset: 2px;
+  }
+
+  // Variantes
   &--primary {
     background-color: $primary-color;
-    color: white;
+    color: $color-light;
 
     &:hover:not(:disabled) {
       background-color: $primary-hover;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.4); // Anneau focus pour plus de visibilité
     }
   }
 
   &--secondary {
     background-color: transparent;
     border: 1px solid $border-color;
-    color: $text-color;
+    color: $color-text-primary;
 
     &:hover:not(:disabled) {
       background-color: $background-btn;
@@ -40,30 +49,42 @@
 
   &--ghost {
     background-color: transparent;
-    color: $text-color;
+    color: $color-text-primary;
 
     &:hover:not(:disabled) {
-      background-color: $background-btn;
+      background-color: $background-btn-grey;
     }
   }
 
-  // Sizes
+  // Tailles
   &--sm {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
+    font-size: $fs-sm;
+    padding: $sp-xs $sp-sm;
   }
 
   &--md {
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
+    font-size: $fs-md;
+    padding: $sp-sm $sp-md;
   }
 
   &--lg {
-    padding: 1rem 1.5rem;
-    font-size: 1.125rem;
+    font-size: $fs-lg;
+    padding: $sp-md $sp-lg;
   }
 
+  // Pleine largeur
   &--full-width {
     width: 100%;
+  }
+
+  // Icône
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+
+    // Ajuste automatiquement l’espacement avec le texte
+    &--only {
+      margin-right: 0;
+    }
   }
 }

@@ -24,6 +24,11 @@ export const Button: React.FC<ButtonProps> = ({
     className
   );
 
+  // Vérification d'erreur en dev : Pas de texte (children) ni icône
+  if (!children && !icon) {
+    console.warn('Button component should have at least either text (children) or an icon.');
+  }
+
   return (
     <button
       type={type}
@@ -31,7 +36,15 @@ export const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
     >
-      {icon && <span className="button__icon">{icon}</span>}
+      {icon && (
+        <span
+          className={classNames('button__icon', {
+            'button__icon--only': !children, // Classe spécifique si seul l'icône est présent
+          })}
+        >
+          {icon}
+        </span>
+      )}
       {children}
     </button>
   );
