@@ -10,16 +10,18 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   onClick,
   hover = false,
-  icon
+  icon,
 }) => {
   const cardClasses = `card ${hover ? 'card--hover' : ''} ${className}`;
 
   return (
-    <div 
+    <div
       className={cardClasses}
       onClick={onClick}
       {...(onClick && { role: 'button', tabIndex: 0 })}
+      aria-label={title || 'Card'}
     >
+      {/* Header Section */}
       {(title || icon || subtitle) && (
         <div className="card__header">
           {icon && <div className="card__icon">{icon}</div>}
@@ -29,9 +31,11 @@ export const Card: React.FC<CardProps> = ({
           </div>
         </div>
       )}
-      
+
+      {/* Content Section */}
       <div className="card__content">{children}</div>
-      
+
+      {/* Footer Section */}
       {footer && <div className="card__footer">{footer}</div>}
     </div>
   );
