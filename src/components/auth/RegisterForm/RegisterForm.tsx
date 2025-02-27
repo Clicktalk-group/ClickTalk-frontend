@@ -1,5 +1,3 @@
-// src/components/auth/RegisterForm/RegisterForm.tsx
-
 import React, { useState } from "react";
 import "./RegisterForm.scss";
 import { Input } from "../../common/Input";
@@ -33,7 +31,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation des champs
     const usernameError = validateUsername(username);
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
@@ -46,7 +43,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         password: passwordError,
         confirmPassword: confirmPasswordError,
       });
-      return; // Bloquer la soumission si erreurs
+      return;
     }
 
     onSubmit({ username, email, password, confirmPassword });
@@ -54,6 +51,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
 
   return (
     <form className="register-form" onSubmit={handleSubmit}>
+      <h1 className="form-title">ClickTalk</h1>
+      <img src="/assets/images/logo.png" alt="Logo ClickTalk" className="form-logo" />
+      
       <Input
         name="username"
         label="Nom d'utilisateur"
@@ -61,9 +61,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         value={username}
         onChange={(e) => {
           setUsername(e.target.value);
-          setErrors((prev) => ({ ...prev, username: null })); // Reset l'erreur sur modification
+          setErrors((prev) => ({ ...prev, username: null }));
         }}
-        error={nullToUndefined(errors.username)} // Transformation du `null` en `undefined`
+        error={nullToUndefined(errors.username)}
       />
       <Input
         name="email"
@@ -72,9 +72,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
-          setErrors((prev) => ({ ...prev, email: null })); // Reset l'erreur sur modification
+          setErrors((prev) => ({ ...prev, email: null }));
         }}
-        error={nullToUndefined(errors.email)} // Transformation du `null` en `undefined`
+        error={nullToUndefined(errors.email)}
       />
       <Input
         name="password"
@@ -83,9 +83,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         value={password}
         onChange={(e) => {
           setPassword(e.target.value);
-          setErrors((prev) => ({ ...prev, password: null })); // Reset l'erreur sur modification
+          setErrors((prev) => ({ ...prev, password: null }));
         }}
-        error={nullToUndefined(errors.password)} // Transformation du `null` en `undefined`
+        error={nullToUndefined(errors.password)}
       />
       <Input
         name="confirmPassword"
@@ -94,9 +94,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         value={confirmPassword}
         onChange={(e) => {
           setConfirmPassword(e.target.value);
-          setErrors((prev) => ({ ...prev, confirmPassword: null })); // Reset l'erreur sur modification
+          setErrors((prev) => ({ ...prev, confirmPassword: null }));
         }}
-        error={nullToUndefined(errors.confirmPassword)} // Transformation du `null` en `undefined`
+        error={nullToUndefined(errors.confirmPassword)}
       />
       <Button type="submit">S'inscrire</Button>
     </form>

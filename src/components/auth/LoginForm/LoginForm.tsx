@@ -1,5 +1,3 @@
-// src/components/auth/LoginForm/LoginForm.tsx
-
 import React, { useState } from "react";
 import "./LoginForm.scss";
 import { Input } from "../../common/Input";
@@ -19,30 +17,30 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation des champs
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
 
     if (emailError || passwordError) {
       setErrors({ email: emailError, password: passwordError });
-      return; // Bloquer la soumission si erreurs
+      return;
     }
 
     onSubmit({ email, password });
   };
 
   const handleForgotPassword = () => {
-    // Placeholder: Ajouter la logique pour "Mot de passe oublié"
     console.log("Mot de passe oublié");
   };
 
   const handleForgotEmail = () => {
-    // Placeholder: Ajouter la logique pour "Email oublié"
     console.log("Email oublié");
   };
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
+      <h1 className="form-title">ClickTalk</h1>
+      <img src="/assets/images/logo.png" alt="Logo ClickTalk" className="form-logo" />
+      
       <div className="login-form__field">
         <Input
           name="email"
@@ -51,9 +49,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            setErrors((prev) => ({ ...prev, email: null })); // Reset l'erreur sur modification
+            setErrors((prev) => ({ ...prev, email: null }));
           }}
-          error={nullToUndefined(errors.email)} // Transformation du `null` en `undefined`
+          error={nullToUndefined(errors.email)}
         />
         <button type="button" className="login-form__link-centered" onClick={handleForgotEmail}>
           Email oublié ?
@@ -68,9 +66,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            setErrors((prev) => ({ ...prev, password: null })); // Reset l'erreur sur modification
+            setErrors((prev) => ({ ...prev, password: null }));
           }}
-          error={nullToUndefined(errors.password)} // Transformation du `null` en `undefined`
+          error={nullToUndefined(errors.password)}
         />
         <button type="button" className="login-form__link-centered" onClick={handleForgotPassword}>
           Mot de passe oublié ?
