@@ -1,7 +1,7 @@
 export interface InputProps {
   id?: string;
   name: string;
-  type?: "text" | "password" | "email" | "number" | "search";
+  type?: 'text' | 'password' | 'email' | 'number' | 'search';
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;

@@ -9,7 +9,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       id,
       name,
       type = 'text',
-      value,
+      value = '',
       onChange,
       placeholder,
       label,
@@ -27,12 +27,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputClasses = classNames(
       'input-field',
       {
-        'error': !!error,
-        'with-icon': !!icon
+        error: !!error,
+        'with-icon': !!icon,
       },
       className
     );
-    
+
     return (
       <div className="input-wrapper">
         {label && (
