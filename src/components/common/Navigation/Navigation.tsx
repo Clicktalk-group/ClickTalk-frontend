@@ -8,10 +8,13 @@ export const Navigation: React.FC<NavigationProps> = ({
   items,
   currentPath,
   onNavigate,
-  className
+  className,
 }) => {
-  const handleClick = (path: string) => {
-    onNavigate(path);
+  const handleLinkClick = (path: string) => {
+    // Sécurité : Vérifie si une nouvelle navigation est requise.
+    if (currentPath !== path) {
+      onNavigate(path);
+    }
   };
 
   return (
@@ -22,12 +25,16 @@ export const Navigation: React.FC<NavigationProps> = ({
             <Link
               to={item.path}
               className={classNames('navigation-item', {
-                active: currentPath === item.path
+                active: currentPath === item.path,
               })}
-              onClick={() => handleClick(item.path)}
+              onClick={() => handleLinkClick(item.path)}
               aria-current={currentPath === item.path ? 'page' : undefined}
             >
-              {item.icon && <span className="navigation-icon">{item.icon}</span>}
+              {item.icon && (
+                <span className="navigation-icon" aria-hidden="true">
+                  {item.icon}
+                </span>
+              )}
               <span className="navigation-label">{item.label}</span>
             </Link>
           </li>

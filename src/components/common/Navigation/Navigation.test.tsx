@@ -22,15 +22,15 @@ describe('Navigation', () => {
 
   it('renders all navigation items', () => {
     renderWithRouter(<Navigation {...defaultProps} />);
-    mockItems.forEach(item => {
+    mockItems.forEach((item) => {
       expect(screen.getByText(item.label)).toBeInTheDocument();
     });
   });
 
-  it('marks current path as active', () => {
+  it('marks the current path as active', () => {
     renderWithRouter(<Navigation {...defaultProps} currentPath="/chat" />);
-    const chatLink = screen.getByRole('link', { name: 'Chat' });
-    expect(chatLink).toHaveClass('active');
+    const activeLink = screen.getByRole('link', { name: 'Chat' });
+    expect(activeLink).toHaveClass('active');
   });
 
   it('calls onNavigate when clicking a link', () => {
@@ -39,8 +39,14 @@ describe('Navigation', () => {
     expect(defaultProps.onNavigate).toHaveBeenCalledWith('/chat');
   });
 
-  it('applies custom className', () => {
-    renderWithRouter(<Navigation {...defaultProps} className="custom-nav" />);
-    expect(screen.getByRole('navigation')).toHaveClass('custom-nav');
+  it('adds a custom class', () => {
+    const customClass = 'custom-navigation';
+    renderWithRouter(<Navigation {...defaultProps} className={customClass} />);
+    expect(screen.getByRole('navigation')).toHaveClass(customClass);
+  });
+
+  it('handles missing icons gracefully', () => {
+    renderWithRouter(<Navigation {...defaultProps} />);
+    expect(screen.queryByRole('img')).not.toBeInTheDocument(); // Vérifie si aucun icône n’est nécessaire
   });
 });
