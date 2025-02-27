@@ -5,16 +5,19 @@ import { Button } from "../../common/Button";
 import { LoginFormProps } from "./LoginForm.types";
 import { validateEmail, validatePassword } from "../../../utils/validators/validators";
 import { nullToUndefined } from "../../../utils/helpers/nullToUndefined";
+import { useAuth } from "../../../context/AuthContext"; // Import des hooks Auth
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
+  const { signIn } = useAuth(); // Hook Auth
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email: string | null; password: string | null }>({
     email: null,
     password: null,
   });
+  const [authError, setAuthError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const emailError = validateEmail(email);
@@ -25,22 +28,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       return;
     }
 
-    onSubmit({ email, password });
-  };
-
-  const handleForgotPassword = () => {
-    console.log("Mot de passe oublié");
-  };
-
-  const handleForgotEmail = () => {
-    console.log("Email oublié");
+    try {
+      setAuthError(null);
+      await signIn(email, password); // Appel via AuthContext
+      onSubmit({ email, password });
+    } catch (err) {
+      setAuthError("Échec de la connexion. Veuillez vérifier vos identifiants.");
+    }
   };
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
       <h1 className="form-title">ClickTalk</h1>
       <img src="/assets/images/logo.png" alt="Logo ClickTalk" className="form-logo" />
-      
+
+      {authError && <div className="auth-error">{authError}</div>}
+
       <div className="login-form__field">
         <Input
           name="email"
@@ -53,7 +56,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
           }}
           error={nullToUndefined(errors.email)}
         />
-        <button type="button" className="login-form__link-centered" onClick={handleForgotEmail}>
+        <button type="button" className="login-form__link-centered" onClick={() => console.log("Email oublié")}>
           Email oublié ?
         </button>
       </div>
@@ -70,7 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
           }}
           error={nullToUndefined(errors.password)}
         />
-        <button type="button" className="login-form__link-centered" onClick={handleForgotPassword}>
+        <button type="button" className="login-form__link-centered" onClick={() => console.log("Mot de passe oublié")}>
           Mot de passe oublié ?
         </button>
       </div>

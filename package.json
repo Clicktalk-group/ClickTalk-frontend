@@ -9,6 +9,7 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
+    "axios": "^1.8.1",
     "classnames": "^2.5.1",
     "cra-template-typescript": "1.2.0",
     "react": "^19.0.0",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@testing-library/react": "^16.2.0",
+    "@types/axios": "^0.9.36",
     "@types/classnames": "^2.3.0",
     "@types/react-icons": "^2.2.7",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
