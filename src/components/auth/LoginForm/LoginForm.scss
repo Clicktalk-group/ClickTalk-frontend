@@ -9,4 +9,27 @@
   button {
     margin-top: $sp-md;
   }
+
+  // Champs regroupant input + lien
+  &__field {
+    display: flex;
+    flex-direction: column;
+    align-items: center; // Centre horizontalement les éléments
+    gap: $sp-xs; // Petit espace entre l'input et le bouton
+  }
+
+  // Styles pour les liens centrés
+  &__link-centered {
+    background: none;
+    border: none;
+    color: $primary-color;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+      color: $primary-hover;
+    }
+  }
 }

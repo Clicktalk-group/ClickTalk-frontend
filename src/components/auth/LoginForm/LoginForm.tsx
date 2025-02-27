@@ -31,30 +31,52 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     onSubmit({ email, password });
   };
 
+  const handleForgotPassword = () => {
+    // Placeholder: Ajouter la logique pour "Mot de passe oublié"
+    console.log("Mot de passe oublié");
+  };
+
+  const handleForgotEmail = () => {
+    // Placeholder: Ajouter la logique pour "Email oublié"
+    console.log("Email oublié");
+  };
+
   return (
     <form className="login-form" onSubmit={handleSubmit}>
-      <Input
-        name="email"
-        label="Adresse email"
-        type="email"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-          setErrors((prev) => ({ ...prev, email: null })); // Reset l'erreur sur modification
-        }}
-        error={nullToUndefined(errors.email)} // Transformation du `null` en `undefined`
-      />
-      <Input
-        name="password"
-        label="Mot de passe"
-        type="password"
-        value={password}
-        onChange={(e) => {
-          setPassword(e.target.value);
-          setErrors((prev) => ({ ...prev, password: null })); // Reset l'erreur sur modification
-        }}
-        error={nullToUndefined(errors.password)} // Transformation du `null` en `undefined`
-      />
+      <div className="login-form__field">
+        <Input
+          name="email"
+          label="Adresse email"
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setErrors((prev) => ({ ...prev, email: null })); // Reset l'erreur sur modification
+          }}
+          error={nullToUndefined(errors.email)} // Transformation du `null` en `undefined`
+        />
+        <button type="button" className="login-form__link-centered" onClick={handleForgotEmail}>
+          Email oublié ?
+        </button>
+      </div>
+
+      <div className="login-form__field">
+        <Input
+          name="password"
+          label="Mot de passe"
+          type="password"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setErrors((prev) => ({ ...prev, password: null })); // Reset l'erreur sur modification
+          }}
+          error={nullToUndefined(errors.password)} // Transformation du `null` en `undefined`
+        />
+        <button type="button" className="login-form__link-centered" onClick={handleForgotPassword}>
+          Mot de passe oublié ?
+        </button>
+      </div>
+
       <Button type="submit">Se connecter</Button>
     </form>
   );
