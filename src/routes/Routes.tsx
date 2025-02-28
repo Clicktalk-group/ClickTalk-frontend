@@ -1,18 +1,13 @@
-import React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { publicRoutes, privateRoutes } from "./Routes.config";
-import { useAuth } from "../context/AuthContext"; // Utilisation du contexte Auth
+import { createBrowserRouter } from "react-router-dom";
+import { publicRoutes, privateRoutes } from "./Routes.config"; // Importez vos configurations de routes
 
-// Composant qui détermine l'utilisation des routes
-const Routes = () => {
-  const { isAuthenticated } = useAuth();
+// Nouvelle fonction de création de routeur prenant en compte l'authentification
+export function createAppRouter(isAuthenticated: boolean) {
+  // Combinez les routes publiques et privées selon l'état utilisateur
+  const routes = isAuthenticated
+    ? [...publicRoutes, ...privateRoutes] // Si connecté
+    : publicRoutes; // Si non connecté
 
-  // Sélectionne les routes selon l'état d'authentification
-  const routes = isAuthenticated ? [...publicRoutes, ...privateRoutes] : publicRoutes;
-
-  const router = createBrowserRouter(routes);
-
-  return <RouterProvider router={router} />;
-};
-
-export default Routes;
+  // Retourne une instance créée pour le Router
+  return createBrowserRouter(routes);
+}

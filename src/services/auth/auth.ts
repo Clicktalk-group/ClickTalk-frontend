@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const BASE_URL = "http://localhost:8080/api"; // URL de l'API Backend
+import { environment } from "../../config/environment"; // Utiliser les variables centralisées
 
 // Type pour la réponse d'authentification
 interface AuthResponse {
@@ -9,13 +8,16 @@ interface AuthResponse {
 
 // Login utilisateur
 export async function login(email: string, password: string): Promise<string> {
-  const response = await axios.post<AuthResponse>(`${BASE_URL}/auth/login`, { email, password });
+  const response = await axios.post<AuthResponse>(`${environment.apiUrl}/auth/login`, {
+    email,
+    password,
+  });
   return response.data.token; // Renvoie le token JWT reçu
 }
 
 // Inscription utilisateur
 export async function register(userData: { email: string; username: string; password: string }): Promise<void> {
-  await axios.post(`${BASE_URL}/auth/register`, userData);
+  await axios.post(`${environment.apiUrl}/auth/register`, userData);
 }
 
 // Logout (supprime le token du client)

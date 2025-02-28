@@ -1,11 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { login, logout } from "../../services/auth/auth";
 
 interface AuthProviderProps {
-  children: ReactNode; // Ajoute le typage correct de children
+  children: ReactNode;
 }
 
-// Typer l'état du contexte
+// Type pour le contexte
 interface AuthContextState {
   isAuthenticated: boolean;
   user: string | null;
@@ -13,19 +19,19 @@ interface AuthContextState {
   signOut: () => void;
 }
 
-const AuthContext = createContext<AuthContextState | undefined>(undefined);
+export const AuthContext = createContext<AuthContextState | undefined>(undefined); // Export explicite ajouté
 
-// Provider Auth
+// Provider pour gérer l'authentification
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<string | null>(null);
 
+  // Vérifie les informations de connexion lors du montage
   useEffect(() => {
-    // Vérifie si un token est présent au chargement
     const token = localStorage.getItem("authToken");
     if (token) {
       setIsAuthenticated(true);
-      setUser("Authenticated User"); // Ajustez en fonction de votre backend
+      setUser("Authenticated User"); // Si possible, récupérez les infos utilisateur.
     }
   }, []);
 
@@ -49,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// Hook pour consommer le AuthContext
+// Hook pour consommer le contexte (aucun changement ici)
 export const useAuth = (): AuthContextState => {
   const context = useContext(AuthContext);
   if (!context) {

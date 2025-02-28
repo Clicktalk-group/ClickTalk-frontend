@@ -5,7 +5,7 @@ import { Button } from "../../common/Button";
 import { LoginFormProps } from "./LoginForm.types";
 import { validateEmail, validatePassword } from "../../../utils/validators/validators";
 import { nullToUndefined } from "../../../utils/helpers/nullToUndefined";
-import { useAuth } from "../../../context/AuthContext"; // Import des hooks Auth
+import { useAuth } from "../../../hooks/useAuth/useAuth"; // Utilise le hook Auth
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   const { signIn } = useAuth(); // Hook Auth

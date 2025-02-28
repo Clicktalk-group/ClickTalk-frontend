@@ -1,19 +1,18 @@
 import axios from "axios";
-import type { AxiosResponse } from "axios"; // Correction de l'import pour AxiosResponse
 import { login, register, logout } from "./auth";
 
 // Mock d'Axios
 jest.mock("axios");
-const mockedAxios = axios as jest.Mocked<typeof axios>; // Typage de mock Axios
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Fonction pour générer des réponses mockées conformes
-const createMockAxiosResponse = <T>(data: T): AxiosResponse<T> => {
+// Fonction pour générer des réponses conformes au typage Axios avec `config` et `url`
+const createMockResponse = <T>(data: T) => {
   return {
     data,
     status: 200,
     statusText: "OK",
     headers: {},
-    config: { url: "/mock-url", method: "POST" }, // Champs nécessaires pour l'interface AxiosResponse
+    config: { url: "/mock-url" }, // Ajoute une valeur fictive à `config.url`
   };
 };
 
@@ -21,15 +20,12 @@ describe("Auth Service", () => {
   const BASE_URL = "http://localhost:8080/api";
   const mockToken = "mocked-jwt-token";
 
-  afterEach(() => {
-    jest.resetAllMocks(); // Réinitialiser les mocks après chaque test
-  });
+  afterEach(() => jest.resetAllMocks());
 
   describe("login", () => {
     it("should successfully log in and return a JWT token", async () => {
-      // Mock de la réponse Axios avec token
       mockedAxios.post.mockResolvedValueOnce(
-        createMockAxiosResponse({ token: mockToken }) // Utilise createMockAxiosResponse pour conformer le typage
+        createMockResponse({ token: mockToken })
       );
 
       const token = await login("test@example.com", "password123");
@@ -44,9 +40,9 @@ describe("Auth Service", () => {
     it("should throw an error for invalid credentials", async () => {
       mockedAxios.post.mockRejectedValueOnce(new Error("Invalid credentials"));
 
-      await expect(login("bad-user@example.com", "wrongpassword")).rejects.toThrow(
-        "Invalid credentials"
-      );
+      await expect(
+        login("bad-user@example.com", "wrongpassword")
+      ).rejects.toThrow("Invalid credentials");
 
       expect(mockedAxios.post).toHaveBeenCalledWith(`${BASE_URL}/auth/login`, {
         email: "bad-user@example.com",
@@ -57,32 +53,45 @@ describe("Auth Service", () => {
 
   describe("register", () => {
     it("should successfully register a new user", async () => {
-      // Mock de la réponse d'inscription (vide)
-      mockedAxios.post.mockResolvedValueOnce(createMockAxiosResponse({}));
+      mockedAxios.post.mockResolvedValueOnce(createMockResponse({}));
 
       await expect(
-        register({ email: "test@example.com", username: "testuser", password: "password123" })
+        register({
+          email: "test@example.com",
+          username: "testuser",
+          password: "password123",
+        })
       ).resolves.not.toThrow();
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(`${BASE_URL}/auth/register`, {
-        email: "test@example.com",
-        username: "testuser",
-        password: "password123",
-      });
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        `${BASE_URL}/auth/register`,
+        {
+          email: "test@example.com",
+          username: "testuser",
+          password: "password123",
+        }
+      );
     });
 
     it("should throw an error if registration fails", async () => {
       mockedAxios.post.mockRejectedValueOnce(new Error("Registration error"));
 
       await expect(
-        register({ email: "test@example.com", username: "testuser", password: "password123" })
+        register({
+          email: "test@example.com",
+          username: "testuser",
+          password: "password123",
+        })
       ).rejects.toThrow("Registration error");
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(`${BASE_URL}/auth/register`, {
-        email: "test@example.com",
-        username: "testuser",
-        password: "password123",
-      });
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        `${BASE_URL}/auth/register`,
+        {
+          email: "test@example.com",
+          username: "testuser",
+          password: "password123",
+        }
+      );
     });
   });
 
