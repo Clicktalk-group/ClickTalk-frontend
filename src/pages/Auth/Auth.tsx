@@ -3,17 +3,19 @@ import './Auth.scss';
 import LoginForm from '../../components/auth/LoginForm';
 import RegisterForm from '../../components/auth/RegisterForm';
 import { useLocation } from 'react-router-dom';
+import { register } from '../../services/auth/auth';
+import { login } from '../../services/auth/auth';
 
 const Auth: React.FC = () => {
   const location = useLocation();
   const isRegisterPage = location.pathname.includes('/register');
 
   const handleLogin = (data: { email: string; password: string }) => {
-    console.log('Login data:', data);
+    login(data.email, data.password);
   };
 
   const handleRegister = (data: { username: string; email: string; password: string; confirmPassword: string }) => {
-    console.log('Register data:', data);
+    register(data);
   };
 
   return (

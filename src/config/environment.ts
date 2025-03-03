@@ -1,20 +1,20 @@
 // src/config/environment.ts
 
-// Centralisation des variables d'environnement
+// Fonction centrale pour sécuriser l'accès aux variables d'environnement
+function getEnvVariable(key: string, defaultValue?: string): string {
+  const value = process.env[key] || defaultValue;
+  if (!value) {
+    console.error(`❌ ERREUR : La variable ${key} n'est pas définie !`);
+    return "";
+  }
+  if (key !== "REACT_APP_API_KEY") {
+    console.log(`✅ La variable ${key} est correctement définie.`);
+  }
+  return value;
+}
+
+// Export des variables d'environnement
 export const environment = {
-  apiUrl: process.env.REACT_APP_API_URL || "", // URL de l'API
-  apiKey: process.env.REACT_APP_API_KEY || "", // Clé API
+  apiUrl: getEnvVariable("REACT_APP_API_URL"),
+  apiKey: getEnvVariable("REACT_APP_API_KEY"),
 };
-
-// Vérifiez la présence des variables nécessaires au démarrage
-if (!environment.apiUrl || environment.apiUrl === "") {
-  console.error("❌ ERREUR : `REACT_APP_API_URL` n'est pas défini dans le fichier .env !");
-} else {
-  console.log(`✅ URL de l'API : ${environment.apiUrl}`); // Simple log pour confirmer la valeur
-}
-
-if (!environment.apiKey || environment.apiKey === "") {
-  console.error("❌ ERREUR : `REACT_APP_API_KEY` n'est pas défini dans le fichier .env !");
-} else {
-  console.log(`✅ Clé API : [Masquée]`); // Il est déconseillé d'afficher entièrement la clé dans la console
-}

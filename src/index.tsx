@@ -1,26 +1,22 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext/AuthContext"; // Assurez-vous que `AuthProvider` englobe bien toute l'application
+import { AuthProvider, useAuth } from "./context/AuthContext/AuthContext"; // Fournisseur d'authentication
 import { createAppRouter } from "./routes/Routes";
 import "./styles/global.scss";
 
-// Composant principal contenant la logique du fournisseur et du routeur
-const App: React.FC = () => {
-  // Charge l'état d'authentification via le contexte
-  const { isAuthenticated } = useAuth();
-
-  // Crée dynamiquement le router en fonction de l'état
-  const router = createAppRouter(isAuthenticated);
-
+// Composant principal (dynamique grâce à Auth)
+const AppWithRouter: React.FC = () => {
+  const { isAuthenticated } = useAuth(); // Charge l'état Auth
+  const router = createAppRouter(isAuthenticated); // Création conditionnelle du routeur
   return <RouterProvider router={router} />;
 };
 
-// Enveloppement de l'application avec AuthProvider
+// Enveloppement global dans AuthProvider
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <AuthProvider>
-      <App />
+      <AppWithRouter />
     </AuthProvider>
   </React.StrictMode>
 );

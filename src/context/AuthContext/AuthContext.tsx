@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { login, logout } from "../../services/auth/auth";
 
 interface AuthProviderProps {
@@ -19,27 +13,30 @@ interface AuthContextState {
   signOut: () => void;
 }
 
-export const AuthContext = createContext<AuthContextState | undefined>(undefined); // Export explicite ajouté
+export const AuthContext = createContext<AuthContextState | undefined>(undefined);
 
-// Provider pour gérer l'authentification
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<string | null>(null);
 
-  // Vérifie les informations de connexion lors du montage
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
       setIsAuthenticated(true);
-      setUser("Authenticated User"); // Si possible, récupérez les infos utilisateur.
+      setUser("Authenticated User"); // Option : passer par une API pour obtenir les données utilisateur
     }
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const token = await login(email, password);
-    localStorage.setItem("authToken", token);
-    setIsAuthenticated(true);
-    setUser(email);
+    try {
+      const token = await login(email, password);
+      localStorage.setItem("authToken", token);
+      setIsAuthenticated(true);
+      setUser(email);
+    } catch (error) {
+      console.error("Erreur pendant la connexion :", error);
+      alert("Échec de la connexion. Vérifiez vos identifiants.");
+    }
   };
 
   const signOut = () => {
@@ -55,7 +52,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// Hook pour consommer le contexte (aucun changement ici)
 export const useAuth = (): AuthContextState => {
   const context = useContext(AuthContext);
   if (!context) {
