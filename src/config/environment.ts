@@ -2,7 +2,7 @@
 
 // Centralisation des variables d'environnement
 export const environment = {
-  apiUrl: process.env.REACT_APP_API_URL || "", // URL de l'API
+  apiUrl: "http://localhost:8080/", // URL de l'API
   apiKey: process.env.REACT_APP_API_KEY || "", // Clé API
 };
 

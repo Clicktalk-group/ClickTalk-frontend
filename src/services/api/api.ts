@@ -1,36 +1,66 @@
-import axios from "axios";
-import { environment } from "../../config/environment"; // Import des variables d'environnement
+import axios from 'axios';
 
-// Instance d'Axios avec configuration globale
-const apiClient = axios.create({
-  baseURL: environment.apiUrl, // Utilisation de l'URL API définie dans le fichier .env
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+
+// Créer une instance Axios avec la config de base
+const api = axios.create({
+  baseURL: API_BASE_URL,
   headers: {
-    Authorization: `Bearer ${environment.apiKey}`, // Authorization avec clé API
-    "Content-Type": "application/json", // Format JSON global
+    'Content-Type': 'application/json',
   },
-  timeout: 10000, // Timeout des requêtes (en ms)
 });
 
-// Exemple d'appel GET
-export const fetchData = async (endpoint: string, params = {}) => {
-  try {
-    const response = await apiClient.get(endpoint, { params });
-    return response.data; // Retourne les données
-  } catch (error) {
-    console.error("Erreur lors de la récupération des données :", error);
-    throw error;
+// Intercepteur pour ajouter le token à chaque requête si disponible
+api.interceptors.request.use((config) => {
+  // Récupérer le token depuis le localStorage
+  const token = localStorage.getItem('token');
+  
+  // Si un token existe, l'ajouter aux headers
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
+// Intercepteur pour gérer les erreurs de réponse (ex: 401, 403)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Si erreur 401 (non autorisé), déconnecter l'utilisateur
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Si besoin de rediriger, faire ici ou exposer une méthode
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+// Fonctions génériques pour les requêtes HTTP sans utiliser Promise<T> directement
+export const apiService = {
+  get: async <T>(url: string, config?: any): Promise<T> => {
+    const res = await api.get(url, config);
+    return res.data as T;
+  },
+  
+  post: async <T>(url: string, data?: any, config?: any): Promise<T> => {
+    const res = await api.post(url, data, config);
+    return res.data as T;
+  },
+  
+  put: async <T>(url: string, data?: any, config?: any): Promise<T> => {
+    const res = await api.put(url, data, config);
+    return res.data as T;
+  },
+  
+  delete: async <T>(url: string, config?: any): Promise<T> => {
+    const res = await api.delete(url, config);
+    return res.data as T;
   }
 };
 
-// Exemple d'appel POST
-export const postData = async (endpoint: string, data: any) => {
-  try {
-    const response = await apiClient.post(endpoint, data);
-    return response.data; // Retourne les données
-  } catch (error) {
-    console.error("Erreur lors de l'envoi des données :", error);
-    throw error;
-  }
-};
-
-export default apiClient;
+export default api;

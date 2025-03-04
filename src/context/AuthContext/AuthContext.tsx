@@ -1,65 +1,139 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import { login, logout } from "../../services/auth/auth";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { authService } from '../../services/auth/auth';
+import { 
+  AuthContextType, 
+  LoginCredentials, 
+  RegisterCredentials, 
+  User 
+} from '../../types/auth.types';
 
+// Création du contexte avec valeur par défaut
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Props pour le AuthProvider
 interface AuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-// Type pour le contexte
-interface AuthContextState {
-  isAuthenticated: boolean;
-  user: string | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => void;
-}
-
-export const AuthContext = createContext<AuthContextState | undefined>(undefined); // Export explicite ajouté
-
-// Provider pour gérer l'authentification
+// Provider qui encapsule la logique d'authentification
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Vérifie les informations de connexion lors du montage
+  // Vérifier si un utilisateur est déjà connecté (localStorage)
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setIsAuthenticated(true);
-      setUser("Authenticated User"); // Si possible, récupérez les infos utilisateur.
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      // setUser(JSON.parse(storedUser));
     }
+    
+    setIsLoading(false);
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const token = await login(email, password);
-    localStorage.setItem("authToken", token);
-    setIsAuthenticated(true);
-    setUser(email);
+  // Fonction de connexion
+  const login = async (credentials: LoginCredentials) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await authService.login(credentials);
+      
+      // Stocker les informations dans le localStorage
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      
+      // Mettre à jour l'état
+      setToken(response.token);
+      setUser(response.user);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Échec de la connexion');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const signOut = () => {
-    logout();
-    setIsAuthenticated(false);
-    setUser(null);
+  // Fonction d'inscription
+  const register = async (credentials: RegisterCredentials) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await authService.register(credentials);
+      
+      // Stocker les informations dans le localStorage
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      
+      // Mettre à jour l'état
+      setToken(response.token);
+      setUser(response.user);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Échec de l\'inscription');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fonction de déconnexion
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Appeler le service de déconnexion (optionnel, selon votre backend)
+      if (token) {
+        await authService.logout();
+      }
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    } finally {
+      // Supprimer les informations d'authentification du localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Réinitialiser l'état
+      setToken(null);
+      setUser(null);
+      setIsLoading(false);
+    }
+  };
+
+  // Effacer les erreurs
+  const clearError = () => setError(null);
+
+  // Construire la valeur du contexte
+  const contextValue: AuthContextType = {
+    user,
+    token,
+    isAuthenticated: !!user,
+    isLoading,
+    error,
+    login,
+    register,
+    logout,
+    clearError
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, signIn, signOut }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook pour consommer le contexte (aucun changement ici)
-export const useAuth = (): AuthContextState => {
+// Hook personnalisé pour utiliser le contexte d'authentification
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth doit être utilisé dans un AuthProvider");
+  if (context === undefined) {
+    throw new Error('useAuth doit être utilisé à l\'intérieur de AuthProvider');
   }
   return context;
 };
+
+export default AuthContext;

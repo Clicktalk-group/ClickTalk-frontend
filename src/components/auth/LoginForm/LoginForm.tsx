@@ -1,84 +1,123 @@
-import React, { useState } from "react";
-import "./LoginForm.scss";
-import { Input } from "../../common/Input";
-import { Button } from "../../common/Button";
-import { LoginFormProps } from "./LoginForm.types";
-import { validateEmail, validatePassword } from "../../../utils/validators/validators";
-import { nullToUndefined } from "../../../utils/helpers/nullToUndefined";
-import { useAuth } from "../../../hooks/useAuth/useAuth"; // Utilise le hook Auth
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { LoginCredentials } from '../../../types/auth.types';
+import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { validateEmail, validatePassword } from '../../../utils/validators/validators';
+import { Button } from '../../common/Button/Button';
+import { Input } from '../../common/Input/Input';
+import './LoginForm.scss';
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
-  const { signIn } = useAuth(); // Hook Auth
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email: string | null; password: string | null }>({
-    email: null,
-    password: null,
+const LoginForm: React.FC = () => {
+  const { login, error, clearError, isLoading } = useAuth();
+  const [credentials, setCredentials] = useState<LoginCredentials>({
+    email: '',
+    password: ''
   });
-  const [authError, setAuthError] = useState<string | null>(null);
+  
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | null>>({
+    email: null,
+    password: null
+  });
 
+  // Gérer les changements dans les champs du formulaire
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    // Mettre à jour les credentials
+    setCredentials(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Réinitialiser l'erreur au niveau du contexte
+    if (error) clearError();
+    
+    // Valider le champ en temps réel
+    if (name === 'email') {
+      setFieldErrors(prev => ({
+        ...prev,
+        email: validateEmail(value)
+      }));
+    } else if (name === 'password') {
+      setFieldErrors(prev => ({
+        ...prev,
+        password: validatePassword(value)
+      }));
+    }
+  };
+
+  // Soumettre le formulaire
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
-
-    if (emailError || passwordError) {
-      setErrors({ email: emailError, password: passwordError });
-      return;
-    }
-
-    try {
-      setAuthError(null);
-      await signIn(email, password); // Appel via AuthContext
-      onSubmit({ email, password });
-    } catch (err) {
-      setAuthError("Échec de la connexion. Veuillez vérifier vos identifiants.");
+    
+    // Valider les champs avant soumission
+    const emailError = validateEmail(credentials.email);
+    const passwordError = validatePassword(credentials.password);
+    
+    setFieldErrors({
+      email: emailError,
+      password: passwordError
+    });
+    
+    // Si pas d'erreurs, soumettre le formulaire
+    if (!emailError && !passwordError) {
+      try {
+        await login(credentials);
+        // La redirection sera gérée par le routeur après mise à jour du contexte
+      } catch (error) {
+        // Les erreurs sont déjà gérées dans le contexte
+      }
     }
   };
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
-      <h1 className="form-title">ClickTalk</h1>
-      <img src="/assets/images/logo.png" alt="Logo ClickTalk" className="form-logo" />
-
-      {authError && <div className="auth-error">{authError}</div>}
-
+      <img className="form-logo" src="public/assets/images/logo.png" alt="ClickTalk Logo" />
+      <h2 className="form-title">Connexion</h2>
+      
       <div className="login-form__field">
         <Input
-          name="email"
-          label="Adresse email"
           type="email"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setErrors((prev) => ({ ...prev, email: null }));
-          }}
-          error={nullToUndefined(errors.email)}
+          name="email"
+          placeholder="Email"
+          value={credentials.email}
+          onChange={handleChange}
+          error={fieldErrors.email || undefined}
+          aria-label="Adresse email"
         />
-        <button type="button" className="login-form__link-centered" onClick={() => console.log("Email oublié")}>
-          Email oublié ?
-        </button>
       </div>
-
+      
       <div className="login-form__field">
         <Input
-          name="password"
-          label="Mot de passe"
           type="password"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setErrors((prev) => ({ ...prev, password: null }));
-          }}
-          error={nullToUndefined(errors.password)}
+          name="password"
+          placeholder="Mot de passe"
+          value={credentials.password}
+          onChange={handleChange}
+          error={fieldErrors.password || undefined}
+          aria-label="Mot de passe"
         />
-        <button type="button" className="login-form__link-centered" onClick={() => console.log("Mot de passe oublié")}>
-          Mot de passe oublié ?
-        </button>
       </div>
-
-      <Button type="submit">Se connecter</Button>
+      
+      {/* Message d'erreur global */}
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+      
+      <Button 
+        type="submit" 
+        variant="primary"
+        disabled={isLoading}
+        fullWidth
+      >
+        {isLoading ? 'Connexion...' : 'Se connecter'}
+      </Button>
+      
+      <div className="auth-footer">
+        Pas encore de compte ? <Link to="/auth/register">S'inscrire</Link>
+      </div>
     </form>
   );
 };

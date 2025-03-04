@@ -1,41 +1,26 @@
 import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext/AuthContext';
+import LoginForm from '../../components/auth/LoginForm/LoginForm';
+import RegisterForm from '../../components/auth/RegisterForm/RegisterForm';
 import './Auth.scss';
-import LoginForm from '../../components/auth/LoginForm';
-import RegisterForm from '../../components/auth/RegisterForm';
-import { useLocation } from 'react-router-dom';
 
 const Auth: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
-  const isRegisterPage = location.pathname.includes('/register');
-
-  const handleLogin = (data: { email: string; password: string }) => {
-    console.log('Login data:', data);
-  };
-
-  const handleRegister = (data: { username: string; email: string; password: string; confirmPassword: string }) => {
-    console.log('Register data:', data);
-  };
+  
+  // Si l'utilisateur est déjà authentifié, le rediriger vers la page principale
+  if (isAuthenticated) {
+    return <Navigate to="/chat" replace />;
+  }
+  
+  // Déterminer quel formulaire afficher en fonction de l'URL
+  const isRegister = location.pathname === '/auth/register';
 
   return (
     <div className="auth-page">
       <div className="auth-container">
-        {isRegisterPage ? (
-          <>
-            <h1 className="auth-title">Inscription</h1>
-            <RegisterForm onSubmit={handleRegister} />
-            <p className="auth-footer">
-              Vous avez déjà un compte ? <a href="/auth/login">Connectez-vous.</a>
-            </p>
-          </>
-        ) : (
-          <>
-            <h1 className="auth-title">Connexion</h1>
-            <LoginForm onSubmit={handleLogin} />
-            <p className="auth-footer">
-              Vous n'avez pas de compte ? <a href="/auth/register">Inscrivez-vous.</a>
-            </p>
-          </>
-        )}
+        {isRegister ? <RegisterForm /> : <LoginForm />}
       </div>
     </div>
   );

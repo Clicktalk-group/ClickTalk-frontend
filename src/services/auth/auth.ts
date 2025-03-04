@@ -1,26 +1,40 @@
-import axios from "axios";
-import { environment } from "../../config/environment"; // Utiliser les variables centralisées
+import { apiService } from '../api/api';
+import { AuthResponse, LoginCredentials, RegisterCredentials } from '../../types/auth.types';
 
-// Type pour la réponse d'authentification
-interface AuthResponse {
-  token: string;
-}
+const AUTH_ENDPOINTS = {
+  LOGIN: '/auth/login',
+  REGISTER: '/auth/register',
+  LOGOUT: '/auth/logout',
+  DELETE_ACCOUNT: '/auth/delete-account',
+  UPDATE_PASSWORD: '/auth/update-password'
+};
 
-// Login utilisateur
-export async function login(email: string, password: string): Promise<string> {
-  const response = await axios.post<AuthResponse>(`${environment.apiUrl}/auth/login`, {
-    email,
-    password,
-  });
-  return response.data.token; // Renvoie le token JWT reçu
-}
+export const authService = {
+  // Login - Retourne le token et les infos utilisateur
+  login: (credentials: LoginCredentials): Promise<AuthResponse> => {
+    return apiService.post<AuthResponse>(AUTH_ENDPOINTS.LOGIN, credentials);
+  },
 
-// Inscription utilisateur
-export async function register(userData: { email: string; username: string; password: string }): Promise<void> {
-  await axios.post(`${environment.apiUrl}/auth/register`, userData);
-}
+  // Register - Crée un nouvel utilisateur
+  register: (credentials: RegisterCredentials): Promise<AuthResponse> => {
+    return apiService.post<AuthResponse>(AUTH_ENDPOINTS.REGISTER, credentials);
+  },
 
-// Logout (supprime le token du client)
-export function logout(): void {
-  localStorage.removeItem("authToken"); // Supprime le token du stockage local
-}
+  // Logout - Pour se déconnecter côté serveur
+  logout: (): Promise<void> => {
+    return apiService.post<void>(AUTH_ENDPOINTS.LOGOUT);
+  },
+
+  // Suppression de compte
+  deleteAccount: (): Promise<void> => {
+    return apiService.delete<void>(AUTH_ENDPOINTS.DELETE_ACCOUNT);
+  },
+
+  // Mise à jour du mot de passe
+  updatePassword: (oldPassword: string, newPassword: string): Promise<void> => {
+    return apiService.put<void>(AUTH_ENDPOINTS.UPDATE_PASSWORD, {
+      oldPassword,
+      newPassword
+    });
+  }
+};

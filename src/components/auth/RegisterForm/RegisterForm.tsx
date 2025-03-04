@@ -1,104 +1,152 @@
-import React, { useState } from "react";
-import "./RegisterForm.scss";
-import { Input } from "../../common/Input";
-import { Button } from "../../common/Button";
-import { RegisterFormProps } from "./RegisterForm.types";
-import {
-  validateEmail,
-  validatePassword,
-  validateConfirmPassword,
-  validateUsername,
-} from "../../../utils/validators/validators";
-import { nullToUndefined } from "../../../utils/helpers/nullToUndefined";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { RegisterCredentials } from '../../../types/auth.types';
+import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { 
+  validateEmail, 
+  validatePassword, 
+  validateConfirmPassword 
+} from '../../../utils/validators/validators';
+import { Button } from '../../common/Button/Button';
+import { Input } from '../../common/Input/Input';
+import './RegisterForm.scss';
 
-const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<{
-    username: string | null;
-    email: string | null;
-    password: string | null;
-    confirmPassword: string | null;
-  }>({
-    username: null,
+const RegisterForm: React.FC = () => {
+  const { register, error, clearError, isLoading } = useAuth();
+  const [credentials, setCredentials] = useState<RegisterCredentials>({
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | null>>({
     email: null,
     password: null,
-    confirmPassword: null,
+    confirmPassword: null
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const usernameError = validateUsername(username);
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
-    const confirmPasswordError = validateConfirmPassword(password, confirmPassword);
-
-    if (usernameError || emailError || passwordError || confirmPasswordError) {
-      setErrors({
-        username: usernameError,
-        email: emailError,
-        password: passwordError,
-        confirmPassword: confirmPasswordError,
-      });
-      return;
+  // Gérer les changements dans les champs du formulaire
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    // Mettre à jour les credentials
+    setCredentials(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Réinitialiser l'erreur au niveau du contexte
+    if (error) clearError();
+    
+    // Valider le champ en temps réel
+    if (name === 'email') {
+      setFieldErrors(prev => ({
+        ...prev,
+        email: validateEmail(value)
+      }));
+    } else if (name === 'password') {
+      setFieldErrors(prev => ({
+        ...prev,
+        password: validatePassword(value)
+      }));
+      // Valider à nouveau confirmPassword si modifié
+      if (credentials.confirmPassword) {
+        setFieldErrors(prev => ({
+          ...prev,
+          confirmPassword: validateConfirmPassword(value, credentials.confirmPassword)
+        }));
+      }
+    } else if (name === 'confirmPassword') {
+      setFieldErrors(prev => ({
+        ...prev,
+        confirmPassword: validateConfirmPassword(credentials.password, value)
+      }));
     }
+  };
 
-    onSubmit({ username, email, password, confirmPassword });
+  // Soumettre le formulaire
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Valider les champs avant soumission
+    const emailError = validateEmail(credentials.email);
+    const passwordError = validatePassword(credentials.password);
+    const confirmPasswordError = validateConfirmPassword(
+      credentials.password, 
+      credentials.confirmPassword
+    );
+    
+    setFieldErrors({
+      email: emailError,
+      password: passwordError,
+      confirmPassword: confirmPasswordError
+    });
+    
+    // Si pas d'erreurs, soumettre le formulaire
+    if (!emailError && !passwordError && !confirmPasswordError) {
+      try {
+        await register(credentials);
+        // La redirection sera gérée par le routeur après mise à jour du contexte
+      } catch (error) {
+        // Les erreurs sont déjà gérées dans le contexte
+      }
+    }
   };
 
   return (
     <form className="register-form" onSubmit={handleSubmit}>
-      <h1 className="form-title">ClickTalk</h1>
-      <img src="/assets/images/logo.png" alt="Logo ClickTalk" className="form-logo" />
+      <img className="form-logo" src="public/assets/images/logo.png" alt="ClickTalk Logo" />
+      <h2 className="form-title">Inscription</h2>
       
       <Input
-        name="username"
-        label="Nom d'utilisateur"
-        type="text"
-        value={username}
-        onChange={(e) => {
-          setUsername(e.target.value);
-          setErrors((prev) => ({ ...prev, username: null }));
-        }}
-        error={nullToUndefined(errors.username)}
-      />
-      <Input
-        name="email"
-        label="Adresse email"
         type="email"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-          setErrors((prev) => ({ ...prev, email: null }));
-        }}
-        error={nullToUndefined(errors.email)}
+        name="email"
+        placeholder="Email"
+        value={credentials.email}
+        onChange={handleChange}
+        error={fieldErrors.email || undefined}
+        aria-label="Adresse email"
       />
+      
       <Input
+        type="password"
         name="password"
-        label="Mot de passe"
-        type="password"
-        value={password}
-        onChange={(e) => {
-          setPassword(e.target.value);
-          setErrors((prev) => ({ ...prev, password: null }));
-        }}
-        error={nullToUndefined(errors.password)}
+        placeholder="Mot de passe"
+        value={credentials.password}
+        onChange={handleChange}
+        error={fieldErrors.password || undefined}
+        aria-label="Mot de passe"
       />
+      
       <Input
-        name="confirmPassword"
-        label="Confirmer le mot de passe"
         type="password"
-        value={confirmPassword}
-        onChange={(e) => {
-          setConfirmPassword(e.target.value);
-          setErrors((prev) => ({ ...prev, confirmPassword: null }));
-        }}
-        error={nullToUndefined(errors.confirmPassword)}
+        name="confirmPassword"
+        placeholder="Confirmer le mot de passe"
+        value={credentials.confirmPassword}
+        onChange={handleChange}
+        error={fieldErrors.confirmPassword || undefined}
+        aria-label="Confirmation du mot de passe"
       />
-      <Button type="submit">S'inscrire</Button>
+      
+      {/* Message d'erreur global */}
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+      
+      <Button 
+        type="submit" 
+        variant="primary"
+        disabled={isLoading}
+        fullWidth
+      >
+        {isLoading ? 'Inscription...' : 'S\'inscrire'}
+      </Button>
+      
+      <div className="auth-footer">
+        Déjà un compte ? <Link to="/auth/login">Se connecter</Link>
+      </div>
     </form>
   );
 };

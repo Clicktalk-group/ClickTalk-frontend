@@ -36,4 +36,27 @@
       }
     }
   }
+
+  // Styles pour le message d'erreur global
+  .error-message {
+    color: $danger-color;
+    margin: $sp-sm 0;
+    padding: $sp-xs;
+    font-size: $fs-sm;
+    background-color: rgba($danger-color, 0.1);
+    border-radius: $radius-sm;
+    text-align: center;
+  }
+}
+
+// Support du thème sombre
+body.dark-mode {
+  .auth-page {
+    background-color: $color-bg-dark;
+    
+    .auth-container {
+      background-color: $color-bg-dark-hover;
+      color: $color-text-light;
+    }
+  }
 }
