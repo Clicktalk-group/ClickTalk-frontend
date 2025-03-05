@@ -1,5 +1,5 @@
-@import 'variables';
-@import 'mixins';
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
 
 .card {
   background-color: $message-bg-bot;

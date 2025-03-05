@@ -1,0 +1,38 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.not-found {
+  @include flex-center;
+  height: 100vh;
+  text-align: center;
+  padding: $sp-md;
+  background-color: $background-color;
+
+  &__content {
+    max-width: 540px;
+
+    h1 {
+      font-size: 6rem;
+      margin-bottom: $sp-md;
+      color: $primary-color;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: $sp-md;
+    }
+
+    p {
+      margin-bottom: $sp-lg;
+      color: $color-text-secondary;
+    }
+  }
+}
+
+// Support du thème sombre
+body.dark-mode {
+  .not-found {
+    background-color: $color-bg-dark;
+    color: $color-text-light;
+  }
+}

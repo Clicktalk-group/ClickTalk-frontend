@@ -3,36 +3,78 @@
 
 .auth-page {
   @include flex-center;
-  flex-direction: column;
   min-height: 100vh;
+  padding: $sp-md;
   background-color: $background-color;
 
-  .auth-container {
+  .auth-card {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
     background: $color-light;
     padding: $sp-lg;
     border-radius: $radius-md;
     box-shadow: $shadow-md;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
 
-    .auth-title {
-      font-size: $fs-lg;
+    .app-branding {
+      text-align: center;
       margin-bottom: $sp-md;
-      color: $color-text-primary;
+      
+      .app-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: $primary-color;
+        margin-bottom: $sp-sm;
+      }
+      
+      .app-logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        display: block;
+      }
     }
 
-    .auth-footer {
-      margin-top: $sp-lg;
-      font-size: $fs-sm;
+    .auth-tabs {
+      display: flex;
+      margin-bottom: $sp-lg;
 
-      a {
-        color: $primary-color;
-        text-decoration: underline;
+      .auth-tab {
+        flex: 1;
+        padding: $sp-sm;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid $border-color;
+        font-weight: 500;
+        color: $color-text-secondary;
+        cursor: pointer;
+        transition: all 0.3s ease;
 
-        &:hover {
+        &.active {
+          color: $primary-color;
+          border-bottom-color: $primary-color;
+        }
+
+        &:hover:not(.active) {
           color: $primary-hover;
         }
+      }
+    }
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: $sp-md;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+
+    a {
+      color: $primary-color;
+      text-decoration: underline;
+      @include fade-in(0.2s);
+
+      &:hover {
+        color: $primary-hover;
       }
     }
   }
@@ -47,6 +89,17 @@
     border-radius: $radius-sm;
     text-align: center;
   }
+
+  // Styles pour les champs de formulaire
+  .form-field {
+    margin-bottom: $sp-md;
+  }
+
+  .form-title {
+    margin-bottom: $sp-lg;
+    color: $color-text-primary;
+    text-align: center;
+  }
 }
 
 // Support du thème sombre
@@ -54,9 +107,21 @@ body.dark-mode {
   .auth-page {
     background-color: $color-bg-dark;
     
-    .auth-container {
+    .auth-container, .auth-card {
       background-color: $color-bg-dark-hover;
       color: $color-text-light;
+    }
+    
+    .auth-tab {
+      color: $color-text-light;
+      
+      &.active {
+        color: lighten($primary-color, 15%);
+      }
+    }
+    
+    .app-title {
+      color: lighten($primary-color, 15%);
     }
   }
 }

@@ -2,7 +2,7 @@
 import React from 'react';
 
 const Home = () => {
-  return <div>je suis dans la hess</div>;
+  return <div>Allez championne :)</div>;
 };
 
 export default Home;

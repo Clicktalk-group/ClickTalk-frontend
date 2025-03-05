@@ -1,27 +1,63 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import LoginForm from '../../components/auth/LoginForm/LoginForm';
 import RegisterForm from '../../components/auth/RegisterForm/RegisterForm';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { Card } from '../../components/common/Card/Card';
 import './Auth.scss';
 
-const Auth: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+export const Auth = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>(
+    location.pathname.includes('register') ? 'register' : 'login'
+  );
   
-  // Si l'utilisateur est déjà authentifié, le rediriger vers la page principale
+  const { isAuthenticated } = useAuth();
+  
+  // Mettre à jour l'URL lorsque l'onglet actif change
+  useEffect(() => {
+    if (activeTab === 'login') {
+      navigate('/auth/login', { replace: true });
+    } else {
+      navigate('/auth/register', { replace: true });
+    }
+  }, [activeTab, navigate]);
+
+  // Rediriger si déjà authentifié
   if (isAuthenticated) {
     return <Navigate to="/chat" replace />;
   }
-  
-  // Déterminer quel formulaire afficher en fonction de l'URL
-  const isRegister = location.pathname === '/auth/register';
 
   return (
     <div className="auth-page">
-      <div className="auth-container">
-        {isRegister ? <RegisterForm /> : <LoginForm />}
-      </div>
+      <Card className="auth-card">
+        <div className="app-branding">
+          <h1 className="app-title">ClickTalk</h1>
+          <img src="/assets/images/logo.png" alt="ClickTalk Logo" className="app-logo" />
+        </div>
+        
+        <div className="auth-tabs">
+          <button
+            className={`auth-tab ${activeTab === 'login' ? 'active' : ''}`}
+            onClick={() => setActiveTab('login')}
+          >
+            Connexion
+          </button>
+          <button
+            className={`auth-tab ${activeTab === 'register' ? 'active' : ''}`}
+            onClick={() => setActiveTab('register')}
+          >
+            Inscription
+          </button>
+        </div>
+        
+        {activeTab === 'login' ? (
+          <LoginForm />
+        ) : (
+          <RegisterForm />
+        )}
+      </Card>
     </div>
   );
 };
