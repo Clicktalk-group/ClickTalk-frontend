@@ -1,5 +1,5 @@
+// src/components/auth/LoginForm/LoginForm.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { LoginFormProps } from './LoginForm.types';
 import { Input } from '../../common/Input/Input';
 import { Button } from '../../common/Button/Button';
@@ -7,7 +7,7 @@ import { useAuth } from '../../../hooks/useAuth/useAuth';
 import { validateEmail, validatePassword } from '../../../utils/validators/validators';
 import './LoginForm.scss';
 
-export const LoginForm: React.FC<LoginFormProps> = ({ className = '' }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegisterClick }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{
@@ -85,7 +85,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '' }) => {
       
       <div className="form-footer">
         <p>
-          Pas encore de compte ? <Link to="/auth/register">Créer un compte</Link>
+          Pas encore de compte ? 
+          <button 
+            type="button"
+            className="link-button"
+            onClick={onRegisterClick}
+          >
+            Créer un compte
+          </button>
         </p>
       </div>
     </form>

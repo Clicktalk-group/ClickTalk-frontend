@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { RegisterFormProps } from './RegisterForm.types';
 import { Input } from '../../common/Input/Input';
 import { Button } from '../../common/Button/Button';
@@ -12,7 +11,7 @@ import {
 } from '../../../utils/validators/validators';
 import './RegisterForm.scss';
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '' }) => {
+export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLoginClick }) => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -150,7 +149,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '' }) =>
       
       <div className="form-footer">
         <p>
-          Déjà un compte ? <Link to="/auth/login">Se connecter</Link>
+          Déjà un compte ? 
+          <button 
+            type="button"
+            className="link-button"
+            onClick={onLoginClick}
+          >
+            Se connecter
+          </button>
         </p>
       </div>
     </form>

@@ -48,4 +48,28 @@
     margin-bottom: $sp-md;
     display: block;
   }
+  
+  .link-button {
+    background: none;
+    border: none;
+    color: $primary-color;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: $fs-sm;
+    padding: 0;
+    margin: 0 0 0 $sp-xs;
+    
+    &:hover {
+      color: $primary-hover;
+    }
+  }
+  
+  .form-footer {
+    margin-top: $sp-sm;
+    text-align: center;
+    
+    p {
+      color: $color-text-secondary;
+    }
+  }
 }

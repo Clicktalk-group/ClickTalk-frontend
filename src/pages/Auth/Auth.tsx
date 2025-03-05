@@ -1,3 +1,4 @@
+// src/pages/Auth/Auth.tsx
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import LoginForm from '../../components/auth/LoginForm/LoginForm';
@@ -53,9 +54,9 @@ export const Auth = () => {
         </div>
         
         {activeTab === 'login' ? (
-          <LoginForm />
+          <LoginForm onRegisterClick={() => setActiveTab('register')} />
         ) : (
-          <RegisterForm />
+          <RegisterForm onLoginClick={() => setActiveTab('login')} />
         )}
       </Card>
     </div>
