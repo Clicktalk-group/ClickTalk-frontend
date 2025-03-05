@@ -6,6 +6,7 @@ import { Button } from '../../common/Button/Button';
 import { useAuth } from '../../../hooks/useAuth/useAuth';
 import { validateEmail, validatePassword } from '../../../utils/validators/validators';
 import './LoginForm.scss';
+import { useNavigate } from 'react-router-dom';
 
 export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegisterClick }) => {
   const [email, setEmail] = useState('');
@@ -17,6 +18,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegister
   
   const { login, isLoading, error, clearError } = useAuth();
   
+  const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
@@ -35,7 +38,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegister
     
     try {
       await login({ email, password });
+      navigate('/');
     } catch (err) {
+      console.error("Erreur de connexion:", err);
       // L'erreur est déjà gérée dans le hook useAuth
     }
   };

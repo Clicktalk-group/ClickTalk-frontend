@@ -14,7 +14,7 @@ export const Auth = () => {
     location.pathname.includes('register') ? 'register' : 'login'
   );
   
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   
   // Mettre à jour l'URL lorsque l'onglet actif change
   useEffect(() => {
@@ -24,10 +24,13 @@ export const Auth = () => {
       navigate('/auth/register', { replace: true });
     }
   }, [activeTab, navigate]);
+  
+  console.log("État Auth.tsx:", { isAuthenticated, isLoading });
 
   // Rediriger si déjà authentifié
-  if (isAuthenticated) {
-    return <Navigate to="/chat" replace />;
+  if (!isLoading && isAuthenticated) {
+    console.log("Utilisateur authentifié, redirection vers la page d'accueil");
+    return <Navigate to="/" replace />;
   }
 
   return (

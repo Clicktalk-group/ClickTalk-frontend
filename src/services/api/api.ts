@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuration de base pour axios
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 // Création de l'instance axios avec configuration de base
 const axiosInstance = axios.create({
@@ -22,6 +22,7 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    console.log("Requête API envoyée:", { url: config.url, method: config.method });
     return config;
   },
   (error) => {
@@ -31,10 +32,17 @@ axiosInstance.interceptors.request.use(
 
 // Intercepteur pour gérer les erreurs de réponse (ex: token expiré)
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log("Réponse API reçue:", { 
+      url: response.config.url, 
+      status: response.status 
+    });
+    return response;
+  },
   (error) => {
     // Gérer le cas de token expiré (code 401)
     if (error.response?.status === 401) {
+      console.error("Erreur d'authentification (401) - Session expirée");
       // Déconnecter l'utilisateur
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -43,6 +51,12 @@ axiosInstance.interceptors.response.use(
       if (window.location.pathname !== '/auth/login') {
         window.location.href = '/auth/login';
       }
+    } else {
+      console.error("Erreur API:", {
+        url: error.config?.url,
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message
+      });
     }
     
     return Promise.reject(error);

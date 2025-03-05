@@ -10,6 +10,7 @@ import {
   validateUsername 
 } from '../../../utils/validators/validators';
 import './RegisterForm.scss';
+import { useNavigate } from 'react-router-dom';
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLoginClick }) => {
   const [formData, setFormData] = useState({
@@ -32,7 +33,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLo
   });
   
   const { register, isLoading, error, clearError } = useAuth();
-  
+  const navigate = useNavigate();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -66,11 +68,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLo
     }
     
     try {
-      await register({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      });
+      await register(formData);
+      navigate('/');
     } catch (err) {
       // L'erreur est déjà gérée dans le hook useAuth
     }
