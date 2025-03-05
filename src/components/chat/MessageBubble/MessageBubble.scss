@@ -1,0 +1,86 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.message-bubble {
+  max-width: 75%;
+  padding: $sp-md;
+  border-radius: $radius-md;
+  position: relative;
+  
+  // User message styling
+  &.user {
+    align-self: flex-end;
+    background-color: $primary-color;
+    color: white;
+    
+    .message-timestamp {
+      color: rgba(255, 255, 255, 0.8);
+      text-align: right;
+    }
+  }
+  
+  // Bot message styling
+  &.bot {
+    align-self: flex-start;
+    background-color: $color-light;
+    color: $color-text-primary;
+    box-shadow: $shadow-sm;
+    
+    // Markdown content styling
+    p, h1, h2, h3, h4, h5, h6, ul, ol {
+      margin-bottom: $sp-sm;
+    }
+    
+    code {
+      background-color: darken($color-light, 5%);
+      padding: 2px 4px;
+      border-radius: $radius-sm;
+      font-family: monospace;
+    }
+    
+    pre {
+      background-color: darken($color-light, 5%);
+      padding: $sp-sm;
+      border-radius: $radius-sm;
+      overflow-x: auto;
+      margin-bottom: $sp-sm;
+      
+      code {
+        background-color: transparent;
+        padding: 0;
+      }
+    }
+    
+    // Copy button styling
+    .copy-button {
+      position: absolute;
+      top: $sp-sm;
+      right: $sp-sm;
+      background-color: transparent;
+      border: none;
+      color: $color-text-secondary;
+      cursor: pointer;
+      padding: $sp-xs;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      
+      &:hover {
+        color: $primary-color;
+      }
+    }
+    
+    &:hover .copy-button {
+      opacity: 1;
+    }
+  }
+  
+  .message-content {
+    margin-bottom: $sp-xs;
+  }
+  
+  .message-timestamp {
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+    margin-top: $sp-xs;
+  }
+}

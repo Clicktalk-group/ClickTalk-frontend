@@ -1,0 +1,15 @@
+// src/pages/Chat/Chat.scss
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.chat-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: $sp-md;
+  
+  @include responsive($tablet) {
+    padding: $sp-sm;
+  }
+}

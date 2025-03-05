@@ -1,6 +1,9 @@
+// src/components/layouts/MainLayout/MainLayout.tsx
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Sidebar } from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
+import ChatContainer from "../../chat/ChatContainer/ChatContainer";
 import "./MainLayout.scss";
 
 interface MainLayoutProps {
@@ -9,6 +12,10 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  
+  // Vérifier si nous sommes sur une page de chat
+  const isChatPage = location.pathname.includes('/chat');
   
   // Données simulées pour la Sidebar
   const mockConversations = [
@@ -82,9 +89,21 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           isSidebarOpen={sidebarOpen} 
           toggleSidebar={handleToggleSidebar} 
         />
-        <div className="main-content">
-          {children}
-        </div>
+        {/* Ne pas afficher le chat fixe si on est déjà sur une page de chat */}
+        {isChatPage ? (
+          <div className="main-content full-height">
+            {children}
+          </div>
+        ) : (
+          <>
+            <div className="main-content">
+              {children}
+            </div>
+            <div className="chat-footer">
+              <ChatContainer />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

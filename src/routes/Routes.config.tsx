@@ -5,6 +5,7 @@ import Auth from '../pages/Auth/Auth';
 import NotFound from '../pages/NotFound/NotFound';
 import { ProtectedRoute } from '../components/route/ProtectedRoute';
 import MainLayout from '../components/layouts/MainLayout/MainLayout';
+import Chat from '../pages/Chat/Chat';
 
 // Routes publiques (accessibles à tous)
 export const publicRoutes: RouteObject[] = [
@@ -39,6 +40,27 @@ export const privateRoutes: RouteObject[] = [
       <ProtectedRoute>
         <MainLayout>
           <Home />
+        </MainLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/chat/:conversationId',
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Chat />
+        </MainLayout>
+      </ProtectedRoute>
+    )
+  },
+  // Ajouter aussi une route pour la création d'une nouvelle conversation
+  {
+    path: '/chat/new',
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Chat />
         </MainLayout>
       </ProtectedRoute>
     )

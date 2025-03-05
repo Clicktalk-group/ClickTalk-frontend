@@ -1,0 +1,17 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: $sp-md;
+  height: 180px;
+  
+  // Styling for the message container to provide spacing
+  .loading-message {
+    align-self: center;
+    margin: $sp-md 0;
+  }
+}
