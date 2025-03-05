@@ -6,96 +6,165 @@
   top: 0;
   left: 0;
   height: 100vh;
-  width: $sidebar-width; // Largeur par défaut
-  background-color: $color-bg-dark;
-  box-shadow: $shadow-md;
-  color: $color-text-light;
+  width: 240px; // Largeur fixe
+  background-color: #1e2029; // Couleur foncée
+  color: white;
   display: flex;
   flex-direction: column;
-  transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;
-  z-index: 1500;
-
+  z-index: 10000; // Pour passer au-dessus des autres éléments
+  
   &.open {
-    transform: translateX(0); // Affichage de la Sidebar
+    transform: translateX(0);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  &.closed {
+    transform: translateX(-100%); // Cache complètement la sidebar
   }
 
-  /* Zone de contenu commencée sous le bouton */
-  .content {
-    margin-top: 4rem; // Contenu sous le bouton
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow-y: auto;
-    padding: $sp-md;
-  }
-
-  .section {
-    margin-bottom: $sp-md;
-
-    .section-header { 
+  /* Partie supérieure avec l'icône Home */
+  .sidebar-header {
+    padding: 1rem;
+    padding-top: 1.5rem;
+    
+    .home-icon-container {
       display: flex;
       align-items: center;
-      font-size: $fs-lg;
-      font-weight: 600;
-      margin-bottom: $sp-sm;
-    }
-
-    .add-btn {
-      @include button($primary-color, $color-text-light, $primary-hover);
-      margin-top: $sp-xs;
-    }
-
-    .section-list {
-      list-style: none;
-      padding: 0;
-
-      .list-item {
-        cursor: pointer;
-        padding: $sp-sm;
-        border-radius: $radius-sm;
-        &:hover {
-          background: $primary-hover;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      &:hover {
+        .home-icon{background-color: lighten($primary-color, 5%);
         }
+        }
+
+      .home-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: $primary-color;
+        color: white;
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 1.2rem;
+      }
+      
+      .home-title {
+        margin-left: 0.5rem;
+        font-weight: 500;
+        color: white;
       }
     }
   }
 
-  .logout-btn {
-    margin-top: auto;
-    @include button($danger-color, $color-light, darken($danger-color, 10%));
+  /* Contenu principal */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
   }
 
-  /* --- Responsivité pour les mobiles --- */
-  @media (max-width: $tablet) {
-    width: 100vw; // Sidebar s'étend sur toute la largeur de l'écran
-    height: 100vh; // Pleine hauteur
-    padding: $sp-xs;
-
-    .content {
-      margin-top: 4rem; // Ajustement pour une marge plus petite
-      padding: $sp-xs;
-    }
-
+  /* Sections (conversations, projets) */
+  .section {
+    margin-bottom: 1rem;
+    
     .section-header {
-      font-size: $fs-md; // Réduction des tailles de texte
-    }
-
-    .add-btn {
-      padding: $sp-xs $sp-sm; // Boutons plus compacts
-      font-size: $fs-sm; 
-    }
-
-    .section-list {
-      .list-item {
-        padding: $sp-xs; // Espacement plus réduit pour les éléments
-        font-size: $fs-sm; // Texte plus compact
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      
+      .section-title {
+        margin-left: 0.5rem;
       }
     }
+  }
 
-    .logout-btn {
-      font-size: $fs-sm; // Bouton de déconnexion réduit
-      padding: $sp-xs $sp-sm;
+  /* Bouton d'ajout */
+  .add-btn {
+    width: 100%;
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    
+    .add-icon {
+      margin-right: 0.25rem;
+      font-size: 0.8rem;
+    }
+    
+    &:hover {
+      background-color: lighten($primary-color, 5%);
+    }
+  }
+
+  /* Liste des éléments */
+  .section-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    .list-item {
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-bottom: 0.25rem;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  /* Séparateur */
+  .divider {
+    border: none;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
+  }
+
+  /* Bouton de déconnexion */
+  .logout-btn {
+    width: 100%;
+    background-color: rgb(175, 30, 30); // Rouge foncé
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    cursor: pointer;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .logout-icon {
+      margin-right: 0.5rem;
+    }
+    
+    &:hover {
+      background-color: darken(rgb(175, 30, 30), 5%);
+    }
+  }
+  
+  /* Sur mobile, prendre toute la largeur */
+  @media (max-width: 768px) {
+    width: 100%; // Plein écran sur mobile
+    
+    &.open {
+      transform: translateX(0);
     }
   }
 }

@@ -1,37 +1,33 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import MainLayout from "./MainLayout";
-import { BrowserRouter } from "react-router-dom";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import MainLayout from './MainLayout';
 
-describe("MainLayout Component", () => {
-  it("renders the MainLayout correctly", () => {
+describe('MainLayout Component', () => {
+  test('renders without crashing', () => {
     render(
       <BrowserRouter>
-        <MainLayout />
+        <MainLayout>
+          <div data-testid="test-children">Test children content</div>
+        </MainLayout>
       </BrowserRouter>
     );
-
-    // Vérifie si le bouton toggle est présent
-    expect(
-      screen.getByRole("button", { name: /Toggle Sidebar/i })
-    ).toBeInTheDocument();
+    
+    // Vérifier que le contenu est bien rendu
+    expect(screen.getByTestId('test-children')).toBeInTheDocument();
   });
 
-  it("toggles Sidebar open/close when clicking the button", () => {
+  test('toggle button is present', () => {
     render(
       <BrowserRouter>
-        <MainLayout />
+        <MainLayout>
+          <div>Test content</div>
+        </MainLayout>
       </BrowserRouter>
     );
-
-    const toggleButton = screen.getByRole("button", { name: /Toggle Sidebar/i });
-    const layoutContainer = screen.getByTestId("layout-container");
-
-    // Ouverture de la Sidebar
-    fireEvent.click(toggleButton);
-    expect(layoutContainer).toHaveClass("sidebar-open");
-
-    // Fermeture de la Sidebar
-    fireEvent.click(toggleButton);
-    expect(layoutContainer).not.toHaveClass("sidebar-open");
+    
+    // Vérifier que le bouton de toggle est présent
+    const toggleButton = screen.getByRole('button', { name: /☰|×/ });
+    expect(toggleButton).toBeInTheDocument();
   });
 });

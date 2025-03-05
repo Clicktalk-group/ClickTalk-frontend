@@ -3,77 +3,46 @@
 
 .main-layout {
   display: flex;
-  flex-direction: column;
   height: 100vh;
+  overflow: hidden;
 
   .layout-container {
+    flex: 1;
     display: flex;
-    height: 100vh;
+    flex-direction: column;
     transition: margin-left 0.3s ease;
-
-    &.sidebar-open {
-      margin-left: $sidebar-width;
-    }
+    
+    // Le contenu reste en place sans se décaler quand la sidebar s'ouvre
+    // parce que la sidebar passe au-dessus avec son z-index
+    margin-left: 0;
   }
 
   .main-content {
     flex: 1;
     overflow-y: auto;
-    background-color: $background-color;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
   }
 
-  /* --- Responsivité pour les appareils mobiles --- */
-  @media (max-width: $mobile) {
-    .layout-container {
-      flex-direction: column; // Priorité à la colonne pour mieux afficher le contenu
-    }
-
-    .main-content {
-      margin-left: 0; // Annulation du décalage dû à la Sidebar
-    }
-
-    .toggle-sidebar {
-      top: $sp-xs; // Réduction de l'espacement pour les petits écrans
-      left: $sp-xs; // Placement légèrement ajusté
-      height: 2.5rem; // Bouton plus petit
-      width: 2.5rem;
-
-      // Changements de styles spécifiques
-      font-size: $fs-sm; 
-    }
-  }
-
-
-  /* --- Styles des boutons d'ouverture et de fermeture de la Sidebar --- */
-  .toggle-sidebar {
+  /* Overlay pour mobile - active seulement quand la sidebar est ouverte */
+  .sidebar-overlay {
     position: fixed;
-    top: $sp-md; // Toujours en haut avec une marge configurée
-    left: $sp-md; // Toujours en haut gauche
-    z-index: 2000; // Toujours au-dessus des autres éléments
-    height: 3rem;
-    width: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: $color-bg-dark;
-    color: white;
-    border-radius: $radius-md;
-    cursor: pointer;
-    border: none;
-    transition: all 0.3s ease;
-
-    /* Bouton visible quand la Sidebar est fermée */
-    &.open {
-      background-color: $primary-color;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999; // Juste en-dessous de la sidebar
+    display: none;
+    
+    &.active {
+      display: block;
     }
-
-    /* Bouton visible quand la Sidebar est ouverte */
-    &.close {
-      background-color: $secondary-color;
-    }
-
-    &:hover {
-      background-color: $primary-hover;
+  }
+  
+  @media (max-width: 768px) {
+    .layout-container {
+      width: 100%;
     }
   }
 }

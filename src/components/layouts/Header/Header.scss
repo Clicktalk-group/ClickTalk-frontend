@@ -5,62 +5,101 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  background-color: var(--background-color);
+  padding: 0.5rem 1rem;
+  background-color: white;
   border-bottom: 1px solid var(--border-color);
-  position: relative;
   height: 60px;
+  position: relative;
+  width: 100%;
+  z-index: 100;
 
-  /* Conteneur pour le logo */
-  .logoContainer {
-    margin: 0 auto; /* Centrer grâce au flex parent */
-    position: static;
+  /* Icône Home et titre */
+  .homeIconContainer {
     display: flex;
     align-items: center;
-
-    .logo {
-      width: 60px;
-      height: auto;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    &:hover {
+      .homeIcon {
+        background-color: lighten($primary-color, 5%);
+      }
+    }
+    
+    .homeIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: $primary-color;
+      color: white;
+      width: 40px;
+      height: 40px;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 1.2rem;
     }
 
-    @media (max-width: 768px) {
-      justify-content: center;
-      .logo {
-        width: 50px;
-        height: auto;
+    .pageTitle {
+      margin-left: 0.5rem;
+      font-weight: 500;
+      color: $color-text-primary;
+      
+      @media (max-width: 768px) {
+        display: none; /* Cacher le texte sur mobile */
       }
-  
     }
   }
 
-  /* Bouton Menu Burger */
+  /* Logo centré */
+  .logoContainer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    
+    .logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: none;
+    }
+  }
+
+  /* Menu burger à droite */
   .menuButton {
     background: none;
     border: none;
     cursor: pointer;
     font-size: 1.5rem;
-    color: var(--text-color);
-    transition: color 0.2s ease;
+    color: $color-text-primary;
     padding: 0.5rem;
-    margin-right: 1rem; /* Ajouter du padding à droite */
-
+    transition: color 0.2s ease;
+    
     &:hover {
-      color: var(--primary-hover);
+      color: $primary-hover;
     }
-
-    @media (max-width: 768px) {
-      margin-right: 0.75rem;
+    
+    &.active {
+      color: $primary-color;
     }
   }
 
-  /* Responsivité */
   @media (max-width: 768px) {
-    .sidebarToggle {
-      left: 1rem;
+    padding: 0.5rem;
+    
+    .homeIconContainer .homeIcon {
+      width: 36px;
+      height: 36px;
+      font-size: 1.1rem;
     }
-
-    .logoContainer {
-      margin: 0 auto;
+    
+    .logoContainer .logo {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .menuButton {
+      font-size: 1.4rem;
     }
   }
 }

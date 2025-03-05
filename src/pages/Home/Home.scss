@@ -1,0 +1,46 @@
+// src/pages/Home/Home.scss
+
+.home-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    
+    h1 {
+      color: var(--color-primary);
+      margin-bottom: 20px;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+    
+    .quick-actions {
+      background-color: var(--color-background);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      
+      h2 {
+        color: var(--color-text);
+        margin-bottom: 15px;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 10px;
+      }
+      
+      ul {
+        list-style-type: none;
+        padding-left: 0;
+        
+        li {
+          padding: 8px 0;
+          border-bottom: 1px solid var(--color-border-light);
+          
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+      }
+    }
+  }
+  

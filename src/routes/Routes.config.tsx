@@ -1,22 +1,15 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
-import { ProtectedRoute } from '../components/route/ProtectedRoute';
-
-// Pages
-import Home from '../pages/Home';
+import Home from '../pages/Home/Home';
 import Auth from '../pages/Auth/Auth';
-import Chat from '../pages/Chat';
 import NotFound from '../pages/NotFound/NotFound';
+import { ProtectedRoute } from '../components/route/ProtectedRoute';
+import MainLayout from '../components/layouts/MainLayout/MainLayout';
 
 // Routes publiques (accessibles à tous)
 export const publicRoutes: RouteObject[] = [
   {
-    path: '/',
-    element: <Home />
-  },
-  {
     path: '/auth',
-    element: <Auth />,
     children: [
       {
         path: 'login',
@@ -24,6 +17,10 @@ export const publicRoutes: RouteObject[] = [
       },
       {
         path: 'register',
+        element: <Auth />
+      },
+      {
+        index: true,
         element: <Auth />
       }
     ]
@@ -37,8 +34,14 @@ export const publicRoutes: RouteObject[] = [
 // Routes privées (nécessite authentification)
 export const privateRoutes: RouteObject[] = [
   {
-    path: '/chat',
-    element: <ProtectedRoute><Chat /></ProtectedRoute>
-  },
+    path: '/',
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Home />
+        </MainLayout>
+      </ProtectedRoute>
+    )
+  }
   // Ajouter d'autres routes protégées ici
 ];
