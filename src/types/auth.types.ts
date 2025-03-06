@@ -19,16 +19,18 @@ export interface RegisterCredentials {
   password: string;
 }
 
-// Réponse d'authentification
+// RÃ©ponse d'authentification
 export interface AuthResponse {
-  token: string;
+  expires_in: number;
+  access_token: string;
+  token_type: "Bearer";
   user: User;
 }
 
 // Interface du contexte d'authentification
 export interface AuthContextType {
   user: User | null;
-  token: string | null;
+  access_token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;

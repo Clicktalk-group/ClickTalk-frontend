@@ -1,4 +1,3 @@
-// src/components/chat/LoadingIndicator/LoadingIndicator.tsx
 import React from 'react';
 import './LoadingIndicator.scss';
 

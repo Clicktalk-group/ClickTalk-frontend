@@ -1,4 +1,3 @@
-// src/types/chat.types.ts
 // Message standard
 export interface Message {
   id: string;

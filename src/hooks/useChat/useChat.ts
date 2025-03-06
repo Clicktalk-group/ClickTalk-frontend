@@ -1,4 +1,3 @@
-// src/hooks/useChat/useChat.ts
 import { useState, useEffect, useCallback } from 'react';
 import { Message, Conversation, ChatState } from '../../types/chat.types';
 import apiService from '../../services/api/api';
@@ -13,6 +12,8 @@ const useChat = (conversationId?: number) => {
 
   // Charger les messages d'une conversation
   const loadMessages = useCallback(async (convId: number) => {
+    if (!convId) return;
+    
     setState(prev => ({ ...prev, isLoading: true }));
     try {
       // Spécifier que la réponse sera un tableau de messages
@@ -32,63 +33,55 @@ const useChat = (conversationId?: number) => {
   }, []);
 
   // Envoyer un message
-  const sendMessage = useCallback(async (convId: number, content: string) => {
+  const sendMessage = useCallback(async (convId: number | undefined, content: string) => {
+    if (!content.trim()) return;
+    
     setState(prev => ({ ...prev, isLoading: true }));
     
     // Créer un message temporaire optimiste
     const tempMessage: Message = {
       id: `temp-${Date.now()}`,
-      convId: convId,
+      convId: convId || 0,
       content: content,
       isBot: false,
       createdAt: new Date().toISOString()
     };
     
+    // Ajouter le message temporaire à l'UI pour une expérience plus réactive
     setState(prev => ({
       ...prev,
       messages: [...prev.messages, tempMessage]
     }));
     
     try {
-      const response = await apiService.post<Message>('/messages/add', {
-        convId: convId,
-        content: content,
-        isBot: false
+      // Envoyer le message au backend avec le format attendu par l'API
+      // Utiliser le DTO correct qui correspond à SendMessageRequestDTO du backend
+      await apiService.post('/messages/add', {
+        conversationId: convId || null,  // Si 0 ou undefined, envoyer null pour créer une nouvelle conversation
+        message: content,
+        projectId: null  // Pas de projet associé pour l'instant
       });
       
-      // Une fois que nous avons la réponse, nous remplaçons le message temporaire
-      setState(prev => ({
-        ...prev,
-        messages: prev.messages.map(msg => 
-          msg.id === tempMessage.id ? response : msg
-        ),
-        isLoading: false
-      }));
-      
-      // Simuler la réception d'une réponse du bot (à remplacer par une réelle API)
-      setState(prev => ({ ...prev, isLoading: true }));
-      await new Promise(r => setTimeout(r, 1500)); // Attente artificielle
-      
-      const botResponse = await apiService.post<Message>('/messages/add', {
-        convId: convId,
-        content: 'Ceci est une réponse automatique du bot',
-        isBot: true
-      });
+      // Charger tous les messages mis à jour (y compris la réponse du bot)
+      // Seulement si nous avons un ID de conversation valide
+      if (convId) {
+        await loadMessages(convId);
+      }
       
       setState(prev => ({
         ...prev,
-        messages: [...prev.messages, botResponse],
-        isLoading: false
+        isLoading: false,
+        error: null
       }));
-      
     } catch (error) {
+      console.error("Erreur lors de l'envoi du message:", error);
       setState(prev => ({
         ...prev,
-        error: 'Failed to send message',
+        error: "Erreur lors de l'envoi du message",
         isLoading: false
       }));
     }
-  }, []);
+  }, [loadMessages]);
 
   // Créer une nouvelle conversation
   const createConversation = useCallback(async (title: string) => {
@@ -125,7 +118,7 @@ const useChat = (conversationId?: number) => {
 
   // Charger les messages au montage du composant
   useEffect(() => {
-    if (conversationId) {
+    if (conversationId && conversationId > 0) {
       loadConversation(conversationId);
     }
   }, [conversationId, loadConversation]);

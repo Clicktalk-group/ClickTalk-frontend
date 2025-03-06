@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
       } else if (response && typeof response === 'object') {
         // Si la réponse est un objet
-        tokenValue = response.token || '';
+        tokenValue = response.access_token || '';
         userData = response.user || null;
       } else {
         throw new Error("Format de réponse d'authentification non valide");
@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
       } else if (response && typeof response === 'object') {
         // Si la réponse est un objet
-        tokenValue = response.token || '';
+        tokenValue = response.access_token || '';
         userData = response.user || null;
       } else {
         throw new Error("Format de réponse d'inscription non valide");
@@ -181,8 +181,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Construire la valeur du contexte
   const contextValue: AuthContextType = {
     user,
-    token,
-    isAuthenticated: !!token && !!user, // Changer la condition pour considérer aussi le token
+    access_token: token,
+    isAuthenticated: !!token, // Changer la condition pour considérer aussi le token
     isLoading,
     error,
     login,
@@ -206,7 +206,7 @@ export const useAuth = (): AuthContextType => {
   }
   console.log("État d'authentification actuel:", { 
     isAuth: context.isAuthenticated, 
-    token: context.token ? "Présent" : "Absent",
+    token: context.access_token ? "Présent" : "Absent",
     user: context.user 
   });
   return context;

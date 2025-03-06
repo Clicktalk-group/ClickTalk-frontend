@@ -1,12 +1,12 @@
 // src/components/chat/ChatInput/ChatInput.tsx
 import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane } from 'react-icons/fa'; // Remplaçant FiSend qui n'est pas reconnu
+import { FaPaperPlane } from 'react-icons/fa';
 import './ChatInput.scss';
 
 interface ChatInputProps {
   onSendMessage: (content: string) => void;
   isLoading: boolean;
-  onFocus?: () => void; // Ajout de la propriété onFocus pour déclencher le mode chat
+  onFocus?: () => void;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onFocus }) => {
@@ -26,6 +26,11 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onFocus
     if (message.trim() && !isLoading) {
       onSendMessage(message);
       setMessage('');
+      
+      // Reset textarea height
+      if (textAreaRef.current) {
+        textAreaRef.current.style.height = 'auto';
+      }
     }
   };
 
@@ -50,7 +55,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onFocus
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        onFocus={handleFocus} // Ajout du gestionnaire d'événement focus
+        onFocus={handleFocus}
         placeholder="Type a message..."
         rows={1}
         disabled={isLoading}

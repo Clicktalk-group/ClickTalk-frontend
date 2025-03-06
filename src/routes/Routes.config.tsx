@@ -19,7 +19,7 @@ export const publicRoutes: RouteObject[] = [
     children: [
       {
         path: 'login', // Cela devient /auth/login
-        element: <Auth /> 
+        element: <Auth />
       },
       {
         path: 'register', // Cela devient /auth/register
