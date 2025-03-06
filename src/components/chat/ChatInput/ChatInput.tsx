@@ -6,9 +6,10 @@ import './ChatInput.scss';
 interface ChatInputProps {
   onSendMessage: (content: string) => void;
   isLoading: boolean;
+  onFocus?: () => void; // Ajout de la propriété onFocus pour déclencher le mode chat
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onFocus }) => {
   const [message, setMessage] = useState('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -35,6 +36,13 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
     }
   };
 
+  // Gestion du focus sur la zone de texte
+  const handleFocus = () => {
+    if (onFocus) {
+      onFocus();
+    }
+  };
+
   return (
     <form className="chat-input-container" onSubmit={handleSubmit}>
       <textarea
@@ -42,6 +50,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
+        onFocus={handleFocus} // Ajout du gestionnaire d'événement focus
         placeholder="Type a message..."
         rows={1}
         disabled={isLoading}

@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Sidebar } from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
-import ChatContainer from "../../chat/ChatContainer/ChatContainer";
 import "./MainLayout.scss";
 
 interface MainLayoutProps {
@@ -98,9 +97,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <>
             <div className="main-content">
               {children}
-            </div>
-            <div className="chat-footer">
-              <ChatContainer />
             </div>
           </>
         )}

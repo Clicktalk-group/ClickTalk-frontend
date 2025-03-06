@@ -1,3 +1,4 @@
+// src/components/chat/ChatContainer/ChatContainer.scss
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
@@ -6,12 +7,13 @@
   flex-direction: column;
   height: 100%;
   background-color: $background-color;
-  border-radius: $radius-lg $radius-lg 0 0; 
+  border-radius: $radius-lg; 
   overflow: hidden;
   box-shadow: $shadow-lg;
   border: 1px solid darken($background-color, 5%);
   border-bottom: none;
-  margin-top: 0; // Ajouté pour éliminer l'espace
+  padding: $sp-md;
+  margin-top: $sp-xs; // Corrigé pour utiliser $ au lieu de sp
 
   .chat-error {
     padding: $sp-md;

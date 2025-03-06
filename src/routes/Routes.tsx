@@ -5,9 +5,9 @@ import { publicRoutes, privateRoutes } from "./Routes.config";
 export const createAppRouter = (isAuthenticated: boolean) => {
   // Combinez les routes publiques et privées selon l'état utilisateur
   const routes = isAuthenticated
-    ? [...publicRoutes, ...privateRoutes] // Si connecté
-    : publicRoutes; // Si non connecté
-
+    ? [...privateRoutes] //
+    : [...publicRoutes]; //
+    
   // Configurer les drapeaux de fonctionnalités futures pour supprimer les avertissements
   return createBrowserRouter(routes, {
     future: {
