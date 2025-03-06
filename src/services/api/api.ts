@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 10000, // 10s timeout
+  timeout: 60000, // 60s timeout
 });
 
 // Intercepteur pour ajouter le token JWT à chaque requête
@@ -22,27 +22,39 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    console.log("Requête API envoyée:", { url: config.url, method: config.method });
+    console.log("📤 Requête API envoyée:", { 
+      url: config.url, 
+      method: config.method,
+      data: config.data || 'No data' 
+    });
     return config;
   },
   (error) => {
+    console.error("❌ Erreur lors de l'envoi de la requête:", error);
     return Promise.reject(error);
   }
 );
 
 // Intercepteur pour gérer les erreurs de réponse (ex: token expiré)
 axiosInstance.interceptors.response.use(
-  (response) => {
-    console.log("Réponse API reçue:", { 
+  (response: any) => {
+    console.log("📩 Réponse API reçue:", { 
       url: response.config.url, 
-      status: response.status 
+      status: response.status,
+      dataSize: response.data ? JSON.stringify(response.data).length : 0
     });
-    return response;
+    
+    // Vérification simplifiée des données renvoyées
+    if (response.data === undefined || response.data === null) {
+      console.warn("⚠️ La réponse API ne contient pas de données");
+    }
+    
+    return response.data; // Simplification: renvoyer directement response.data
   },
   (error) => {
     // Gérer le cas de token expiré (code 401)
     if (error.response?.status === 401) {
-      console.error("Erreur d'authentification (401) - Session expirée");
+      console.error("🔒 Erreur d'authentification (401) - Session expirée");
       // Déconnecter l'utilisateur
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -52,7 +64,7 @@ axiosInstance.interceptors.response.use(
         window.location.href = '/auth/login';
       }
     } else {
-      console.error("Erreur API:", {
+      console.error("❌ Erreur API:", {
         url: error.config?.url,
         status: error.response?.status,
         message: error.response?.data?.message || error.message
@@ -69,26 +81,46 @@ axiosInstance.interceptors.response.use(
 export const apiService = {
   // GET request
   get: async <T>(url: string, params?: any, config?: any): Promise<T> => {
-    const response = await axiosInstance.get(url, { params, ...config });
-    return response.data as T;
+    try {
+      const response = await axiosInstance.get(url, { params, ...config });
+      return response as T;
+    } catch (error: any) {
+      console.error(`❌ GET error for ${url}:`, error.message);
+      throw error;
+    }
   },
   
   // POST request
   post: async <T>(url: string, data?: any, config?: any): Promise<T> => {
-    const response = await axiosInstance.post(url, data, config);
-    return response.data as T;
+    try {
+      const response = await axiosInstance.post(url, data, config);
+      return response as T;
+    } catch (error: any) {
+      console.error(`❌ POST error for ${url}:`, error.message);
+      throw error;
+    }
   },
   
   // PUT request
   put: async <T>(url: string, data?: any, config?: any): Promise<T> => {
-    const response = await axiosInstance.put(url, data, config);
-    return response.data as T;
+    try {
+      const response = await axiosInstance.put(url, data, config);
+      return response as T;
+    } catch (error: any) {
+      console.error(`❌ PUT error for ${url}:`, error.message);
+      throw error;
+    }
   },
   
   // DELETE request
   delete: async <T>(url: string, config?: any): Promise<T> => {
-    const response = await axiosInstance.delete(url, config);
-    return response.data as T;
+    try {
+      const response = await axiosInstance.delete(url, config);
+      return response as T;
+    } catch (error: any) {
+      console.error(`❌ DELETE error for ${url}:`, error.message);
+      throw error;
+    }
   }
 };
 

@@ -1,6 +1,6 @@
 // Message standard
 export interface Message {
-  id: string;
+  id: string | number;
   convId: number;
   content: string; 
   isBot: boolean;
