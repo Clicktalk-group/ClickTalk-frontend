@@ -16,27 +16,41 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   onCopyMessage 
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages come in
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  // Ajouter des logs pour déboguer
+  useEffect(() => {
+    console.log(`Rendering ${messages.length} messages`);
+    messages.forEach((msg, i) => {
+      console.log(`Message ${i}: ID=${msg.id}, isBot=${msg.isBot}, content=${msg.content.substring(0, 30)}...`);
+    });
   }, [messages]);
 
   return (
-    <div className="chat-messages">
+    <div className="chat-messages" ref={messagesContainerRef}>
       {messages.length === 0 && !isLoading ? (
         <div className="empty-state">
           <p>Commencez une conversation!</p>
         </div>
       ) : (
         <>
-          {messages.map((message) => (
-            <MessageBubble 
-              key={message.id} 
-              message={message}
-              onCopy={() => onCopyMessage(message.content)} 
-            />
-          ))}
+          {/* Afficher les messages dans l'ordre chronologique */}
+          {messages
+            .filter(message => typeof message.id !== 'string' || !message.id.includes('temp-bot'))
+            .map((message, index) => (
+              <MessageBubble 
+                key={`${message.id}-${index}`} 
+                message={message}
+                onCopy={() => onCopyMessage(message.content)} 
+              />
+            ))}
           
           {isLoading && (
             <div className="loading-message">

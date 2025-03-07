@@ -1,3 +1,4 @@
+// src/hooks/useChat/useChat.ts
 import { useState, useEffect, useCallback } from 'react';
 import { Message, Conversation, ChatState } from '../../types/chat.types';
 import apiService from '../../services/api/api';
@@ -34,13 +35,19 @@ const useChat = (conversationId?: number) => {
           messages: response,
           isLoading: false
         }));
+      } else if (response === null || response === undefined) {
+        // Pas d'erreur mais pas de messages - conversation vide
+        setState(prevState => ({
+          ...prevState,
+          messages: [],
+          isLoading: false
+        }));
       } else {
         console.error("❌ API returned non-array response for messages:", response);
         setState(prevState => ({
           ...prevState,
           error: 'Format de réponse invalide du serveur',
-          isLoading: false,
-          messages: [] // Réinitialiser les messages en cas d'erreur
+          isLoading: false
         }));
       }
     } catch (error) {
@@ -67,8 +74,8 @@ const useChat = (conversationId?: number) => {
       ...prevState, 
       isLoading: true, 
       error: null,
-      // Effacer les messages précédents pour éviter confusion
-      messages: []
+      // Ne pas effacer les messages pour éviter le clignotement de l'UI
+      // messages: []
     }));
     
     try {
@@ -109,6 +116,9 @@ const useChat = (conversationId?: number) => {
 
     // Générer des IDs temporaires uniques
     const tempUserId = `temp-user-${Date.now()}`;
+    
+    // Garder une copie des messages actuels pour restaurer en cas d'erreur
+    const currentMessages = [...state.messages];
     
     // Ajouter le message utilisateur immédiatement à l'UI
     setState(prevState => ({
@@ -160,36 +170,48 @@ const useChat = (conversationId?: number) => {
       clearTimeout(typingTimeout);
       
       // Déterminer l'ID de conversation à partir de la réponse
-      // Si nous avons un convId de la réponse, l'utiliser
-      const responseConvId = response.convId || response.conversationId || null;
+      let responseConvId: number | null = null;
+      
+      // Vérifier différentes formes possibles de réponse pour l'ID de conversation
+      if (response) {
+        if (response.convId) {
+          responseConvId = Number(response.convId);
+        } else if (response.conversationId) {
+          responseConvId = Number(response.conversationId);
+        } else if (response.id && response.userId) {
+          // Si la réponse est elle-même une conversation
+          responseConvId = Number(response.id);
+        } else if (convId) {
+          // Utiliser l'ID existant si aucun nouveau n'est fourni
+          responseConvId = convId;
+        }
+      }
       
       if (responseConvId) {
-        console.log(`✅ Message sent to conversation ID: ${responseConvId}`);
+        console.log(`✅ Message successfully processed for conversation ID: ${responseConvId}`);
         
-        // Nettoyer les messages temporaires
-        setState(prevState => ({
-          ...prevState,
-          messages: prevState.messages.filter(m => {
-            if (typeof m.id === 'number') return true;
-            if (typeof m.id !== 'string') return true;
-            return !m.id.includes('temp');
-          })
-        }));
-        
-        // Charger la conversation avec l'ID obtenu
-        if (!convId || convId !== responseConvId) {
-          // Si c'est une nouvelle conversation ou si l'ID a changé
-          await loadConversation(responseConvId);
-        } else {
-          // Si c'est la même conversation, recharger les messages
-          await loadMessages(convId);
-        }
+        // Avoir un délai court avant de recharger, pour éviter la course de conditions
+        setTimeout(async () => {
+          // Nettoyer les messages temporaires et recharger complètement
+          try {
+            if (!convId || convId !== responseConvId) {
+              // Si c'est une nouvelle conversation ou si l'ID a changé
+              await loadConversation(responseConvId as number);
+            } else {
+              // Si c'est la même conversation, recharger les messages
+              await loadMessages(convId);
+            }
+          } catch (err) {
+            console.error("Error refreshing messages after send:", err);
+          }
+        }, 200);
       } else {
         console.error("❌ No conversation ID found in response", response);
         setState(prevState => ({
           ...prevState,
           error: "Erreur: Impossible d'identifier la conversation",
           isLoading: false,
+          // Garder le message de l'utilisateur, supprimer juste le message temporaire du bot
           messages: prevState.messages.filter(m => {
             if (typeof m.id !== 'string') return true;
             return !m.id.includes('temp-bot');
@@ -206,14 +228,11 @@ const useChat = (conversationId?: number) => {
         ...prevState,
         error: "Erreur lors de l'envoi du message. Veuillez réessayer.",
         isLoading: false,
-        // Supprimer uniquement l'indicateur du bot, garder le message utilisateur
-        messages: prevState.messages.filter(m => {
-          if (typeof m.id !== 'string') return true;
-          return !m.id.includes('temp-bot');
-        })
+        // Restaurer l'état précédent sans les messages temporaires
+        messages: currentMessages
       }));
     }
-  }, [loadMessages, loadConversation]);
+  }, [state.messages, loadMessages, loadConversation]);
 
   // Créer une nouvelle conversation
   const createConversation = useCallback(async (title: string) => {
