@@ -30,12 +30,12 @@ export interface AuthResponse {
 // Interface du contexte d'authentification
 export interface AuthContextType {
   user: User | null;
-  access_token: string | null;
+  access_token: string;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (credentials: RegisterCredentials) => Promise<void>;
+ login: (email: string, password: string) => Promise<void>;  register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUserData: () => Promise<void>; // Nouvelle méthode
   clearError: () => void;
 }

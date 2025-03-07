@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 120000, // Augmenté à 120s pour les appels de longue durée à DeepSeek
+  timeout: 60000, // 60s timeout
 });
 
 // Intercepteur pour ajouter le token JWT à chaque requête
@@ -35,7 +35,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Intercepteur pour gérer les erreurs de réponse
+// Intercepteur pour gérer les erreurs de réponse (ex: token expiré)
 axiosInstance.interceptors.response.use(
   (response: any) => {
     console.log("📩 Réponse API reçue:", { 
@@ -44,12 +44,12 @@ axiosInstance.interceptors.response.use(
       dataSize: response.data ? JSON.stringify(response.data).length : 0
     });
     
-    // Vérification des données renvoyées
+    // Vérification simplifiée des données renvoyées
     if (response.data === undefined || response.data === null) {
       console.warn("⚠️ La réponse API ne contient pas de données");
     }
     
-    return response.data; // Renvoyer directement response.data
+    return response.data; // Simplification: renvoyer directement response.data
   },
   (error) => {
     // Gérer le cas de token expiré (code 401)
@@ -63,12 +63,6 @@ axiosInstance.interceptors.response.use(
       if (window.location.pathname !== '/auth/login') {
         window.location.href = '/auth/login';
       }
-    } else if (error.response?.status === 500) {
-      // Erreur serveur 500
-      console.error("🔥 Erreur serveur (500):", error.response?.data || error.message);
-    } else if (!error.response) {
-      // Erreurs réseau (pas de réponse)
-      console.error("🌐 Erreur réseau:", error.message);
     } else {
       console.error("❌ Erreur API:", {
         url: error.config?.url,

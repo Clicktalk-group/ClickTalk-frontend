@@ -1,7 +1,7 @@
 import React from "react";
 import { SidebarProps } from "./Sidebar.types";
 import "./Sidebar.scss";
-import { FaSignOutAlt, FaComments, FaFolder, FaPlus } from "react-icons/fa";
+import { FaSignOutAlt, FaComments, FaFolder, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { BiHomeAlt } from "react-icons/bi";
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -12,21 +12,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onNewProject,
   onSelectConversation,
   onSelectProject,
+  onRenameProject,
+  onDeleteProject,
   onLogout,
   onToggleSidebar,
 }) => {
+  console.log("Projects in sidebar:", projects); // Debugging
+  
   return (
     <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
-      {/* Icône home en haut de la sidebar - ferme la sidebar lorsqu'elle est cliquée */}
       <div className="sidebar-header">
         <div className="home-icon-container" onClick={onToggleSidebar}>
           <BiHomeAlt className="home-icon" />
         </div>
       </div>
 
-      {/* Contenu de la sidebar */}
       <div className="content">
-        {/* Conversations Section */}
         <div className="section">
           <div className="section-header">
             <FaComments />
@@ -35,22 +36,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button className="add-btn" onClick={onNewConversation}>
             <FaPlus className="add-icon" /> Nouvelle Conversation
           </button>
-          <ul className="section-list">
-            {conversations.map((item) => (
-              <li
-                key={item.id}
-                className="list-item"
-                onClick={() => onSelectConversation(item.id)}
-              >
-                {item.title}
-              </li>
-            ))}
-          </ul>
+          <div className="section-list-container">
+            <ul className="section-list">
+              {conversations.map((item) => (
+                <li
+                  key={item.id}
+                  className="list-item"
+                  onClick={() => onSelectConversation(item.id)}
+                >
+                  {item.title}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <hr className="divider" />
 
-        {/* Projects Section */}
         <div className="section">
           <div className="section-header">
             <FaFolder />
@@ -59,23 +61,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button className="add-btn" onClick={onNewProject}>
             <FaPlus className="add-icon" /> Nouveau Projet
           </button>
-          <ul className="section-list">
-            {projects.map((item) => (
-              <li
-                key={item.id}
-                className="list-item"
-                onClick={() => onSelectProject(item.id)}
-              >
-                {item.title}
-              </li>
-            ))}
-          </ul>
+          <div className="section-list-container">
+            <ul className="section-list">
+              {projects.map((item) => (
+                <li
+                  key={item.id}
+                  className="list-item project-item"
+                >
+                  <span 
+                    className="project-title" 
+                    onClick={() => onSelectProject(item.id)}
+                  >
+                    {item.title}
+                  </span>
+                  <div className="project-actions">
+                  <button 
+                  className="action-btn edit-btn" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRenameProject(item);
+                  }}
+                  title="Modifier le projet"
+                >
+                  <FaEdit />
+                </button>
+                    <button 
+                      className="action-btn delete-btn" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm(`Voulez-vous vraiment supprimer le projet "${item.title}" ?`)) {
+                          onDeleteProject(item.id);
+                        }
+                      }}
+                      title="Supprimer le projet"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <hr className="divider" />
       </div>
 
-      {/* Bouton déconnexion en bas */}
       <button className="logout-btn" onClick={onLogout}>
         <FaSignOutAlt className="logout-icon" /> Déconnexion
       </button>

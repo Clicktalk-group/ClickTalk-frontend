@@ -37,7 +37,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegister
     }
     
     try {
-      await login({ email, password });
+      await login(email, password);
       navigate('/');
     } catch (err) {
       console.error("Erreur de connexion:", err);

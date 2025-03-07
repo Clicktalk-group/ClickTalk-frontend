@@ -1,0 +1,72 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.conversation-project-list {
+  margin: $sp-md 0;
+  
+  h3 {
+    font-size: $fs-md;
+    margin-bottom: $sp-sm;
+    color: $color-text-secondary;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+    
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $sp-sm $sp-md;
+      margin-bottom: $sp-xs;
+      background-color: $background-btn-grey;
+      border-radius: $radius-md;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: $background-btn;
+      }
+      
+      .title {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $color-text-primary;
+      }
+      
+      .actions {
+        display: flex;
+        align-items: center;
+        
+        .remove-btn {
+          background: none;
+          border: none;
+          color: $color-text-light;
+          padding: $sp-xs;
+          margin-left: $sp-xs;
+          border-radius: $radius-sm;
+          transition: all 0.2s ease;
+          
+          &:hover {
+            color: $danger-color;
+            background-color: rgba($danger-color, 0.1);
+          }
+        }
+      }
+    }
+  }
+  
+  .loading, .error, .empty {
+    padding: $sp-md;
+    text-align: center;
+    color: $color-text-secondary;
+    font-size: $fs-sm;
+  }
+  
+  .error {
+    color: $danger-color;
+  }
+}

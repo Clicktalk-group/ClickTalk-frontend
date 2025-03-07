@@ -6,27 +6,28 @@ import NotFound from '../pages/NotFound/NotFound';
 import { ProtectedRoute } from '../components/route/ProtectedRoute';
 import MainLayout from '../components/layouts/MainLayout/MainLayout';
 import Chat from '../pages/Chat/Chat';
+import Project from '../pages/Project/Project';
 
 // Routes publiques (accessibles à tous)
 export const publicRoutes: RouteObject[] = [
   {
     path: '/',
-    element: <Navigate to="/auth" /> // Rediriger vers /auth au lieu de /auth/login
+    element: <Navigate to="/auth" />
   },
   {
     path: '/auth',
-    element: <Auth />, // Élément principal pour la route /auth
+    element: <Auth />,
     children: [
       {
-        path: 'login', // Cela devient /auth/login
+        path: 'login',
         element: <Auth />
       },
       {
-        path: 'register', // Cela devient /auth/register
+        path: 'register',
         element: <Auth />
       },
       {
-        index: true, // Cela est pour /auth directement
+        index: true,
         element: <Auth />
       }
     ] 
@@ -59,7 +60,6 @@ export const privateRoutes: RouteObject[] = [
       </ProtectedRoute>
     )
   },
-  // Ajouter aussi une route pour la création d'une nouvelle conversation
   {
     path: '/chat/new',
     element: (
@@ -71,7 +71,17 @@ export const privateRoutes: RouteObject[] = [
     )
   },
   {
-    path: '/auth', // Ajout de cette route pour éviter l'erreur si l'utilisateur tente d'accéder à /auth en étant connecté
+    path: '/project/:projectId',
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Project />
+        </MainLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/auth',
     element: <Navigate to="/" />
   },
   {
