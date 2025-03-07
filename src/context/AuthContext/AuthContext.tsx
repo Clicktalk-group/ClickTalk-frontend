@@ -1,36 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService } from '../../services/auth/auth';
-import { LoginCredentials, RegisterCredentials, User } from '../../types/auth.types';
-
-// Définition du type pour la réponse d'authentification
-export interface AuthResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  user?: User; // Optionnel car l'API ne renvoie peut-être pas directement l'utilisateur
-}
-
-// Type pour le contexte d'authentification
-export type AuthContextType = {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (credentials: RegisterCredentials) => Promise<void>;
-  logout: () => Promise<void>;
-  clearError: () => void;
-};
+import { LoginCredentials, RegisterCredentials, User, AuthContextType, AuthResponse } from '../../types/auth.types';
 
 // Création du contexte avec une valeur par défaut
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  access_token: '',
   isAuthenticated: false,
   isLoading: false,
   error: null,
   login: async () => {},
   register: async () => {},
   logout: async () => {},
+  refreshUserData: async () => {},
   clearError: () => {},
 });
 
@@ -42,7 +24,7 @@ type AuthProviderProps = {
 // Provider d'authentification qui encapsule la logique d'authentification
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       } catch (err) {
         console.error('Erreur lors de l\'initialisation de l\'authentification:', err);
-        setAccessToken(null);
+        setAccessToken('');
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -76,14 +58,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   // Fonction de connexion
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
       setError(null);
       
-      console.log("Tentative de connexion avec:", credentials);
+      console.log("Tentative de connexion avec:", { email, password });
       
-      const response = await authService.login(credentials);
+      const response = await authService.login({ email, password });
       console.log("Réponse de connexion:", response);
       
       let tokenValue = '';
@@ -108,10 +90,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('token', tokenValue);
       
       // Si nous n'avons pas reçu de données utilisateur, créons un utilisateur de base
-      if (!userData && credentials.email) {
+      if (!userData && email) {
         userData = {
           id: 1, // ID par défaut
-          email: credentials.email,
+          email: email,
           username: 'defaultUsername', // Valeur par défaut
           createdAt: new Date().toISOString(), // Valeur par défaut
         };
@@ -215,7 +197,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('user');
       
       // Réinitialisation de l'état
-      setAccessToken(null);
+      setAccessToken('');
       setUser(null);
       setError(null);
       
@@ -223,6 +205,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (err) {
       console.error("Erreur lors de la déconnexion:", err);
       setError("Échec de la déconnexion");
+    }
+  };
+
+  // Fonction pour rafraîchir les données utilisateur
+  const refreshUserData = async () => {
+    try {
+      // Implémentation du rafraîchissement des données utilisateur
+      // À compléter avec l'appel API approprié
+      console.log("Rafraîchissement des données utilisateur");
+    } catch (err) {
+      console.error("Erreur lors du rafraîchissement des données utilisateur:", err);
     }
   };
 
@@ -234,12 +227,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Valeur du contexte à fournir aux composants
   const contextValue: AuthContextType = {
     user,
+    access_token: accessToken,
     isAuthenticated: !!accessToken && !!user, // Changer la condition pour considérer aussi le token
     isLoading,
     error,
     login,
     register,
     logout,
+    refreshUserData,
     clearError,
   };
 
@@ -250,7 +245,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// Hook personnalisé pour accéder au contexte d'authentification
 export const useAuth = () => {
   const context = useContext(AuthContext);
   
