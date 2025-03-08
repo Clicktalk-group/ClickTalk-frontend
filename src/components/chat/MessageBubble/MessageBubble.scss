@@ -84,6 +84,14 @@
     
     ul, ol {
       padding-left: 20px;
+      
+      li {
+        margin-bottom: $sp-xs;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
     }
     
     a {
@@ -98,7 +106,7 @@
       background-color: rgba(0, 0, 0, 0.05);
       padding: 2px 4px;
       border-radius: $radius-sm;
-      font-family: monospace;
+      font-family: 'Fira Code', monospace, 'Courier New';
       font-size: 0.9em;
     }
     
@@ -109,11 +117,13 @@
       border-radius: $radius-sm;
       overflow-x: auto;
       margin-bottom: $sp-sm;
+      position: relative;
       
       code {
         background-color: transparent;
         padding: 0;
         color: inherit;
+        white-space: pre-wrap;
       }
     }
     
@@ -129,6 +139,8 @@
       width: 100%;
       border-collapse: collapse;
       margin: $sp-md 0;
+      display: block;
+      overflow-x: auto;
       
       th {
         background-color: $background-color;
@@ -144,6 +156,14 @@
       tr:nth-child(even) {
         background-color: rgba(0, 0, 0, 0.02);
       }
+    }
+    
+    hr {
+      border: 0;
+      height: 1px;
+      background: $border-color;
+      opacity: 0.2;
+      margin: $sp-md 0;
     }
   }
   

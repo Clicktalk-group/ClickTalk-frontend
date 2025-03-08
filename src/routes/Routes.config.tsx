@@ -7,6 +7,8 @@ import { ProtectedRoute } from '../components/route/ProtectedRoute';
 import MainLayout from '../components/layouts/MainLayout/MainLayout';
 import Chat from '../pages/Chat/Chat';
 import Project from '../pages/Project/Project';
+import Settings from '../pages/Settings/Settings';
+
 
 // Routes publiques (accessibles à tous)
 export const publicRoutes: RouteObject[] = [
@@ -76,6 +78,16 @@ export const privateRoutes: RouteObject[] = [
       <ProtectedRoute>
         <MainLayout>
           <Project />
+        </MainLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/settings',
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Settings />
         </MainLayout>
       </ProtectedRoute>
     )

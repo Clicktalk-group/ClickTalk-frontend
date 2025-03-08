@@ -19,7 +19,15 @@ axiosInstance.interceptors.request.use(
     const token = localStorage.getItem('token');
     
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      // S'assurer que le token est correctement formaté (sans guillemets)
+      const cleanToken = token.replace(/^"|"$/g, '');
+      config.headers.Authorization = `Bearer ${cleanToken}`;
+      
+      // Log pour déboguer
+      console.log("🔑 Token utilisé:", cleanToken.slice(0, 15) + "...");
+    } else if (!token && config.url && !config.url.includes('/auth/')) {
+      // Avertissement si token manquant pour requête authentifiée
+      console.warn("⚠️ Requête authentifiée sans token:", config.url);
     }
     
     console.log("📤 Requête API envoyée:", { 
@@ -63,11 +71,18 @@ axiosInstance.interceptors.response.use(
       if (window.location.pathname !== '/auth/login') {
         window.location.href = '/auth/login';
       }
-    } else {
+    } 
+    // Gérer le cas d'accès refusé (code 403)
+    else if (error.response?.status === 403) {
+      console.error("🚫 Erreur d'autorisation (403) - Accès refusé");
+      // On pourrait rediriger vers une page d'erreur spécifique
+    }
+    else {
       console.error("❌ Erreur API:", {
         url: error.config?.url,
         status: error.response?.status,
-        message: error.response?.data?.message || error.message
+        message: error.response?.data?.message || error.message,
+        headers: error.config?.headers,
       });
     }
     

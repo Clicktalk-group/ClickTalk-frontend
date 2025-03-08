@@ -1,0 +1,194 @@
+// src/pages/Settings/Settings.scss
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.settings-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $sp-lg;
+  
+  h1 {
+    font-size: $fs-xl;
+    margin-bottom: $sp-xl;
+  }
+}
+
+.settings-section {
+  margin-bottom: $sp-xl;
+  background: $color-light;
+  border-radius: $radius-md;
+  padding: $sp-lg;
+  box-shadow: $shadow-sm;
+  
+  h2 {
+    font-size: $fs-lg;
+    margin-bottom: $sp-md;
+    color: $color-text-primary;
+  }
+  
+  body.dark-mode & {
+    background: $color-bg-dark-hover;
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  
+  .avatar {
+    width: 60px;
+    height: 60px;
+    background-color: $primary-color;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: $sp-md;
+    
+    svg {
+      color: $color-light;
+      font-size: 28px;
+    }
+  }
+  
+  .user-details {
+    h3 {
+      margin-bottom: $sp-xs;
+    }
+    
+    p {
+      color: $color-text-secondary;
+    }
+  }
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $sp-md 0;
+  border-bottom: 1px solid rgba($border-color, 0.1);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .setting-label {
+    flex: 1;
+    
+    span {
+      display: block;
+      font-weight: 500;
+      margin-bottom: $sp-xs;
+    }
+    
+    .setting-description {
+      font-size: $fs-sm;
+      color: $color-text-secondary;
+    }
+  }
+  
+  .setting-control {
+    min-width: 120px;
+  }
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  padding: $sp-sm $sp-md;
+  border-radius: $radius-md;
+  transition: all 0.3s ease;
+  
+  svg {
+    margin-right: $sp-sm;
+  }
+  
+  &.theme-light {
+    background-color: $background-color;
+    color: $color-text-primary;
+    
+    svg {
+      color: #f39c12;
+    }
+  }
+  
+  &.theme-dark {
+    background-color: $color-bg-dark;
+    color: $color-light;
+    
+    svg {
+      color: #f1c40f;
+    }
+  }
+}
+
+.danger-zone {
+  .danger-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $sp-md;
+  }
+  
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $sp-md;
+    border-radius: $radius-md;
+    border: none;
+    gap: $sp-sm;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    
+    svg {
+      font-size: 16px;
+    }
+  }
+  
+  .logout-button {
+    background-color: $background-btn;
+    color: $color-text-primary;
+    
+    &:hover {
+      background-color: darken($background-btn, 5%);
+    }
+  }
+  
+  .delete-account-button {
+    background-color: rgba($danger-color, 0.1);
+    color: $danger-color;
+    
+    &:hover {
+      background-color: $danger-color;
+      color: $color-light;
+    }
+  }
+}
+
+// Responsive
+@include responsive($tablet) {
+  .settings-page {
+    padding: $sp-md;
+  }
+  
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .setting-label {
+      margin-bottom: $sp-sm;
+    }
+  }
+  
+  .danger-zone {
+    .danger-actions {
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
