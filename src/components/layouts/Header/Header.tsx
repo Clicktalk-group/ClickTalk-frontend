@@ -1,10 +1,18 @@
-import React from "react";
+// src/components/layout/Header/Header.tsx
+import React, { useState } from "react";
 import "./Header.scss";
 import { HeaderProps } from "./Header.types";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaHome } from "react-icons/fa";
+import HeaderMenu from "../../common/HeaderMenu/HeaderMenu";
 
 const Header: React.FC<HeaderProps> = ({ isSidebarOpen, toggleSidebar }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <header className="header">
       {/* Home Icon - visible uniquement quand la sidebar est fermée */}
@@ -22,14 +30,20 @@ const Header: React.FC<HeaderProps> = ({ isSidebarOpen, toggleSidebar }) => {
         <img src="/assets/images/logo.png" alt="ClickTalk Logo" className="logo" />
       </div>
 
-      {/* Menu Button - ne contrôle plus la sidebar */}
+      {/* Menu Button - ouvre maintenant le menu déroulant */}
       <button 
         className="menuButton" 
-        onClick={() => console.log("Menu hamburger clicked - future functionality")}
+        onClick={toggleMenu}
         aria-label="Menu principal"
       >
         <GiHamburgerMenu />
       </button>
+      
+      {/* Menu déroulant */}
+      <HeaderMenu 
+        isOpen={isMenuOpen} 
+        onClose={() => setIsMenuOpen(false)} 
+      />
     </header>
   );
 };

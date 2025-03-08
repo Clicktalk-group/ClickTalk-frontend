@@ -34,6 +34,7 @@
 .user-info {
   display: flex;
   align-items: center;
+  margin-bottom: $sp-lg;
   
   .avatar {
     width: 60px;
@@ -58,6 +59,48 @@
     
     p {
       color: $color-text-secondary;
+    }
+  }
+}
+
+.account-form {
+  .form-group {
+    margin-bottom: $sp-md;
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: $sp-xs;
+      color: $color-text-primary;
+    }
+    
+    input {
+      width: 100%;
+      padding: $sp-sm;
+      border: 1px solid $border-color;
+      border-radius: $radius-sm;
+      font-size: $fs-md;
+      transition: border-color 0.2s ease;
+      
+      &:focus {
+        border-color: $primary-color;
+        outline: none;
+      }
+    }
+  }
+  
+  .save-button {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    padding: $sp-md $sp-lg;
+    border-radius: $radius-md;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: darken($primary-color, 10%);
     }
   }
 }
@@ -93,6 +136,32 @@
   }
 }
 
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $sp-xs;
+  max-width: 240px;
+  
+  .color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border: 2px solid transparent;
+    
+    &.active {
+      border-color: white;
+      box-shadow: 0 0 0 2px $primary-color;
+      transform: scale(1.1);
+    }
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -120,6 +189,70 @@
     
     svg {
       color: #f1c40f;
+    }
+  }
+}
+
+.help-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  
+  p {
+    margin-bottom: $sp-md;
+  }
+  
+  .help-button {
+    display: flex;
+    align-items: center;
+    gap: $sp-sm;
+    background-color: $background-btn;
+    border: none;
+    padding: $sp-sm $sp-md;
+    border-radius: $radius-md;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: darken($background-btn, 5%);
+    }
+    
+    svg {
+      color: $primary-color;
+    }
+  }
+}
+
+.help-modal-content {
+  h3 {
+    margin-bottom: $sp-md;
+  }
+  
+  h4 {
+    margin: $sp-md 0 $sp-sm;
+  }
+  
+  p {
+    margin-bottom: $sp-md;
+    line-height: 1.5;
+  }
+  
+  ul {
+    margin: $sp-sm 0;
+    padding-left: $sp-lg;
+    
+    li {
+      margin-bottom: $sp-xs;
+    }
+  }
+  
+  a {
+    color: $primary-color;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
