@@ -1,6 +1,5 @@
-// src/hooks/useChat/useChat.ts
 import { useState, useEffect, useCallback } from 'react';
-import { Message, Conversation, ChatState } from '../../types/chat.types';
+import { Message, Conversation, ChatState, ApiMessageResponse } from '../../types/chat.types';
 import apiService from '../../services/api/api';
 
 const useChat = (conversationId?: number) => {
@@ -8,7 +7,8 @@ const useChat = (conversationId?: number) => {
     messages: [],
     isLoading: false,
     currentConversation: null,
-    error: null
+    error: null,
+    streamingMessage: null // NOUVEAU: pour le message en cours de streaming
   });
 
   // Déclaration préliminaire pour résoudre la dépendance circulaire
@@ -105,7 +105,22 @@ const useChat = (conversationId?: number) => {
   // Assigner la fonction réelle à la référence
   Object.assign(loadConversationRef, { current: loadConversation });
 
-  // Envoyer un message
+  // NOUVEAU: Fonction pour traiter les chunks (morceaux) de texte en streaming
+  const handleStreamChunk = useCallback((chunk: string) => {
+    setState(prevState => {
+      // Ajouter le nouveau morceau au message en streaming
+      const newStreamingContent = (prevState.streamingMessage || '') + chunk;
+      
+      console.log(`📈 Streaming chunk received: "${chunk}" (Total: ${newStreamingContent.length} chars)`);
+      
+      return {
+        ...prevState,
+        streamingMessage: newStreamingContent
+      };
+    });
+  }, []);
+
+  // Envoyer un message avec support de streaming
   const sendMessage = useCallback(async (convId: number | undefined, content: string) => {
     if (!content.trim()) {
       console.warn("Empty message, not sending");
@@ -116,6 +131,7 @@ const useChat = (conversationId?: number) => {
 
     // Générer des IDs temporaires uniques
     const tempUserId = `temp-user-${Date.now()}`;
+    const tempBotId = `temp-bot-${Date.now()}`;
     
     // Garder une copie des messages actuels pour restaurer en cas d'erreur
     const currentMessages = [...state.messages];
@@ -134,12 +150,12 @@ const useChat = (conversationId?: number) => {
         }
       ],
       isLoading: true,
-      error: null // Réinitialiser les erreurs précédentes
+      error: null, // Réinitialiser les erreurs précédentes
+      streamingMessage: null // Réinitialiser le message en streaming
     }));
     
-    // Ajouter l'indicateur "bot is typing"
-    const tempBotId = `temp-bot-${Date.now()}`;
-    const typingTimeout = setTimeout(() => {
+    // Ajouter un message bot vide qui sera rempli progressivement
+    setTimeout(() => {
       setState(prevState => ({
         ...prevState,
         messages: [
@@ -147,7 +163,7 @@ const useChat = (conversationId?: number) => {
           {
             id: tempBotId,
             convId: convId || 0,
-            content: "...",
+            content: "",
             isBot: true,
             createdAt: new Date().toISOString()
           }
@@ -163,11 +179,15 @@ const useChat = (conversationId?: number) => {
       };
       
       console.log("📦 API payload:", payload);
-      const response = await apiService.post<any>('/messages/add', payload);
-      console.log("📩 API response:", response);
       
-      // Annuler le timeout si la réponse arrive avant
-      clearTimeout(typingTimeout);
+      // NOUVEAU: Utiliser la fonction de streaming
+      const response = await apiService.stream<ApiMessageResponse>(
+        '/messages/add', 
+        payload,
+        handleStreamChunk // Passer le gestionnaire de chunks
+      );
+      
+      console.log("📩 API response:", response);
       
       // Déterminer l'ID de conversation à partir de la réponse
       let responseConvId: number | null = null;
@@ -190,19 +210,37 @@ const useChat = (conversationId?: number) => {
       if (responseConvId) {
         console.log(`✅ Message successfully processed for conversation ID: ${responseConvId}`);
         
-        // Avoir un délai court avant de recharger, pour éviter la course de conditions
+        // Intégrer le message en streaming dans la liste des messages
+        setState(prevState => {
+          const updatedMessages = prevState.messages.map(msg => {
+            if (typeof msg.id === 'string' && msg.id === tempBotId && prevState.streamingMessage) {
+              // Remplacer le message temporaire du bot par le contenu complet streamé
+              return {
+                ...msg,
+                content: prevState.streamingMessage
+              };
+            }
+            return msg;
+          });
+          
+          return {
+            ...prevState,
+            messages: updatedMessages,
+            streamingMessage: null, // Réinitialiser le message en streaming
+            isLoading: false
+          };
+        });
+        
+        // Charger la conversation complète après un court délai
+        const finalConvId = responseConvId;
         setTimeout(async () => {
-          // Nettoyer les messages temporaires et recharger complètement
           try {
-            if (!convId || convId !== responseConvId) {
+            if (!convId || convId !== finalConvId) {
               // Si c'est une nouvelle conversation ou si l'ID a changé
-              await loadConversation(responseConvId as number);
-            } else {
-              // Si c'est la même conversation, recharger les messages
-              await loadMessages(convId);
+              await loadConversation(finalConvId);
             }
           } catch (err) {
-            console.error("Error refreshing messages after send:", err);
+            console.error("Error refreshing conversation after send:", err);
           }
         }, 200);
       } else {
@@ -211,6 +249,7 @@ const useChat = (conversationId?: number) => {
           ...prevState,
           error: "Erreur: Impossible d'identifier la conversation",
           isLoading: false,
+          streamingMessage: null,
           // Garder le message de l'utilisateur, supprimer juste le message temporaire du bot
           messages: prevState.messages.filter(m => {
             if (typeof m.id !== 'string') return true;
@@ -219,20 +258,19 @@ const useChat = (conversationId?: number) => {
         }));
       }
     } catch (error) {
-      // Annuler le timeout en cas d'erreur
-      clearTimeout(typingTimeout);
-      
       console.error("❌ Error sending message:", error);
       
       setState(prevState => ({
         ...prevState,
         error: "Erreur lors de l'envoi du message. Veuillez réessayer.",
         isLoading: false,
+        streamingMessage: null,
         // Restaurer l'état précédent sans les messages temporaires
         messages: currentMessages
       }));
     }
-  }, [state.messages, loadMessages, loadConversation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleStreamChunk, loadConversation, state.messages]); 
 
   // Créer une nouvelle conversation
   const createConversation = useCallback(async (title: string) => {

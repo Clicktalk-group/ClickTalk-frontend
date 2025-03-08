@@ -64,6 +64,21 @@
     box-shadow: $shadow-sm;
     border-top-left-radius: 0;
     
+    // NOUVEAU: Style pour le streaming
+    &.streaming {
+      .cursor-blink {
+        display: inline-block;
+        width: 2px;
+        height: 16px;
+        background-color: var(--color-text-primary, $color-text-primary);
+        margin-left: 2px;
+        vertical-align: middle;
+        animation: blink 1s infinite;
+      }
+      
+      animation: pulseHighlight 2s infinite;
+    }
+    
     // Markdown content styling
     p, h1, h2, h3, h4, h5, h6, ul, ol {
       margin-bottom: $sp-sm;
@@ -169,6 +184,7 @@
   
   .message-content {
     margin-bottom: $sp-sm;
+    position: relative; // Ajout pour positionner le curseur correctement
   }
   
   .message-actions {
@@ -194,6 +210,17 @@
       }
     }
   }
+}
+
+// NOUVEAU: Animations pour le streaming
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes pulseHighlight {
+  0%, 100% { box-shadow: 0 0 0 rgba(var(--primary-rgb, 0, 123, 255), 0); }
+  50% { box-shadow: 0 0 5px rgba(var(--primary-rgb, 0, 123, 255), 0.3); }
 }
 
 @media (max-width: $tablet) {

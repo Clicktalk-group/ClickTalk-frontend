@@ -13,6 +13,7 @@ export interface ChatState {
   isLoading: boolean;
   currentConversation: Conversation | null;
   error: string | null;
+  streamingMessage: string | null; // NOUVEAU: pour suivre le message en streaming
 }
 
 // Type pour une conversation
@@ -35,4 +36,18 @@ export interface Project {
 export interface ProjectConversation {
   projectId: number;
   convId: number;
+}
+
+// Type pour la réponse API avec message bot
+export interface ApiMessageResponse {
+  botResponse?: {
+    content: string;
+    id?: string | number;
+    convId?: number;
+  };
+  convId?: number;
+  conversationId?: number;
+  id?: number;
+  userId?: number;
+  [key: string]: any; // Pour les autres champs possibles
 }

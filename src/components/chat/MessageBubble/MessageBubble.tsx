@@ -1,62 +1,42 @@
-import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import rehypeHighlight from 'rehype-highlight';
-import remarkGfm from 'remark-gfm';
+import React from 'react';
+import { FaCopy } from 'react-icons/fa';
 import { Message } from '../../../types/chat.types';
-import { FaCopy, FaCheck, FaUser, FaRobot } from 'react-icons/fa'; 
 import './MessageBubble.scss';
 
 interface MessageBubbleProps {
   message: Message;
   onCopy: () => void;
+  isStreaming?: boolean; // NOUVEAU: Pour indiquer si le message est en train de streamer
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onCopy }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    onCopy();
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
-  };
-
-  const formattedDate = new Date(message.createdAt).toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onCopy, isStreaming = false }) => {
+  const { content, isBot } = message;
+  
+  // Sécurité supplémentaire pour s'assurer que le contenu est une chaîne de caractères
+  const safeContent = typeof content === 'string' ? content : '';
+  
+  // Formatage du contenu pour l'affichage (conservation des sauts de ligne)
+  const formattedContent = safeContent.split('\n').map((line, i) => (
+    <React.Fragment key={i}>
+      {line}
+      {i < safeContent.split('\n').length - 1 && <br />}
+    </React.Fragment>
+  ));
 
   return (
-    <div className={`message-bubble ${message.isBot ? 'bot' : 'user'}`}>
-      <div className="message-header">
-        <div className="avatar">
-          {message.isBot ? <FaRobot /> : <FaUser />}
-        </div>
-        <span className="sender">{message.isBot ? 'ClickTalk' : 'Vous'}</span>
-        <span className="time">{formattedDate}</span>
-      </div>
-
+    <div className={`message-bubble ${isBot ? 'bot' : 'user'} ${isStreaming ? 'streaming' : ''}`}>
       <div className="message-content">
-        {message.isBot ? (
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeHighlight]}
-          >
-            {message.content}
-          </ReactMarkdown>
-        ) : (
-          <p>{message.content}</p>
+        {formattedContent}
+        {isStreaming && (
+          <span className="cursor-blink">|</span>
         )}
       </div>
-
-      {message.isBot && (
+      
+      {isBot && safeContent.trim().length > 0 && (
         <div className="message-actions">
-          <button 
-            className="copy-button" 
-            onClick={handleCopy} 
-            aria-label="Copy message"
-          >
-            {copied ? <FaCheck /> : <FaCopy />}
-            <span>{copied ? 'Copié' : 'Copier'}</span>
+          <button className="copy-button" onClick={onCopy} aria-label="Copy message">
+            <FaCopy />
+            <span>Copier</span>
           </button>
         </div>
       )}

@@ -13,6 +13,7 @@
     background-color: var(--primary-color, $primary-color);
     border-radius: 50%;
     animation: bounce 1.4s infinite ease-in-out both;
+    will-change: transform; // Optimisation performance
     
     &:nth-child(1) {
       animation-delay: -0.32s;

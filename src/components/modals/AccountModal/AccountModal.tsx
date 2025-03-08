@@ -77,6 +77,8 @@ const AccountModalContent: React.FC<AccountModalContentProps> = ({ onClose }) =>
           <label>Email</label>
           <div className="input-with-icon">
             <input 
+            title = "Email"
+            placeholder='Email'
               type="email"
               name="email"
               value={formData.email}

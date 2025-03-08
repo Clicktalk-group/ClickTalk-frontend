@@ -1,4 +1,3 @@
-// src/components/chat/ChatContainer/ChatContainer.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ChatMessages from '../ChatMessages';
@@ -27,7 +26,8 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
     error,
     sendMessage, 
     copyMessage,
-    currentConversation
+    currentConversation,
+    streamingMessage // Ajout du streamingMessage
   } = useChat(convId);
 
   // Si la conversation est créée, naviguer vers son URL
@@ -75,6 +75,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
         messages={messages} 
         isLoading={isLoading} 
         onCopyMessage={copyMessage} 
+        streamingMessage={streamingMessage} // Ajout du prop streamingMessage
       />
       
       <ChatInput 

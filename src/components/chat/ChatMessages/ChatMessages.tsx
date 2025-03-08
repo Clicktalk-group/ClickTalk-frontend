@@ -8,12 +8,14 @@ interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
   onCopyMessage: (content: string) => void;
+  streamingMessage: string | null; // NOUVEAU: pour afficher le message en streaming
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({ 
   messages, 
   isLoading, 
-  onCopyMessage 
+  onCopyMessage,
+  streamingMessage 
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -23,15 +25,24 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages, streamingMessage]); 
 
-  // Ajouter des logs pour déboguer
   useEffect(() => {
     console.log(`Rendering ${messages.length} messages`);
-    messages.forEach((msg, i) => {
-      console.log(`Message ${i}: ID=${msg.id}, isBot=${msg.isBot}, content=${msg.content.substring(0, 30)}...`);
-    });
-  }, [messages]);
+    if (streamingMessage) {
+      console.log(`Current streaming message: ${streamingMessage.substring(0, 30)}...`);
+    }
+  }, [messages, streamingMessage]);
+
+  // Trouver le dernier message bot temporaire sans utiliser findLast
+  let lastBotMessage: Message | undefined = undefined;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i];
+    if (msg.isBot && typeof msg.id === 'string' && msg.id.includes('temp-bot')) {
+      lastBotMessage = msg;
+      break;
+    }
+  }
 
   return (
     <div className="chat-messages" ref={messagesContainerRef}>
@@ -42,17 +53,25 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       ) : (
         <>
           {/* Afficher les messages dans l'ordre chronologique */}
-          {messages
-            .filter(message => typeof message.id !== 'string' || !message.id.includes('temp-bot'))
-            .map((message, index) => (
+          {messages.map((message, index) => {
+            // Détermine si ce message spécifique est en streaming
+            const isStreaming = message === lastBotMessage && streamingMessage !== null;
+            
+            // Contenu à afficher (original ou streaming si applicable)
+            const displayContent = isStreaming ? streamingMessage : message.content;
+            
+            return (
               <MessageBubble 
-                key={`${message.id}-${index}`} 
-                message={message}
-                onCopy={() => onCopyMessage(message.content)} 
+                key={typeof message.id === 'string' ? message.id : `msg-${index}`}
+                message={{...message, content: displayContent}}
+                onCopy={() => onCopyMessage(displayContent)}
+                isStreaming={isStreaming}
               />
-            ))}
+            );
+          })}
           
-          {isLoading && (
+          {/* Indicateur de chargement (seulement si aucun message en streaming) */}
+          {isLoading && !streamingMessage && !lastBotMessage && (
             <div className="loading-message">
               <LoadingIndicator />
               <p>ClickTalk est en train d'écrire...</p>
