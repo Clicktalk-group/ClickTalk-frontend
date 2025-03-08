@@ -1,0 +1,84 @@
+// src/components/modals/ThemeModal.scss
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+@import '../Modals.scss';
+
+.theme-modal-content {
+  .theme-section {
+    margin-bottom: $sp-lg;
+    
+    h3 {
+      margin-bottom: $sp-sm;
+      font-size: $fs-md;
+    }
+  }
+  
+  .theme-options {
+    display: flex;
+    gap: $sp-md;
+    
+    .theme-button {
+      padding: $sp-sm $sp-lg;
+      border: 1px solid $border-color;
+      border-radius: $radius-sm;
+      background: none;
+      cursor: pointer;
+      flex: 1;
+      
+      &.active {
+        background-color: $primary-color;
+        color: white;
+        border-color: $primary-color;
+      }
+      
+      &:hover:not(.active) {
+        background-color: $background-btn;
+      }
+    }
+  }
+  
+  .color-options {
+    display: flex;
+    gap: $sp-md;
+    margin-top: $sp-sm;
+    
+    .color-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &.active {
+        border-color: $color-text-primary;
+        transform: scale(1.1);
+      }
+      
+      &:hover:not(.active) {
+        transform: scale(1.05);
+      }
+    }
+  }
+    
+    .button-group {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: $sp-lg;
+      
+      .cancel-button {
+        padding: $sp-sm $sp-lg;
+        border-radius: $radius-sm;
+        border: none;
+        background-color: $background-btn;
+        color: $color-text-primary;
+        font-weight: 500;
+        cursor: pointer;
+        
+        &:hover {
+          background-color: darken($background-btn, 5%);
+        }
+      }
+    }
+  }
+  

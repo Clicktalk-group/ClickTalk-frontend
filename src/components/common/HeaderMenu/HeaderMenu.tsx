@@ -1,8 +1,11 @@
 // src/components/common/HeaderMenu/HeaderMenu.tsx
 import React, { useRef, useEffect, useState } from 'react';
-import { FaCog, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
-import { useAuth } from '../../../context/AuthContext/AuthContext';
+import { FaUserCircle, FaPalette, FaQuestionCircle, FaSignOutAlt } from 'react-icons/fa';
+import { useAuth } from '../../../hooks/useAuth/useAuth';
 import { Modal } from '../Modal/Modal';
+import AccountModalContent from '../../modals/AccountModal/AccountModal';
+import ThemeModalContent from '../../modals/ThemeModal/ThemeModal';
+import HelpModalContent from '../../modals/HelpModal/HelpModal';
 import './HeaderMenu.scss';
 
 interface HeaderMenuProps {
@@ -51,9 +54,14 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isOpen, onClose }) => {
             className="header-menu-dropdown"
           >
             <div className="menu-items">
-              <button className="menu-item" onClick={() => handleOpenModal('settings')}>
-                <FaCog />
-                <span>Paramètres</span>
+              <button className="menu-item" onClick={() => handleOpenModal('account')}>
+                <FaUserCircle />
+                <span>Compte</span>
+              </button>
+              
+              <button className="menu-item" onClick={() => handleOpenModal('theme')}>
+                <FaPalette />
+                <span>Thème</span>
               </button>
               
               <button className="menu-item" onClick={() => handleOpenModal('help')}>
@@ -70,26 +78,24 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isOpen, onClose }) => {
         </div>
       )}
 
-      {/* Modal paramètres */}
+      {/* Modal Compte */}
       <Modal
-        isOpen={activeModal === 'settings'}
+        isOpen={activeModal === 'account'}
         onClose={handleCloseModal}
-        title="Paramètres"
+        title="Compte utilisateur"
         size="md"
       >
-        <div className="settings-modal-content">
-          <h3>Paramètres utilisateur</h3>
-          <p>
-            Ici vous pouvez configurer vos préférences d'utilisation de l'application.
-          </p>
-          <div className="settings-section">
-            <h4>Thème</h4>
-            <div className="theme-options">
-              <button className="theme-button active">Clair</button>
-              <button className="theme-button">Sombre</button>
-            </div>
-          </div>
-        </div>
+        <AccountModalContent onClose={handleCloseModal} />
+      </Modal>
+
+      {/* Modal Thème */}
+      <Modal
+        isOpen={activeModal === 'theme'}
+        onClose={handleCloseModal}
+        title="Personnalisation du thème"
+        size="md"
+      >
+        <ThemeModalContent onClose={handleCloseModal} />
       </Modal>
 
       {/* Modal aide */}
@@ -99,19 +105,7 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isOpen, onClose }) => {
         title="Aide ClickTalk"
         size="md"
       >
-        <div className="help-modal-content">
-          <h3>Bienvenue dans l'aide de ClickTalk</h3>
-          <p>
-            ClickTalk est un chatbot intelligent utilisant le Machine Learning pour interagir avec vous et répondre à vos questions. Voici quelques informations pour vous aider à tirer le meilleur parti de ClickTalk.
-          </p>
-          
-          <h4>Fonctionnalités principales</h4>
-          <ul>
-            <li><strong>Conversations</strong> - Discutez avec notre IA et obtenez des réponses instantanées</li>
-            <li><strong>Projects</strong> - Organisez vos conversations par projets avec des instructions spécifiques</li>
-            <li><strong>Personnalisation</strong> - Adaptez l'apparence de l'application selon vos préférences</li>
-          </ul>
-        </div>
+        <HelpModalContent onClose={handleCloseModal} />
       </Modal>
 
       {/* Modal déconnexion */}

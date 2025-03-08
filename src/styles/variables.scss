@@ -1,62 +1,80 @@
-// Palette de couleurs principales
-$primary-color: #7c3aed; // Couleur principale (violet)
-$primary-hover: #6d28d9; // Hover sur boutons principaux
-$secondary-color: #9333ea; // Couleur secondaire
+// Palette de couleurs principales - valeurs fixes pour SASS
+$primary-color-light: #7c3aed; // Couleur principale (violet)
+$primary-hover-light: #6d28d9; // Hover sur boutons principaux
+$secondary-color-light: #9333ea; // Couleur secondaire
+$background-color-light: #f3f4f6; // Arrière-plan principal clair
+$background-btn-light: #e7e7e7; // Fond pour boutons (gris clair)
+$color-text-primary-light: #111827; // Couleur principale texte (mode clair)
+$color-text-secondary-light: #4b5563; // Texte secondaire (mode clair)
+$border-color-light: #e5e7eb; // Couleur des bordures (mode clair)
 
-// Fonds et arrière-plans
-$background-color: #f3f4f6; // Arrière-plan principal
-$background-btn: #e7e7e7; // Fond pour boutons (gris clair)
-$background-btn-grey: #f9fafb; // Fond pour boutons gris très clair
-$color-bg-dark: #1f2937; // Fond sombre global
-$color-bg-dark-hover: #374151; // Hover pour fonds sombres
-$color-bg-light: darken($background-color, 5%); // Variation pour les composants clairs
-$sidebar-color: $color-bg-dark; // Couleur principale de la Sidebar
+// Variables mode sombre
+$primary-color-dark: #7c3aed; // Même couleur principale (violet)
+$primary-hover-dark: #6d28d9; // Même hover
+$secondary-color-dark: #9333ea; // Même couleur secondaire
+$background-color-dark: #1f2937; // Arrière-plan principal sombre
+$background-btn-dark: #374151; // Fond pour boutons (mode sombre)
+$color-text-primary-dark: #f9fafb; // Couleur principale texte (mode sombre)
+$color-text-secondary-dark: #d1d5db; // Texte secondaire (mode sombre)
+$border-color-dark: #4b5563; // Couleur des bordures (mode sombre)
+
+// Variables utilisées par SASS (toujours utiliser les valeurs par défaut)
+$primary-color: $primary-color-light;
+$primary-hover: $primary-hover-light;
+$secondary-color: $secondary-color-light;
+$background-color: $background-color-light;
+$background-btn: $background-btn-light;
+$background-btn-grey: #f9fafb;
+$color-bg-dark: #1f2937;
+$color-bg-dark-hover: #374151;
+$color-bg-light: darken($background-color-light, 5%); // Utilise la valeur fixe
+$sidebar-color: $color-bg-dark;
 
 // Texte et bordures
-$color-text-primary: #111827; // Couleur principale texte
-$color-text-secondary: lighten($color-text-primary, 30%); // Texte secondaire/moins contrasté
-$color-text-light: #9ca3af; // Texte clair pour fonds sombres
-$border-color: #383838; // Couleur des bordures générales
+$color-text-primary: $color-text-primary-light;
+$color-text-secondary: $color-text-secondary-light;
+$color-text-light: #9ca3af;
+$border-color: $border-color-light;
 
 // Messages
-$message-bg-user: #eef2ff; // Fond pour messages utilisateur
-$message-bg-bot: #ffffff; // Fond pour messages chatbot
+$message-bg-user: #eef2ff;
+$message-bg-bot: #ffffff;
 
 // Menus déroulants (dropdown)
-$dropdown-bg: #ffffff; // Fond des menus dropdown
-$dropdown-hover: #f3f4f6; // Hover sur items dropdown
+$dropdown-bg: #ffffff;
+$dropdown-hover: #f3f4f6;
 
 // Danger et états d'alerte
-$danger-color: #770b0d !default; // Exemples : rouge pour messages d'erreur
-$danger-hover: darken($danger-color, 10%); // Hover pour boutons rouges
+$danger-color: #ef4444 !default;
+$danger-hover: darken($danger-color, 10%);
 
 // Ombres
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05); // Ombre légère
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1); // Ombre modérée
-$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2); // Ombre plus forte
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
 
 // Radius (coins arrondis)
-$radius-sm: 0.25rem; // Rayon pour petits éléments
-$radius-md: 0.5rem; // Rayon pour éléments moyens
-$radius-lg: 0.75rem; // Rayon pour grands éléments
+$radius-sm: 0.25rem;
+$radius-md: 0.5rem;
+$radius-lg: 0.75rem;
 
 // Espacements
-$sp-xs: 0.25rem; // Petit espacement
-$sp-sm: 0.5rem; // Moyen
-$sp-md: 1rem; // Standard
-$sp-lg: 1.5rem; // Large
-$sp-xl: 2rem; // Très large
+$sp-xs: 0.25rem;
+$sp-sm: 0.5rem;
+$sp-md: 1rem;
+$sp-lg: 1.5rem;
+$sp-xl: 2rem;
 
 // Typographie
-$fs-sm: 0.875rem; // Texte petit
-$fs-md: 1rem; // Texte par défaut
-$fs-lg: 1.25rem; // Gros texte
-$fs-xl: 1.5rem; // Très gros texte
+$fs-sm: 0.875rem;
+$fs-md: 1rem;
+$fs-lg: 1.25rem;
+$fs-xl: 1.5rem;
 
 // Points de rupture (breakpoints)
-$mobile: 480px; // Max-width = taille mobile
-$tablet: 768px; // Max-width = taille tablette
-$desktop: 1024px; // Max-width = desktop standard
+$mobile: 480px;
+$tablet: 768px;
+$desktop: 1024px;
 
-$sidebar-width: 350px; // Largeur standard de la Sidebar
-$color-light: #ffffff !default; // Exemple pour $color-light
+$sidebar-width: 350px;
+$color-light: #ffffff !default;

@@ -1,7 +1,9 @@
+// index.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext/ThemeContext";
 import { createAppRouter } from "./routes/Routes";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 import "./styles/global.scss";
@@ -10,7 +12,9 @@ import "./styles/global.scss";
 const App = () => {
   return (
     <AuthProvider>
-      <AppWithRouter />
+      <ThemeProvider>
+        <AppWithRouter />
+      </ThemeProvider>
     </AuthProvider>
   );
 };

@@ -1,0 +1,27 @@
+// src/components/modals/HelpModal.scss
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+@import '../Modals.scss';
+
+.help-modal-content {
+    .button-group {
+      display: flex;
+      justify-content: center;
+      margin-top: $sp-lg;
+      
+      .close-button {
+        padding: $sp-sm $sp-lg;
+        border-radius: $radius-sm;
+        border: none;
+        background-color: $primary-color;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        
+        &:hover {
+          background-color: $primary-hover;
+        }
+      }
+    }
+  }
+  

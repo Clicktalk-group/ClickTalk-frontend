@@ -1,0 +1,79 @@
+// src/components/modals/AccountModal.scss
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+@import '../Modals.scss';
+
+.account-modal-content {
+  .form-group {
+    margin-bottom: $sp-md;
+    
+    label {
+      display: block;
+      margin-bottom: $sp-xs;
+      font-weight: 500;
+    }
+    
+    .input-with-icon {
+      display: flex;
+      align-items: center;
+      
+      input {
+        flex: 1;
+        padding: $sp-sm;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: $fs-md;
+        
+        &:disabled {
+          background-color: #f9f9f9;
+        }
+      }
+      
+      .edit-button {
+        background: none;
+        border: none;
+        margin-left: $sp-sm;
+        color: $primary-color;
+        cursor: pointer;
+        
+        &:hover {
+          color: $primary-hover;
+        }
+      }
+    }
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: $sp-lg;
+    gap: $sp-md;
+    
+    button {
+      padding: $sp-sm $sp-lg;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .cancel-button {
+      background-color: $background-btn;
+      border: none;
+      color: $color-text-primary;
+      
+      &:hover {
+        background-color: darken($background-btn, 5%);
+      }
+    }
+    
+    .save-button {
+      background-color: $primary-color;
+      border: none;
+      color: white;
+      
+      &:hover {
+        background-color: $primary-hover;
+      }
+    }
+  }
+}
