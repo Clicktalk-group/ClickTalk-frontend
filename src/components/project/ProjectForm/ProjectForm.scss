@@ -7,7 +7,7 @@
   h3 {
     font-size: $fs-lg;
     margin-bottom: $sp-md;
-    color: $color-text-primary;
+    color: var(--color-text-primary, $color-text-primary);
   }
   
   .form-group {
@@ -17,20 +17,22 @@
       display: block;
       margin-bottom: $sp-xs;
       font-weight: 500;
-      color: $color-text-secondary;
+      color: var(--color-text-secondary, $color-text-secondary);
     }
     
     input, textarea {
       width: 100%;
       padding: $sp-sm;
-      border: 1px solid darken($background-color, 10%);
+      border: 1px solid var(--border-color, darken($background-color, 10%));
       border-radius: $radius-md;
       font-size: $fs-md;
       transition: border-color 0.2s ease;
+      background-color: var(--background-color, $background-color);
+      color: var(--color-text-primary, $color-text-primary);
       
       &:focus {
         outline: none;
-        border-color: $primary-color;
+        border-color: var(--primary-color, $primary-color);
       }
     }
     
@@ -48,11 +50,23 @@
     
     .btn-cancel {
       @include button($background-btn-grey, $color-text-secondary, $background-btn);
-      border: 1px solid darken($background-btn-grey, 10%);
+      border: 1px solid var(--border-color, darken($background-btn-grey, 10%));
+      background-color: var(--background-btn-grey, $background-btn-grey);
+      color: var(--color-text-secondary, $color-text-secondary);
+      
+      &:hover {
+        background-color: var(--background-btn, $background-btn);
+      }
     }
     
     .btn-submit {
       @include button($primary-color, $color-light, $primary-hover);
+      background-color: var(--primary-color, $primary-color);
+      color: $color-light;
+      
+      &:hover {
+        background-color: var(--primary-hover, $primary-hover);
+      }
     }
   }
 }

@@ -24,8 +24,8 @@
       justify-content: center;
       border-radius: 50%;
       margin-right: $sp-sm;
-      background-color: $color-bg-dark;
-      color: $color-light;
+      background-color: var(--color-bg-dark, $color-bg-dark);
+      color: var(--color-light, $color-light);
     }
     
     .sender {
@@ -35,23 +35,23 @@
     
     .time {
       font-size: $fs-sm;
-      color: $color-text-secondary;
+      color: var(--color-text-secondary, $color-text-secondary);
     }
   }
   
   // User message styling
   &.user {
     align-self: flex-end;
-    background-color: $primary-color;
-    color: white;
+    background-color: var(--primary-color, $primary-color);
+    color: var(--color-on-primary, white);
     border-top-right-radius: 0;
     
     .message-header {
       .avatar {
-        background-color: $primary-hover;
+        background-color: var(--primary-hover, $primary-hover);
       }
       .time {
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--color-on-primary-secondary, rgba(255, 255, 255, 0.8));
       }
     }
   }
@@ -59,8 +59,8 @@
   // Bot message styling
   &.bot {
     align-self: flex-start;
-    background-color: $color-light;
-    color: $color-text-primary;
+    background-color: var(--color-light, $color-light);
+    color: var(--color-text-primary, $color-text-primary);
     box-shadow: $shadow-sm;
     border-top-left-radius: 0;
     
@@ -95,7 +95,7 @@
     }
     
     a {
-      color: $primary-color;
+      color: var(--primary-color, $primary-color);
       text-decoration: none;
       &:hover {
         text-decoration: underline;
@@ -103,7 +103,7 @@
     }
     
     code {
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: var(--code-background, rgba(0, 0, 0, 0.05));
       padding: 2px 4px;
       border-radius: $radius-sm;
       font-family: 'Fira Code', monospace, 'Courier New';
@@ -111,8 +111,8 @@
     }
     
     pre {
-      background-color: #2d2d2d;
-      color: #f8f8f2;
+      background-color: var(--pre-background, #2d2d2d);
+      color: var(--pre-text-color, #f8f8f2);
       padding: $sp-sm;
       border-radius: $radius-sm;
       overflow-x: auto;
@@ -128,9 +128,9 @@
     }
     
     blockquote {
-      border-left: 3px solid $border-color;
+      border-left: 3px solid var(--border-color, $border-color);
       padding-left: $sp-md;
-      color: $color-text-secondary;
+      color: var(--color-text-secondary, $color-text-secondary);
       font-style: italic;
       margin: $sp-md 0;
     }
@@ -143,25 +143,25 @@
       overflow-x: auto;
       
       th {
-        background-color: $background-color;
+        background-color: var(--background-color, $background-color);
         font-weight: bold;
       }
       
       th, td {
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color, $border-color);
         padding: $sp-sm;
         text-align: left;
       }
       
       tr:nth-child(even) {
-        background-color: rgba(0, 0, 0, 0.02);
+        background-color: var(--table-row-even, rgba(0, 0, 0, 0.02));
       }
     }
     
     hr {
       border: 0;
       height: 1px;
-      background: $border-color;
+      background: var(--border-color, $border-color);
       opacity: 0.2;
       margin: $sp-md 0;
     }
@@ -179,7 +179,7 @@
     .copy-button {
       background-color: transparent;
       border: none;
-      color: $color-text-secondary;
+      color: var(--color-text-secondary, $color-text-secondary);
       cursor: pointer;
       padding: $sp-xs $sp-sm;
       display: flex;
@@ -189,8 +189,8 @@
       transition: all 0.2s ease;
       
       &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-        color: $primary-color;
+        background-color: var(--btn-hover-bg, rgba(0, 0, 0, 0.05));
+        color: var(--primary-color, $primary-color);
       }
     }
   }

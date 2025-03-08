@@ -6,7 +6,8 @@
   height: 100vh;
   text-align: center;
   padding: $sp-md;
-  background-color: $background-color;
+  background-color: var(--background-color, $background-color);
+  color: var(--color-text-primary, $color-text-primary);
 
   &__content {
     max-width: 540px;
@@ -14,25 +15,27 @@
     h1 {
       font-size: 6rem;
       margin-bottom: $sp-md;
-      color: $primary-color;
+      color: var(--primary-color, $primary-color);
     }
 
     h2 {
       font-size: 2rem;
       margin-bottom: $sp-md;
+      color: var(--color-text-primary, $color-text-primary);
     }
 
     p {
       margin-bottom: $sp-lg;
-      color: $color-text-secondary;
+      color: var(--color-text-secondary, $color-text-secondary);
     }
   }
 }
 
-// Support du thème sombre
+// Note: Ce bloc peut être conservé pour la compatibilité, mais n'est plus
+// nécessaire avec l'utilisation des variables CSS pour le thème
 body.dark-mode {
   .not-found {
-    background-color: $color-bg-dark;
-    color: $color-text-light;
+    background-color: var(--color-bg-dark, $color-bg-dark);
+    color: var(--color-text-light, $color-text-light);
   }
 }

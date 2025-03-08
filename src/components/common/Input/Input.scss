@@ -8,7 +8,7 @@
   .input-label {
     display: block;
     margin-bottom: $sp-xs;
-    color: $color-text-primary;
+    color: var(--color-text-primary, $color-text-primary);
     font-size: $fs-sm;
     font-weight: 500;
     transition: color 0.2s ease;
@@ -25,10 +25,10 @@
     .input-field {
       width: 100%;
       padding: $sp-sm;
-      border: 1px solid $border-color;
+      border: 1px solid var(--border-color, $border-color);
       border-radius: $radius-md;
-      background-color: $background-color;
-      color: $color-text-primary;
+      background-color: var(--background-color, $background-color);
+      color: var(--color-text-primary, $color-text-primary);
       font-size: $fs-md;
       line-height: 1.5;
       transition: all 0.2s ease;
@@ -38,17 +38,17 @@
       }
 
       &::placeholder {
-        color: $color-text-light;
+        color: var(--color-text-secondary, $color-text-secondary);
       }
 
       &:focus {
         outline: none;
-        border-color: $primary-color;
-        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        border-color: var(--primary-color, $primary-color);
+        box-shadow: 0 0 0 2px rgba(var(--primary-color, $primary-color), 0.2);
       }
 
       &:disabled {
-        background-color: $background-btn;
+        background-color: var(--background-btn, $background-btn);
         cursor: not-allowed;
         opacity: 0.6;
       }
@@ -67,7 +67,7 @@
       right: $sp-sm;
       top: 50%;
       transform: translateY(-50%);
-      color: $color-text-light;
+      color: var(--color-text-secondary, $color-text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;

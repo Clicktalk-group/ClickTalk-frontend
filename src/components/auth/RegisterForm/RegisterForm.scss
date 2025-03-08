@@ -14,7 +14,7 @@
   .form-title {
     font-size: clamp(1.5rem, 3vw, 2rem);
     font-weight: bold;
-    color: $primary-color;
+    color: var(--primary-color, $primary-color);
     text-align: center;
     margin-bottom: $sp-sm;
   }
@@ -29,7 +29,7 @@
   .link-button {
     background: none;
     border: none;
-    color: $primary-color;
+    color: var(--primary-color, $primary-color);
     text-decoration: underline;
     cursor: pointer;
     font-size: $fs-sm;
@@ -37,7 +37,7 @@
     margin: 0 0 0 $sp-xs;
     
     &:hover {
-      color: $primary-hover;
+      color: var(--primary-hover, $primary-hover);
     }
   }
   
@@ -46,7 +46,7 @@
     text-align: center;
     
     p {
-      color: $color-text-secondary;
+      color: var(--color-text-secondary, $color-text-secondary);
     }
   }
 }

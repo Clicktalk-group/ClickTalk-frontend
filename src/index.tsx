@@ -11,11 +11,11 @@ import "./styles/global.scss";
 // Composant qui enveloppe la logique du routeur
 const App = () => {
   return (
-    <AuthProvider>
       <ThemeProvider>
+    <AuthProvider>
         <AppWithRouter />
-      </ThemeProvider>
     </AuthProvider>
+      </ThemeProvider>
   );
 };
 

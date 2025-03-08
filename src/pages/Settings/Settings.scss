@@ -6,16 +6,19 @@
   max-width: 800px;
   margin: 0 auto;
   padding: $sp-lg;
+  background-color: var(--background-color, $background-color);
+  color: var(--color-text-primary, $color-text-primary);
   
   h1 {
     font-size: $fs-xl;
     margin-bottom: $sp-xl;
+    color: var(--color-text-primary, $color-text-primary);
   }
 }
 
 .settings-section {
   margin-bottom: $sp-xl;
-  background: $color-light;
+  background: var(--card-background, $color-light);
   border-radius: $radius-md;
   padding: $sp-lg;
   box-shadow: $shadow-sm;
@@ -23,11 +26,13 @@
   h2 {
     font-size: $fs-lg;
     margin-bottom: $sp-md;
-    color: $color-text-primary;
+    color: var(--color-text-primary, $color-text-primary);
   }
   
+  // Note: Ce bloc peut être conservé pour la compatibilité, mais n'est plus
+  // nécessaire avec l'utilisation des variables CSS pour le thème
   body.dark-mode & {
-    background: $color-bg-dark-hover;
+    background: var(--color-bg-dark-hover, $color-bg-dark-hover);
   }
 }
 
@@ -39,7 +44,7 @@
   .avatar {
     width: 60px;
     height: 60px;
-    background-color: $primary-color;
+    background-color: var(--primary-color, $primary-color);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -55,10 +60,11 @@
   .user-details {
     h3 {
       margin-bottom: $sp-xs;
+      color: var(--color-text-primary, $color-text-primary);
     }
     
     p {
-      color: $color-text-secondary;
+      color: var(--color-text-secondary, $color-text-secondary);
     }
   }
 }
@@ -71,26 +77,28 @@
       display: block;
       font-weight: 500;
       margin-bottom: $sp-xs;
-      color: $color-text-primary;
+      color: var(--color-text-primary, $color-text-primary);
     }
     
     input {
       width: 100%;
       padding: $sp-sm;
-      border: 1px solid $border-color;
+      border: 1px solid var(--border-color, $border-color);
       border-radius: $radius-sm;
       font-size: $fs-md;
       transition: border-color 0.2s ease;
+      background-color: var(--background-color, $background-color);
+      color: var(--color-text-primary, $color-text-primary);
       
       &:focus {
-        border-color: $primary-color;
+        border-color: var(--primary-color, $primary-color);
         outline: none;
       }
     }
   }
   
   .save-button {
-    background-color: $primary-color;
+    background-color: var(--primary-color, $primary-color);
     color: white;
     border: none;
     padding: $sp-md $sp-lg;
@@ -100,7 +108,7 @@
     transition: background-color 0.2s ease;
     
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: var(--primary-hover, $primary-hover);
     }
   }
 }
@@ -110,7 +118,7 @@
   justify-content: space-between;
   align-items: center;
   padding: $sp-md 0;
-  border-bottom: 1px solid rgba($border-color, 0.1);
+  border-bottom: 1px solid var(--border-color-transparent, rgba($border-color, 0.1));
   
   &:last-child {
     border-bottom: none;
@@ -123,11 +131,12 @@
       display: block;
       font-weight: 500;
       margin-bottom: $sp-xs;
+      color: var(--color-text-primary, $color-text-primary);
     }
     
     .setting-description {
       font-size: $fs-sm;
-      color: $color-text-secondary;
+      color: var(--color-text-secondary, $color-text-secondary);
     }
   }
   
@@ -152,7 +161,7 @@
     
     &.active {
       border-color: white;
-      box-shadow: 0 0 0 2px $primary-color;
+      box-shadow: 0 0 0 2px var(--primary-color, $primary-color);
       transform: scale(1.1);
     }
     
@@ -175,8 +184,8 @@
   }
   
   &.theme-light {
-    background-color: $background-color;
-    color: $color-text-primary;
+    background-color: var(--background-color, $background-color);
+    color: var(--color-text-primary, $color-text-primary);
     
     svg {
       color: #f39c12;
@@ -184,8 +193,8 @@
   }
   
   &.theme-dark {
-    background-color: $color-bg-dark;
-    color: $color-light;
+    background-color: var(--color-bg-dark, $color-bg-dark);
+    color: var(--color-text-light, $color-text-light);
     
     svg {
       color: #f1c40f;
@@ -200,26 +209,28 @@
   
   p {
     margin-bottom: $sp-md;
+    color: var(--color-text-primary, $color-text-primary);
   }
   
   .help-button {
     display: flex;
     align-items: center;
     gap: $sp-sm;
-    background-color: $background-btn;
+    background-color: var(--background-btn, $background-btn);
     border: none;
     padding: $sp-sm $sp-md;
     border-radius: $radius-md;
     cursor: pointer;
     font-weight: 500;
     transition: background-color 0.2s ease;
+    color: var(--color-text-primary, $color-text-primary);
     
     &:hover {
-      background-color: darken($background-btn, 5%);
+      background-color: var(--background-btn-hover, darken($background-btn, 5%));
     }
     
     svg {
-      color: $primary-color;
+      color: var(--primary-color, $primary-color);
     }
   }
 }
@@ -227,15 +238,18 @@
 .help-modal-content {
   h3 {
     margin-bottom: $sp-md;
+    color: var(--color-text-primary, $color-text-primary);
   }
   
   h4 {
     margin: $sp-md 0 $sp-sm;
+    color: var(--color-text-primary, $color-text-primary);
   }
   
   p {
     margin-bottom: $sp-md;
     line-height: 1.5;
+    color: var(--color-text-primary, $color-text-primary);
   }
   
   ul {
@@ -244,11 +258,12 @@
     
     li {
       margin-bottom: $sp-xs;
+      color: var(--color-text-primary, $color-text-primary);
     }
   }
   
   a {
-    color: $primary-color;
+    color: var(--primary-color, $primary-color);
     text-decoration: none;
     
     &:hover {
@@ -281,11 +296,11 @@
   }
   
   .logout-button {
-    background-color: $background-btn;
-    color: $color-text-primary;
+    background-color: var(--background-btn, $background-btn);
+    color: var(--color-text-primary, $color-text-primary);
     
     &:hover {
-      background-color: darken($background-btn, 5%);
+      background-color: var(--background-btn-hover, darken($background-btn, 5%));
     }
   }
   

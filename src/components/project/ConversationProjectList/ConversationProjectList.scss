@@ -7,7 +7,7 @@
   h3 {
     font-size: $fs-md;
     margin-bottom: $sp-sm;
-    color: $color-text-secondary;
+    color: var(--color-text-secondary, $color-text-secondary);
   }
   
   ul {
@@ -20,13 +20,13 @@
       align-items: center;
       padding: $sp-sm $sp-md;
       margin-bottom: $sp-xs;
-      background-color: $background-btn-grey;
+      background-color: var(--background-btn-grey, $background-btn-grey);
       border-radius: $radius-md;
       cursor: pointer;
       transition: background-color 0.2s ease;
       
       &:hover {
-        background-color: $background-btn;
+        background-color: var(--background-btn, $background-btn);
       }
       
       .title {
@@ -34,7 +34,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: $color-text-primary;
+        color: var(--color-text-primary, $color-text-primary);
       }
       
       .actions {
@@ -44,7 +44,7 @@
         .remove-btn {
           background: none;
           border: none;
-          color: $color-text-light;
+          color: var(--color-text-secondary, $color-text-light);
           padding: $sp-xs;
           margin-left: $sp-xs;
           border-radius: $radius-sm;
@@ -62,7 +62,7 @@
   .loading, .error, .empty {
     padding: $sp-md;
     text-align: center;
-    color: $color-text-secondary;
+    color: var(--color-text-secondary, $color-text-secondary);
     font-size: $fs-sm;
   }
   

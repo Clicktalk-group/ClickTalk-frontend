@@ -22,7 +22,7 @@
   }
 
   .modal-content {
-    background-color: $background-color;
+    background-color: var(--background-color, $background-color);
     border-radius: $radius-lg;
     @include shadow(md);
     width: 90%;
@@ -48,7 +48,7 @@
 
   .modal-header {
     padding: $sp-md;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--border-color, $border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -57,7 +57,7 @@
   .modal-title {
     font-size: $fs-lg;
     font-weight: 600;
-    color: $color-text-primary;
+    color: var(--color-text-primary, $color-text-primary);
     margin: 0;
   }
 
@@ -65,20 +65,20 @@
     background: none;
     border: none;
     font-size: $fs-xl;
-    color: $color-text-light;
+    color: var(--color-text-secondary, $color-text-secondary);
     cursor: pointer;
     padding: $sp-xs;
     transition: color 0.2s ease;
 
     &:hover {
-      color: $color-text-primary;
+      color: var(--color-text-primary, $color-text-primary);
     }
   }
 
   .modal-body {
     padding: $sp-lg;
     font-size: $fs-md;
-    color: $color-text-primary;
+    color: var(--color-text-primary, $color-text-primary);
   }
 }
 

@@ -8,6 +8,8 @@
   height: 100%;
   width: 100%;
   padding: $sp-md;
+  background-color: var(--background-color, $background-color);
+  color: var(--color-text-primary, $color-text-primary);
   
   @include responsive($tablet) {
     padding: $sp-sm;

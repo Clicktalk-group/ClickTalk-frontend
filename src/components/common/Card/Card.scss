@@ -2,8 +2,8 @@
 @import '../../../styles/mixins';
 
 .card {
-  background-color: $message-bg-bot;
-  border: 1px solid $border-color;
+  background-color: var(--message-bg-bot, $message-bg-bot);
+  border: 1px solid var(--border-color, $border-color);
   border-radius: $radius-md;
   @include shadow(sm);
   overflow: hidden;
@@ -23,7 +23,7 @@
     align-items: center;
     gap: $sp-md;
     padding: $sp-md;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--border-color, $border-color);
     background-color: $background-btn-grey;
   }
 
@@ -34,7 +34,7 @@
     width: 2rem;
     height: 2rem;
     font-size: $fs-lg;
-    color: $primary-color;
+    color: var(--primary-color, $primary-color);
     @include shadow(sm);
   }
 
@@ -46,7 +46,7 @@
   &__title {
     font-size: $fs-lg;
     font-weight: 600;
-    color: $color-text-primary;
+    color: var(--color-text-primary, $color-text-primary);
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
@@ -55,21 +55,21 @@
 
   &__subtitle {
     font-size: $fs-sm;
-    color: $color-text-secondary;
+    color: var(--color-text-secondary, $color-text-secondary);
     margin: $sp-xs 0 0;
   }
 
   &__content {
     padding: $sp-md;
     font-size: $fs-md;
-    color: $color-text-primary;
-    background-color: $background-color;
+    color: var(--color-text-primary, $color-text-primary);
+    background-color: var(--background-color, $background-color);
   }
 
   &__footer {
     padding: $sp-md;
-    border-top: 1px solid $border-color;
-    background-color: $background-btn;
+    border-top: 1px solid var(--border-color, $border-color);
+    background-color: var(--background-btn, $background-btn);
     text-align: center;
 
     button {

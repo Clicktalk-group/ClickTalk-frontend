@@ -1,4 +1,7 @@
 // src/pages/Home/Home.scss
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
 .home-page {
   max-width: 800px;
   margin: 0 auto;
@@ -6,25 +9,26 @@
   transition: all 0.3s ease;
   
   h1 {
-    color: var(--color-primary);
+    color: var(--primary-color, $primary-color);
     margin-bottom: 20px;
   }
   
   p {
     font-size: 1.1rem;
     margin-bottom: 30px;
+    color: var(--color-text-primary, $color-text-primary);
   }
   
   .quick-actions {
-    background-color: var(--color-background);
+    background-color: var(--background-color, $background-color);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     
     h2 {
-      color: var(--color-text);
+      color: var(--color-text-primary, $color-text-primary);
       margin-bottom: 15px;
-      border-bottom: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--border-color, $border-color);
       padding-bottom: 10px;
     }
     
@@ -34,7 +38,8 @@
       
       li {
         padding: 8px 0;
-        border-bottom: 1px solid var(--color-border-light);
+        border-bottom: 1px solid var(--border-color, $border-color);
+        color: var(--color-text-primary, $color-text-primary);
         
         &:last-child {
           border-bottom: none;

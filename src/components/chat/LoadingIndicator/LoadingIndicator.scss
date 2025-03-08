@@ -10,7 +10,7 @@
   .dot {
     width: 8px;
     height: 8px;
-    background-color: $primary-color;
+    background-color: var(--primary-color, $primary-color);
     border-radius: 50%;
     animation: bounce 1.4s infinite ease-in-out both;
     
