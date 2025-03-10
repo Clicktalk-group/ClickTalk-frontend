@@ -16,6 +16,50 @@
     border-bottom: 1px solid var(--border-color, $border-color);
     background-color: var(--background-color, white);
 
+    // Style adaptatif pour le bouton de retour à l'accueil
+    .back-to-home {
+      margin-bottom: $sp-md;
+      
+      .home-button {
+        display: inline-flex;
+        align-items: center;
+        gap: $sp-sm;
+        font-weight: 500;
+        font-size: $fs-md;
+        padding: $sp-xs $sp-md;
+        border-radius: $radius-md;
+        background-color: transparent;
+        color: var(--color-text-secondary, $color-text-secondary);
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        
+        // Mode clair (par défaut)
+        background-color: var(--background-btn, $background-btn-light);
+        
+        &:hover {
+          transform: translateX(-3px);
+          background-color: var(--primary-color, $primary-color);
+          color: white;
+          box-shadow: $shadow-sm;
+        }
+        
+        svg {
+          font-size: 1.1em;
+        }
+        
+        // Support du thème sombre
+        .dark-theme & {
+          background-color: var(--background-btn, $background-btn-dark);
+          color: var(--color-text-secondary, $color-text-secondary-dark);
+          
+          &:hover {
+            background-color: var(--primary-color, $primary-color-dark);
+            color: white;
+          }
+        }
+      }
+    }
+
     .project-title-container {
       display: flex;
       justify-content: space-between;
@@ -116,11 +160,13 @@
 
       .select-conversation-msg {
         display: flex;
+        flex-direction: column;
         flex: 1;
         align-items: center;
         justify-content: center;
         text-align: center;
         color: var(--color-text-secondary, $color-text-secondary);
+        gap: $sp-md;
       }
     }
   }
@@ -177,6 +223,15 @@
 @media (max-width: $mobile) {
   .project-page {
     .project-header {
+      .back-to-home {
+        margin-bottom: $sp-sm;
+        
+        .home-button {
+          padding: $sp-xs ($sp-sm + $sp-xs);
+          font-size: $fs-sm;
+        }
+      }
+      
       .project-title-container {
         flex-direction: column;
         align-items: flex-start;

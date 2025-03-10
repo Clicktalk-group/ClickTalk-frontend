@@ -8,7 +8,7 @@ import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import ProjectForm from '../../components/project/ProjectForm/ProjectForm';
 import { Modal } from '../../components/common/Modal';
 import './Project.scss';
-import { FaPlus, FaEdit, FaArrowLeft } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaArrowLeft, FaHome } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import ConversationProjectList from '../../components/project/ConversationProjectList/ConversationProjectList';
 import { Button } from '../../components/common/Button';
@@ -117,6 +117,11 @@ const Project: React.FC = () => {
     }
   };
 
+  // Naviguer vers la page d'accueil
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   // Ouvrir le modal d'édition
   const handleEditProject = () => {
     setShowEditModal(true);
@@ -167,19 +172,31 @@ const Project: React.FC = () => {
   return (
     <div className="project-page">
       <div className="project-header">
+        {/* Bouton de retour à l'accueil */}
+        <div className="back-to-home">
+          <Button 
+            variant="ghost" 
+            onClick={handleGoHome}
+            className="home-button"
+            title="Retour à l'accueil"
+          >
+            <FaHome /> Accueil
+          </Button>
+        </div>
+        
         <div className="project-title-container">
           <h1>{currentProjectData.title}</h1>
           <div className="project-actions">
             <Button 
-              variant="secondary" 
-              onClick={handleEditProject} 
+              variant="secondary"
+              onClick={handleEditProject}
               title="Modifier le projet"
             >
               <FaEdit /> Modifier
             </Button>
             <Button 
-              variant="danger" 
-              onClick={handleDeleteProject} 
+              variant="danger"
+              onClick={handleDeleteProject}
               title="Supprimer le projet"
             >
               Supprimer
