@@ -1,55 +1,77 @@
+// /src/components/project/ConversationProjectList/ConversationProjectList.scss
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
 .conversation-project-list {
-  margin: $sp-md 0;
-  
   h3 {
-    font-size: $fs-md;
-    margin-bottom: $sp-sm;
-    color: var(--color-text-secondary, $color-text-secondary);
+    font-size: 1rem;
+    color: var(--color-text-primary, $color-text-primary);
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color, $border-color);
   }
-  
+
   ul {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
+    margin: 0;
     
     li {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: $sp-sm $sp-md;
-      margin-bottom: $sp-xs;
+      justify-content: space-between;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
       background-color: var(--background-btn-grey, $background-btn-grey);
       border-radius: $radius-md;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: all 0.2s;
       
       &:hover {
         background-color: var(--background-btn, $background-btn);
+        transform: translateY(-2px);
       }
       
-      .title {
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: var(--color-text-primary, $color-text-primary);
-      }
-      
-      .actions {
+      .conversation-item {
         display: flex;
         align-items: center;
+        flex: 1;
         
-        .remove-btn {
-          background: none;
-          border: none;
-          color: var(--color-text-secondary, $color-text-light);
-          padding: $sp-xs;
-          margin-left: $sp-xs;
-          border-radius: $radius-sm;
-          transition: all 0.2s ease;
+        .icon {
+          color: var(--primary-color, $primary-color);
+          margin-right: 0.75rem;
+          font-size: 1rem;
+        }
+        
+        .conversation-info {
+          display: flex;
+          flex-direction: column;
           
+          .title {
+            color: var(--color-text-primary, $color-text-primary);
+            font-weight: 500;
+          }
+          
+          .date {
+            color: var(--color-text-secondary, $color-text-secondary);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+          }
+        }
+      }
+      
+      .remove-btn {
+        background: none;
+        border: none;
+        color: var(--color-text-secondary, $color-text-secondary);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        
+        &:hover {
+          color: $danger-color;
+          background-color: rgba($danger-color, 0.1);
           &:hover {
             color: $danger-color;
             background-color: rgba($danger-color, 0.1);
@@ -57,37 +79,29 @@
         }
       }
     }
-  }
-  
-  .empty {
-    text-align: center;
-    padding: $sp-lg;
-    color: var(--color-text-secondary, $color-text-secondary);
     
-    .empty-icon {
-      font-size: $fs-xl;
-      margin-bottom: $sp-sm;
-      opacity: 0.6;
-    }
-    
-    p {
-      margin: $sp-xs 0;
-    }
-    
-    .empty-hint {
-      font-size: $fs-sm;
+    .loading, .empty-list {
+      color: var(--color-text-secondary, $color-text-secondary);
+      text-align: center;
+      padding: 1rem 0;
       font-style: italic;
     }
   }
   
-  .loading, .error {
-    padding: $sp-md;
-    text-align: center;
-    color: var(--color-text-secondary, $color-text-secondary);
-    font-size: $fs-sm;
-  }
-  
-  .error {
-    color: $danger-color;
+  @media (max-width: $mobile) {
+    .conversation-project-list {
+      ul li {
+        flex-direction: column;
+        
+        .conversation-item {
+          width: 100%;
+          margin-bottom: $sp-xs;
+        }
+        
+        .remove-btn {
+          align-self: flex-end;
+        }
+      }
+    }
   }
 }

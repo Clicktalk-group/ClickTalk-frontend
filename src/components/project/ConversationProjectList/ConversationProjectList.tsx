@@ -1,76 +1,74 @@
-import React, { useEffect, useState } from "react";
-import { useConversation } from "../../../hooks/useConversation/useConversation";
-import { Conversation } from "../../../types/conversation.types";
-import "./ConversationProjectList.scss";
-import { FaTrash, FaComments } from "react-icons/fa";
+// /src/components/project/ConversationProjectList/ConversationProjectList.tsx
+import React, { useState, useEffect } from 'react';
+import { useConversation } from '../../../hooks/useConversation/useConversation';
+import { Conversation } from '../../../types/conversation.types';
+import './ConversationProjectList.scss';
+import { FaTrash, FaComment } from 'react-icons/fa';
 
 interface ConversationProjectListProps {
   projectId: number;
-  onSelect: (id: number) => void;
-  onRemove: (convId: number) => void;
+  onSelect: (conversationId: number) => void;
+  onRemove: (conversationId: number) => void;
 }
 
-const ConversationProjectList: React.FC<ConversationProjectListProps> = ({ 
-  projectId, 
-  onSelect, 
+const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
+  projectId,
+  onSelect,
   onRemove
 }) => {
-  const { fetchProjectConversations, loading, error } = useConversation();
-  const [projectConversations, setProjectConversations] = useState<Conversation[]>([]);
+  const { fetchProjectConversations, loading } = useConversation();
+  const [conversations, setConversations] = useState<Conversation[]>([]);
 
   useEffect(() => {
     const loadConversations = async () => {
-      if (!projectId) return;
-      
       try {
-        const conversations = await fetchProjectConversations(projectId);
-        setProjectConversations(conversations || []);
-      } catch (err) {
-        console.error("Erreur lors du chargement des conversations du projet", err);
+        if (projectId) {
+          const data = await fetchProjectConversations(projectId);
+          setConversations(data);
+        }
+      } catch (error) {
+        console.error('Error loading project conversations:', error);
       }
     };
 
     loadConversations();
   }, [projectId, fetchProjectConversations]);
 
-  if (loading && projectConversations.length === 0) {
+  if (loading) {
     return <div className="loading">Chargement des conversations...</div>;
   }
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
-
-  if (projectConversations.length === 0) {
-    return (
-      <div className="empty">
-        <FaComments className="empty-icon" />
-        <p>Aucune conversation dans ce projet</p>
-        <p className="empty-hint">Créez une nouvelle conversation en utilisant le bouton ci-dessus</p>
-      </div>
-    );
+  if (!conversations.length) {
+    return <div className="empty-list">Aucune conversation dans ce projet</div>;
   }
 
   return (
     <div className="conversation-project-list">
-      <h3>Conversations du projet</h3>
+      <h3>Conversations</h3>
       <ul>
-        {projectConversations.map((conversation) => (
+        {conversations.map(conversation => (
           <li key={conversation.id} onClick={() => onSelect(conversation.id)}>
-            <span className="title">{conversation.title}</span>
-            <div className="actions">
-              <button 
-                className="remove-btn" 
-                aria-label={`Supprimer la conversation ${conversation.title}`}
-                title={`Supprimer la conversation ${conversation.title}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemove(conversation.id);
-                }}
-              >
-                <FaTrash />
-              </button>
+            <div className="conversation-item">
+              <FaComment className="icon" />
+              <div className="conversation-info">
+                <span className="title">{conversation.title || `Conversation #${conversation.id}`}</span>
+                <span className="date">
+                  {conversation.updatedAt || conversation.createdAt 
+                    ? new Date(conversation.updatedAt || conversation.createdAt).toLocaleDateString()
+                    : 'Date inconnue'}
+                </span>
+              </div>
             </div>
+            <button 
+              className="remove-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove(conversation.id);
+              }}
+              title="Retirer de ce projet"
+            >
+              <FaTrash />
+            </button>
           </li>
         ))}
       </ul>
