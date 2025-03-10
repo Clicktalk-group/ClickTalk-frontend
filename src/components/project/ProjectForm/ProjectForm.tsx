@@ -99,7 +99,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData 
           />
         </div>
         <div className="form-group">
-          <label htmlFor="context">Contexte du projet (optionnel)</label>
+          <label htmlFor="context">Contexte du projet (optionnel)(en cours de construction)</label>
           <textarea
             id="context"
             value={context}

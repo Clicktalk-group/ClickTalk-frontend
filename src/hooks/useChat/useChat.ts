@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+// src/hooks/useChat/useChat.ts
+
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Message, Conversation, ChatState, ApiMessageResponse } from '../../types/chat.types';
 import apiService from '../../services/api/api';
+import usePerformanceMetrics from '../usePerformanceMetrics/usePerformanceMetrics';
 
 const useChat = (conversationId?: number) => {
   const [state, setState] = useState<ChatState>({
@@ -11,9 +14,28 @@ const useChat = (conversationId?: number) => {
     streamingMessage: null // NOUVEAU: pour le message en cours de streaming
   });
 
+  // Utiliser notre hook de métriques de performance
+  const {
+    metrics,
+    recordMessageStart,
+    recordMessageEnd,
+    recordStreamingChunk,
+    recordRenderStart,
+    recordRenderEnd,
+    clearMetrics
+  } = usePerformanceMetrics();
+
+  // Ref pour accéder aux messages actuels sans créer de dépendances
+  const messagesRef = useRef<Message[]>([]);
+  
+  // Mettre à jour la référence lorsque les messages changent
+  useEffect(() => {
+    messagesRef.current = state.messages;
+  }, [state.messages]);
+
   // Déclaration préliminaire pour résoudre la dépendance circulaire
-  const loadMessagesRef = useCallback(async (convId: number) => {}, []);
-  const loadConversationRef = useCallback(async (convId: number) => {}, []);
+  const loadMessagesRef = useRef(async (convId: number) => {});
+  const loadConversationRef = useRef(async (convId: number) => {});
 
   // Charger les messages d'une conversation
   const loadMessages = useCallback(async (convId: number) => {
@@ -26,7 +48,9 @@ const useChat = (conversationId?: number) => {
     
     try {
       console.log(`🔄 Loading messages for conversation ID: ${convId}`);
+      recordRenderStart(`loadMessages-${convId}`);
       const response = await apiService.get<Message[]>(`/messages/conv/${convId}`);
+      recordRenderEnd(`loadMessages-${convId}`);
       console.log(`✅ Received ${response?.length || 0} messages from API:`, response);
       
       if (Array.isArray(response)) {
@@ -58,10 +82,12 @@ const useChat = (conversationId?: number) => {
         isLoading: false
       }));
     }
-  }, []);
+  }, [recordRenderStart, recordRenderEnd]);
 
   // Assigner la fonction réelle à la référence
-  Object.assign(loadMessagesRef, { current: loadMessages });
+  useEffect(() => {
+    loadMessagesRef.current = loadMessages;
+  }, [loadMessages]);
 
   // Charger une conversation
   const loadConversation = useCallback(async (convId: number) => {
@@ -80,7 +106,9 @@ const useChat = (conversationId?: number) => {
     
     try {
       console.log(`🔄 Loading conversation: ${convId}`);
+      recordRenderStart(`loadConversation-${convId}`);
       const response = await apiService.get<Conversation>(`/conversation/${convId}`);
+      recordRenderEnd(`loadConversation-${convId}`);
       console.log("✅ Conversation loaded:", response);
       
       // Mettre à jour les détails de la conversation
@@ -100,13 +128,20 @@ const useChat = (conversationId?: number) => {
         isLoading: false
       }));
     }
-  }, [loadMessages]);
+  }, [loadMessages, recordRenderStart, recordRenderEnd]);
   
   // Assigner la fonction réelle à la référence
-  Object.assign(loadConversationRef, { current: loadConversation });
+  useEffect(() => {
+    loadConversationRef.current = loadConversation;
+  }, [loadConversation]);
 
-  // NOUVEAU: Fonction pour traiter les chunks (morceaux) de texte en streaming
+  // NOUVEAU: Fonction pour traiter les chunks (morceaux) de texte en streaming avec métriques
   const handleStreamChunk = useCallback((chunk: string) => {
+    // Enregistrer les métriques pour cette portion de streaming
+    if (chunk.length > 0) {
+      recordStreamingChunk(chunk);
+    }
+    
     setState(prevState => {
       // Ajouter le nouveau morceau au message en streaming
       const newStreamingContent = (prevState.streamingMessage || '') + chunk;
@@ -118,9 +153,9 @@ const useChat = (conversationId?: number) => {
         streamingMessage: newStreamingContent
       };
     });
-  }, []);
+  }, [recordStreamingChunk]);
 
-  // Envoyer un message avec support de streaming
+  // Envoyer un message avec support de streaming et métriques
   const sendMessage = useCallback(async (convId: number | undefined, content: string) => {
     if (!content.trim()) {
       console.warn("Empty message, not sending");
@@ -134,7 +169,10 @@ const useChat = (conversationId?: number) => {
     const tempBotId = `temp-bot-${Date.now()}`;
     
     // Garder une copie des messages actuels pour restaurer en cas d'erreur
-    const currentMessages = [...state.messages];
+    const currentMessages = [...messagesRef.current];
+    
+    // Commencer à mesurer le temps de livraison du message
+    recordMessageStart(tempUserId);
     
     // Ajouter le message utilisateur immédiatement à l'UI
     setState(prevState => ({
@@ -180,12 +218,17 @@ const useChat = (conversationId?: number) => {
       
       console.log("📦 API payload:", payload);
       
-      // NOUVEAU: Utiliser la fonction de streaming
+      // NOUVEAU: Utiliser la fonction de streaming avec métriques
+      recordRenderStart(`apiCall-${tempBotId}`);
       const response = await apiService.stream<ApiMessageResponse>(
         '/messages/add', 
         payload,
         handleStreamChunk // Passer le gestionnaire de chunks
       );
+      recordRenderEnd(`apiCall-${tempBotId}`);
+      
+      // Enregistrer la fin du message et sa taille
+      recordMessageEnd(tempUserId, content.length);
       
       console.log("📩 API response:", response);
       
@@ -223,6 +266,11 @@ const useChat = (conversationId?: number) => {
             return msg;
           });
           
+          // Enregistrer la taille finale du message reçu
+          if (prevState.streamingMessage) {
+            recordMessageEnd(tempBotId, prevState.streamingMessage.length);
+          }
+          
           return {
             ...prevState,
             messages: updatedMessages,
@@ -237,7 +285,7 @@ const useChat = (conversationId?: number) => {
           try {
             if (!convId || convId !== finalConvId) {
               // Si c'est une nouvelle conversation ou si l'ID a changé
-              await loadConversation(finalConvId);
+              await loadConversationRef.current(finalConvId);
             }
           } catch (err) {
             console.error("Error refreshing conversation after send:", err);
@@ -269,8 +317,8 @@ const useChat = (conversationId?: number) => {
         messages: currentMessages
       }));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleStreamChunk, loadConversation, state.messages]); 
+  // IMPORTANT: Ne pas inclure state.messages dans les dépendances
+  }, [handleStreamChunk, recordMessageStart, recordMessageEnd, recordRenderStart, recordRenderEnd]); 
 
   // Créer une nouvelle conversation
   const createConversation = useCallback(async (title: string) => {
@@ -278,7 +326,9 @@ const useChat = (conversationId?: number) => {
     
     try {
       console.log(`🆕 Creating new conversation with title: "${title}"`);
+      recordRenderStart('createConversation');
       const response = await apiService.post<Conversation>('/conversation/add', { title });
+      recordRenderEnd('createConversation');
       console.log("✅ Conversation created:", response);
       
       setState(prevState => ({ ...prevState, isLoading: false }));
@@ -294,7 +344,7 @@ const useChat = (conversationId?: number) => {
       
       return null;
     }
-  }, []);
+  }, [recordRenderStart, recordRenderEnd]);
 
   // Charger les messages au montage du composant
   useEffect(() => {
@@ -304,7 +354,10 @@ const useChat = (conversationId?: number) => {
     } else {
       console.log("No conversation ID provided at mount, starting fresh");
     }
-  }, [conversationId, loadConversation]);
+    
+    // Clear metrics when conversation changes
+    clearMetrics();
+  }, [conversationId, loadConversation, clearMetrics]);
   
   // Copier un message
   const copyMessage = useCallback((content: string) => {
@@ -318,7 +371,8 @@ const useChat = (conversationId?: number) => {
     sendMessage,
     createConversation,
     loadConversation,
-    copyMessage
+    copyMessage,
+    performanceMetrics: metrics // Nouvelle propriété pour exposer les métriques
   };
 };
 

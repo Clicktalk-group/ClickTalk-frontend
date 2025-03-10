@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+// src/components/chat/ChatContainer/ChatContainer.tsx
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ChatMessages from '../ChatMessages';
 import ChatInput from '../ChatInput';
 import useChat from '../../../hooks/useChat/useChat';
+import PerformanceMonitor from '../PerformanceMonitor';
 import './ChatContainer.scss';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useConversation } from '../../../hooks/useConversation/useConversation';
@@ -19,6 +22,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
   const navigate = useNavigate();
   
   const [isNewConversation, setIsNewConversation] = useState(!convId);
+  const [showPerformanceMetrics, setShowPerformanceMetrics] = useState(false);
   
   const { 
     messages, 
@@ -27,7 +31,8 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
     sendMessage, 
     copyMessage,
     currentConversation,
-    streamingMessage // Ajout du streamingMessage
+    streamingMessage,
+    performanceMetrics // Nouvelle propriété pour les métriques
   } = useChat(convId);
 
   // Si la conversation est créée, naviguer vers son URL
@@ -38,8 +43,13 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
     }
   }, [currentConversation, isNewConversation, navigate]);
 
+  // Utiliser useCallback pour éviter de recréer cette fonction à chaque rendu
+  const handleTogglePerformanceMetrics = useCallback(() => {
+    setShowPerformanceMetrics(prev => !prev);
+  }, []);
+
   // Fonction pour envoyer un message
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string) => {
     // Pour une nouvelle conversation, créer d'abord la conversation visuellement
     if (isNewConversation) {
       try {
@@ -67,15 +77,32 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
         onMessageSent();
       }
     }
-  };
+  }, [isNewConversation, sendMessage, convId, onMessageSent]);
 
   return (
     <div className="chat-container">
+      <div className="chat-tools">
+        <button 
+          onClick={handleTogglePerformanceMetrics}
+          className="performance-toggle-btn"
+        >
+          {showPerformanceMetrics ? 'Hide Performance Metrics' : 'Show Performance Metrics'}
+        </button>
+      </div>
+      
+      {/* Utiliser le composant PerformanceMonitor uniquement si visible */}
+      {showPerformanceMetrics && (
+        <PerformanceMonitor 
+          metrics={performanceMetrics} 
+          visible={true}
+        />
+      )}
+      
       <ChatMessages 
         messages={messages} 
         isLoading={isLoading} 
         onCopyMessage={copyMessage} 
-        streamingMessage={streamingMessage} // Ajout du prop streamingMessage
+        streamingMessage={streamingMessage}
       />
       
       <ChatInput 

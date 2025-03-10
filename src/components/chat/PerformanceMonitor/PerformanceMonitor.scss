@@ -1,0 +1,179 @@
+// src/components/chat/PerformanceMonitor/PerformanceMonitor.scss
+@import '../../../styles/variables.scss';
+
+.performance-monitor {
+  background-color: $message-bg-bot;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: $sp-md;
+  margin: $sp-md 0;
+  box-shadow: $shadow-sm;
+  
+  h3 {
+    margin-top: 0;
+    margin-bottom: $sp-md;
+    font-size: $fs-lg;
+    color: $color-text-primary;
+    font-weight: 600;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: $sp-md;
+  }
+
+  .metric-card {
+    background-color: $message-bg-user;
+    border-radius: $radius-sm;
+    padding: $sp-md;
+    box-shadow: $shadow-sm;
+
+    h4 {
+      margin-top: 0;
+      margin-bottom: $sp-sm;
+      font-size: $fs-md;
+      color: $color-text-primary;
+      font-weight: 500;
+    }
+
+    p {
+      margin: $sp-xs 0;
+      font-size: $fs-sm;
+      color: $color-text-secondary;
+    }
+  }
+}
+
+// Support pour le mode sombre
+[data-theme="dark"] {
+  .performance-monitor {
+    background-color: darken($background-color-dark, 3%);
+    border-color: $border-color-dark;
+    
+    h3 {
+      color: $color-text-primary-dark;
+    }
+    
+    .metric-card {
+      background-color: $background-color-dark;
+      
+      h4 {
+        color: $color-text-primary-dark;
+      }
+      
+      p {
+        color: $color-text-secondary-dark;
+      }
+    }
+  }
+}
+
+// Support pour les thèmes de couleurs personnalisés
+[data-color-scheme="blue"] {
+  .performance-monitor {
+    .metric-card {
+      border-left: 3px solid #3b82f6;
+    }
+  }
+}
+
+[data-color-scheme="green"] {
+  .performance-monitor {
+    .metric-card {
+      border-left: 3px solid #10b981;
+    }
+  }
+}
+
+[data-color-scheme="purple"] {
+  .performance-monitor {
+    .metric-card {
+      border-left: 3px solid $primary-color;
+    }
+  }
+}
+
+// Styles pour le bouton de toggle du moniteur
+.performance-toggle-btn {
+  background-color: $background-btn;
+  color: $color-text-primary;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+  padding: $sp-xs $sp-md;
+  font-size: $fs-sm;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: $dropdown-hover;
+  }
+  
+  // Styles pour le mode sombre
+  [data-theme="dark"] & {
+    background-color: $background-btn-dark;
+    color: $color-text-primary-dark;
+    border-color: $border-color-dark;
+    
+    &:hover {
+      background-color: lighten($background-btn-dark, 5%);
+    }
+  }
+}
+
+// Animation subtile pour les métriques
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.01);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.performance-monitor {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    .metric-card {
+      animation: pulse 2s infinite ease-in-out;
+      animation-delay: calc(var(--animation-order, 0) * 0.1s);
+    }
+    
+    .metric-card:nth-child(1) {
+      --animation-order: 1;
+    }
+    
+    .metric-card:nth-child(2) {
+      --animation-order: 2;
+    }
+    
+    .metric-card:nth-child(3) {
+      --animation-order: 3;
+    }
+    
+    .metric-card:nth-child(4) {
+      --animation-order: 4;
+    }
+  }
+}
+
+// Styles responsifs
+@media (max-width: $tablet) {
+  .performance-monitor {
+    .metrics-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .performance-monitor {
+    .metrics-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
