@@ -99,15 +99,26 @@ export const useProject = () => {
     }
   }, []);
 
-  // Supprimer une conversation d'un projet
+  // Supprimer une conversation d'un projet - CORRECTION ICI
   const removeConversationFromProject = useCallback(async (projectId: number, convId: number) => {
+    setLoading(true);
     try {
+      console.log(`Removing conversation ${convId} from project ${projectId}`);
+      // Vérification des IDs
+      if (!projectId || !convId) {
+        throw new Error('Project ID or Conversation ID is invalid');
+      }
+      
       await projectService.removeConversationFromProject(projectId, convId);
+      console.log('Successfully removed conversation from project');
       setError(null);
-    } catch (err) {
-      setError(`Erreur lors de la suppression de la conversation ${convId} du projet ${projectId}`);
-      console.error(err);
+    } catch (err: any) {
+      const errorMessage = `Erreur lors de la suppression de la conversation ${convId} du projet ${projectId}: ${err.message}`;
+      console.error(errorMessage);
+      setError(errorMessage);
       throw err;
+    } finally {
+      setLoading(false);
     }
   }, []);
 

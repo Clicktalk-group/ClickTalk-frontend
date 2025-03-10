@@ -65,20 +65,31 @@ const Project: React.FC = () => {
     setIsNewConversation(false);
   };
 
-  // Supprimer une conversation
+  // Supprimer une conversation - CORRECTION ICI
   const handleRemoveConversation = async (conversationId: number) => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer cette conversation du projet ?")) {
       try {
-        if (projectId) {
-          await removeConversationFromProject(Number(projectId), conversationId);
-          // Si c'était la conversation actuellement ouverte, revenir à l'écran de sélection
-          if (currentConversationId === conversationId) {
-            setCurrentConversationId(null);
-            setIsNewConversation(false);
-          }
+        if (!projectId) {
+          throw new Error("Project ID is missing");
+        }
+        
+        console.log(`Attempting to remove conversation ${conversationId} from project ${projectId}`);
+        await removeConversationFromProject(Number(projectId), conversationId);
+        console.log('Conversation removed successfully');
+        
+        // Si c'était la conversation actuellement ouverte, revenir à l'écran de sélection
+        if (currentConversationId === conversationId) {
+          setCurrentConversationId(null);
+          setIsNewConversation(false);
+        }
+        
+        // Forcer le rafraîchissement des conversations du projet
+        if (fetchProjectConversations) {
+          fetchProjectConversations(Number(projectId));
         }
       } catch (error) {
         console.error("Erreur lors de la suppression de la conversation du projet:", error);
+        alert("Une erreur est survenue lors de la suppression de la conversation. Veuillez réessayer.");
       }
     }
   };

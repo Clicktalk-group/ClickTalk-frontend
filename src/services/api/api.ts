@@ -95,6 +95,15 @@ axiosInstance.interceptors.response.use(
       console.error("🚫 Erreur d'autorisation (403) - Accès refusé");
       // On pourrait rediriger vers une page d'erreur spécifique
     }
+    // CORRECTION ICI - Gestion spécifique des erreurs 500
+    else if (error.response?.status === 500) {
+      console.error("⛔ Erreur serveur (500):", {
+        url: error.config?.url,
+        responseData: error.response?.data,
+        message: error.response?.data?.message || error.message,
+        stack: error.stack
+      });
+    }
     else {
       console.error("❌ Erreur API:", {
         url: error.config?.url,
@@ -246,13 +255,25 @@ export const apiService = {
     }
   },
   
-  // DELETE request
+  // DELETE request - CORRECTION ICI
   delete: async <T>(url: string, config?: any): Promise<T> => {
     try {
+      console.log(`🗑️ Sending DELETE request to: ${url}`);
       const response = await axiosInstance.delete(url, config);
+      console.log(`✅ DELETE success for ${url}:`, response);
       return response as T;
     } catch (error: any) {
       console.error(`❌ DELETE error for ${url}:`, error.message);
+      
+      // Gestion spécifique des erreurs 500
+      if (error.response?.status === 500) {
+        console.error('Détails de l\'erreur 500:', {
+          responseData: error.response?.data,
+          message: error.response?.data?.message || error.message,
+          stack: error.stack
+        });
+      }
+      
       throw error;
     }
   },

@@ -103,12 +103,21 @@ export const projectService = {
     }
   },
   
-  // Supprimer une conversation d'un projet
+  // Supprimer une conversation d'un projet - CORRIGÉ
   removeConversationFromProject: async (projectId: number, convId: number): Promise<void> => {
     try {
-      await apiService.delete(`/project/${projectId}/remove-conversation/${convId}`);
+      // Vérification des paramètres
+      if (!projectId || !convId) {
+        throw new Error('Invalid project ID or conversation ID');
+      }
+      
+      console.log(`Attempting to delete conversation ${convId}`);
+      // Utiliser l'endpoint de suppression de conversation directement
+      await apiService.delete(`/conversation/delete/${convId}`);
+      console.log('Conversation successfully deleted');
     } catch (error) {
-      console.error(`Error removing conversation ${convId} from project ${projectId}:`, error);
+      console.error(`Error deleting conversation ${convId}:`, error);
+      // Rethrow pour que l'erreur soit gérée au niveau supérieur
       throw error;
     }
   }
