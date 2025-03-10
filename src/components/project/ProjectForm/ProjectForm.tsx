@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useProject } from "../../../hooks/useProject/useProject";
 import { useAuth } from "../../../hooks/useAuth/useAuth";
 import "./ProjectForm.scss";
+import { Button } from "../../../components/common/Button";
 
 interface ProjectFormProps {
   onClose: () => void;
@@ -26,16 +27,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData 
   const effectiveUserId = userId || user?.id || 0;
   
   useEffect(() => {
-    // Log pour debug
-    console.log("ProjectForm - User ID:", effectiveUserId);
-    console.log("ProjectForm - User from Auth:", user);
-    
     if (!effectiveUserId) {
       console.warn("Attention: UserId non défini dans ProjectForm");
     }
   }, [effectiveUserId, user]);
 
-  const isEditMode = !!initialData;
+  const isEditMode = !!initialData && initialData.id > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +104,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData 
             id="context"
             value={context}
             onChange={(e) => setContext(e.target.value)}
-            placeholder="Décrivez le contexte de ce projet"
+            placeholder="Décrivez le contexte de ce projet pour guider les conversations"
             rows={4}
             className="textarea-input"
           />
@@ -116,20 +113,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData 
           </p>
         </div>
         <div className="form-actions">
-          <button 
+          <Button 
             type="button" 
-            className="btn-cancel"
+            variant="secondary"
             onClick={onClose}
           >
             Annuler
-          </button>
-          <button 
+          </Button>
+          <Button 
             type="submit" 
-            className="btn-submit"
+            variant="primary"
             disabled={loading || !title.trim()}
           >
             {loading ? (isEditMode ? "Modification..." : "Création...") : (isEditMode ? "Modifier" : "Créer")}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

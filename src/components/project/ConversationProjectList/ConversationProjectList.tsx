@@ -1,6 +1,7 @@
 // /src/components/project/ConversationProjectList/ConversationProjectList.tsx
 import React, { useState, useEffect } from 'react';
 import { useConversation } from '../../../hooks/useConversation/useConversation';
+import { useProject } from '../../../hooks/useProject/useProject';
 import { Conversation } from '../../../types/conversation.types';
 import './ConversationProjectList.scss';
 import { FaTrash, FaComment } from 'react-icons/fa';
@@ -16,44 +17,86 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
   onSelect,
   onRemove
 }) => {
-  const { fetchProjectConversations, loading } = useConversation();
+  const { fetchProjectConversations } = useConversation();
+  // Utiliser aussi le hook useProject pour pouvoir utiliser getProjectConversations si disponible
+  const { getProjectConversations } = useProject();
+  
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadConversations = async () => {
+      setIsLoading(true);
       try {
         if (projectId) {
-          const data = await fetchProjectConversations(projectId);
-          setConversations(data);
+          // Essayer d'abord fetchProjectConversations (de useConversation)
+          let data;
+          
+          try {
+            data = await fetchProjectConversations(projectId);
+          } catch (e) {
+            console.warn('Failed to load with fetchProjectConversations, trying getProjectConversations');
+            // Essayer la méthode alternative si la première échoue
+            if (getProjectConversations) {
+              data = await getProjectConversations(projectId);
+            }
+          }
+          
+          if (data && Array.isArray(data)) {
+            const formattedConversations = data.map(conv => ({
+              id: conv.id || conv.convId,
+              title: conv.title || `Conversation #${conv.id || conv.convId}`,
+              userId: conv.userId,
+              createdAt: conv.createdAt,
+              updatedAt: conv.updatedAt
+            }));
+            
+            setConversations(formattedConversations);
+            setError(null);
+          } else {
+            setConversations([]);
+            setError("Aucune conversation trouvée ou format de données non valide");
+          }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error loading project conversations:', error);
+        setError(`Erreur de chargement: ${error.message || 'Contactez l\'administrateur'}`);
+        setConversations([]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadConversations();
-  }, [projectId, fetchProjectConversations, isRemoving]);
+  }, [projectId, fetchProjectConversations, getProjectConversations, isRemoving]);
 
   const handleRemoveClick = async (e: React.MouseEvent, conversationId: number) => {
     e.stopPropagation();
-    try {
-      setIsRemoving(true);
-      // Seul l'événement est transmis, la logique de suppression est gérée par le parent
-      await onRemove(conversationId);
-      
-      // Forcer le rafraîchissement après suppression
-      const updatedConversations = conversations.filter(conv => conv.id !== conversationId);
-      setConversations(updatedConversations);
-    } catch (error) {
-      console.error(`Error removing conversation ${conversationId}:`, error);
-    } finally {
-      setIsRemoving(false);
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette conversation? Cette action est irréversible.")) {
+      try {
+        setIsRemoving(true);
+        await onRemove(conversationId);
+        
+        // Mettre à jour la liste locale après la suppression
+        setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+        setError(null);
+      } catch (error: any) {
+        console.error(`Error removing conversation ${conversationId}:`, error);
+        setError(`Erreur lors de la suppression: ${error.message || 'Contactez l\'administrateur'}`);
+      } finally {
+        setIsRemoving(false);
+      }
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <div className="loading">Chargement des conversations...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
   }
 
   if (!conversations.length) {
@@ -80,7 +123,7 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
             <button 
               className="remove-btn"
               onClick={(e) => handleRemoveClick(e, conversation.id)}
-              title="Retirer de ce projet"
+              title="Supprimer cette conversation"
               disabled={isRemoving}
             >
               <FaTrash />

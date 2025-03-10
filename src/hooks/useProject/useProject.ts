@@ -24,6 +24,34 @@ export const useProject = () => {
     }
   }, []);
 
+  // Charger un projet spécifique
+  const fetchProjectById = useCallback(async (id: number) => {
+    setLoading(true);
+    try {
+      const data = await projectService.getProjectById(id);
+      if (data) {
+        setCurrentProject(data);
+        // Mettre à jour le projet dans la liste si présent
+        setProjects(prev => {
+          const exists = prev.some(p => p.id === data.id);
+          if (exists) {
+            return prev.map(p => p.id === data.id ? data : p);
+          } else {
+            return [...prev, data];
+          }
+        });
+      }
+      setError(null);
+      return data;
+    } catch (err) {
+      setError(`Erreur lors du chargement du projet ${id}`);
+      console.error(err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Créer un nouveau projet
   const createProject = useCallback(async (data: CreateProjectRequest) => {
     setLoading(true);
@@ -99,7 +127,18 @@ export const useProject = () => {
     }
   }, []);
 
-  // Supprimer une conversation d'un projet - CORRECTION ICI
+  // Récupérer les conversations d'un projet
+  const getProjectConversations = useCallback(async (projectId: number) => {
+    try {
+      return await projectService.getProjectConversations(projectId);
+    } catch (err) {
+      setError(`Erreur lors de la récupération des conversations du projet ${projectId}`);
+      console.error(err);
+      return [];
+    }
+  }, []);
+
+  // Supprimer une conversation d'un projet
   const removeConversationFromProject = useCallback(async (projectId: number, convId: number) => {
     setLoading(true);
     try {
@@ -133,10 +172,12 @@ export const useProject = () => {
     loading,
     error,
     fetchProjects,
+    fetchProjectById,
     createProject,
     updateProject,
     deleteProject,
     addConversationToProject,
-    removeConversationFromProject
+    removeConversationFromProject,
+    getProjectConversations
   };
 };

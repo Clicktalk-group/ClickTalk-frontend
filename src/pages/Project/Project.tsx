@@ -4,14 +4,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useProject } from '../../hooks/useProject/useProject';
 import { useConversation } from '../../hooks/useConversation/useConversation';
 import { Project as ProjectType } from '../../types/project.types';
-import { Conversation } from '../../types/conversation.types';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import ProjectForm from '../../components/project/ProjectForm/ProjectForm';
 import { Modal } from '../../components/common/Modal';
 import './Project.scss';
-import { FaPlus, FaEdit } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaArrowLeft } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import ConversationProjectList from '../../components/project/ConversationProjectList/ConversationProjectList';
+import { Button } from '../../components/common/Button';
 
 const Project: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -22,11 +22,13 @@ const Project: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const { 
     projects,
     currentProject,
     fetchProjects,
+    fetchProjectById,
     updateProject,
     deleteProject,
     removeConversationFromProject
@@ -37,21 +39,45 @@ const Project: React.FC = () => {
     fetchProjectConversations
   } = useConversation();
 
+  // Charger le projet spécifique quand l'ID est disponible
+  useEffect(() => {
+    const loadProject = async () => {
+      if (!projectId) {
+        navigate('/');
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        // Chercher d'abord dans la liste existante
+        const existingProject = projects.find(p => p.id === Number(projectId));
+        
+        if (existingProject) {
+          setIsLoading(false);
+          return;
+        }
+        
+        // Si pas trouvé, charger depuis l'API
+        if (fetchProjectById) {
+          await fetchProjectById(Number(projectId));
+        } else {
+          await fetchProjects();
+        }
+        
+        setError(null);
+      } catch (error: any) {
+        console.error("Error loading project:", error);
+        setError(`Erreur de chargement: ${error.message || "Contactez l'administrateur"}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadProject();
+  }, [projectId, navigate, fetchProjectById, fetchProjects, projects]);
+
   // Rechercher le projet actuel dans la liste des projets
   const currentProjectData = projectId ? projects.find(p => p.id === Number(projectId)) : null;
-
-  // Effet pour gérer le chargement initial
-  useEffect(() => {
-    if (!projectId) {
-      navigate('/');
-      return;
-    }
-    
-    // Une fois que les projets sont chargés, arrêter le chargement
-    if (projects.length >= 0) {
-      setIsLoading(false);
-    }
-  }, [projectId, navigate, projects]);
 
   // Gérer la création de nouvelle conversation
   const handleNewConversation = () => {
@@ -65,32 +91,29 @@ const Project: React.FC = () => {
     setIsNewConversation(false);
   };
 
-  // Supprimer une conversation - CORRECTION ICI
+  // Supprimer une conversation
   const handleRemoveConversation = async (conversationId: number) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette conversation du projet ?")) {
-      try {
-        if (!projectId) {
-          throw new Error("Project ID is missing");
-        }
-        
-        console.log(`Attempting to remove conversation ${conversationId} from project ${projectId}`);
-        await removeConversationFromProject(Number(projectId), conversationId);
-        console.log('Conversation removed successfully');
-        
-        // Si c'était la conversation actuellement ouverte, revenir à l'écran de sélection
-        if (currentConversationId === conversationId) {
-          setCurrentConversationId(null);
-          setIsNewConversation(false);
-        }
-        
-        // Forcer le rafraîchissement des conversations du projet
-        if (fetchProjectConversations) {
-          fetchProjectConversations(Number(projectId));
-        }
-      } catch (error) {
-        console.error("Erreur lors de la suppression de la conversation du projet:", error);
-        alert("Une erreur est survenue lors de la suppression de la conversation. Veuillez réessayer.");
+    try {
+      if (!projectId) {
+        throw new Error("Project ID is missing");
       }
+      
+      console.log(`Attempting to remove conversation ${conversationId} from project ${projectId}`);
+      await removeConversationFromProject(Number(projectId), conversationId);
+      console.log('Conversation removed successfully');
+      
+      // Si c'était la conversation actuellement ouverte, revenir à l'écran de sélection
+      if (currentConversationId === conversationId) {
+        setCurrentConversationId(null);
+        setIsNewConversation(false);
+      }
+      
+      setError(null);
+      return true;
+    } catch (error: any) {
+      console.error("Erreur lors de la suppression de la conversation du projet:", error);
+      setError(`Erreur de suppression: ${error.message || "Contactez l'administrateur"}`);
+      return false;
     }
   };
 
@@ -102,18 +125,23 @@ const Project: React.FC = () => {
   // Fermer le modal d'édition
   const handleCloseEditModal = () => {
     setShowEditModal(false);
+    // Rafraîchir les données du projet après modifications
+    if (projectId && fetchProjectById) {
+      fetchProjectById(Number(projectId));
+    }
   };
 
   // Supprimer le projet
   const handleDeleteProject = async () => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le projet "${currentProjectData?.title}" ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le projet "${currentProjectData?.title}" et toutes ses conversations ?`)) {
       try {
         if (projectId) {
           await deleteProject(Number(projectId));
           navigate('/');
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Erreur lors de la suppression du projet:", error);
+        setError(`Erreur lors de la suppression: ${error.message || "Contactez l'administrateur"}`);
       }
     }
   };
@@ -129,7 +157,9 @@ const Project: React.FC = () => {
       <div className="project-not-found">
         <h2>Projet non trouvé</h2>
         <p>Le projet que vous recherchez n'existe pas ou a été supprimé.</p>
-        <button onClick={() => navigate('/')}>Retour à l'accueil</button>
+        <Button onClick={() => navigate('/')} variant="primary">
+          <FaArrowLeft /> Retour à l'accueil
+        </Button>
       </div>
     );
   }
@@ -140,24 +170,38 @@ const Project: React.FC = () => {
         <div className="project-title-container">
           <h1>{currentProjectData.title}</h1>
           <div className="project-actions">
-            <button className="edit-btn" onClick={handleEditProject} title="Modifier le projet">
-              <FaEdit />
-            </button>
-            <button className="delete-btn" onClick={handleDeleteProject} title="Supprimer le projet">
+            <Button 
+              variant="secondary" 
+              onClick={handleEditProject} 
+              title="Modifier le projet"
+            >
+              <FaEdit /> Modifier
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={handleDeleteProject} 
+              title="Supprimer le projet"
+            >
               Supprimer
-            </button>
+            </Button>
           </div>
         </div>
         {currentProjectData.context && (
           <p className="project-context">{currentProjectData.context}</p>
         )}
+        {error && <div className="error-notification">{error}</div>}
       </div>
       
       <div className="project-content">
         <div className="project-sidebar">
-          <button className="new-conv-btn" onClick={handleNewConversation}>
+          <Button 
+            variant="primary" 
+            className="new-conv-btn" 
+            onClick={handleNewConversation}
+            fullWidth
+          >
             <FaPlus /> Nouvelle conversation
-          </button>
+          </Button>
           
           {projectId && (
             <ConversationProjectList 
@@ -176,6 +220,12 @@ const Project: React.FC = () => {
           ) : (
             <div className="select-conversation-msg">
               <p>Sélectionnez une conversation ou créez-en une nouvelle</p>
+              <Button 
+                variant="primary"
+                onClick={handleNewConversation}
+              >
+                <FaPlus /> Démarrer une nouvelle conversation
+              </Button>
             </div>
           )}
         </div>
