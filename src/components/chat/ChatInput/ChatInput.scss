@@ -17,7 +17,7 @@
     min-height: 45px;
     max-height: 120px;
     overflow-y: auto;
-    background-color: var(--input-background, white);
+    background-color: var(--input-background, rgba($background-color-dark, 0.1));
     color: var(--color-text-primary, $color-text-primary);
     
     &:focus {
@@ -53,6 +53,25 @@
     &.disabled {
       background-color: var(--button-disabled, darken($background-color, 20%));
       cursor: not-allowed;
+    }
+  }
+}
+
+// Ajout des styles spécifiques pour le mode sombre
+:root.dark-theme {
+  .chat-input-container {
+    textarea {
+      background-color: var(--input-background, $background-btn-dark);
+      color: var(--color-text-primary, $color-text-primary-dark);
+      border-color: var(--border-color-dark, $border-color-dark);
+      
+      &::placeholder {
+        color: var(--color-text-secondary, $color-text-secondary-dark);
+      }
+      
+      &:disabled {
+        background-color: var(--input-disabled, darken($background-btn-dark, 5%));
+      }
     }
   }
 }
