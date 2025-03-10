@@ -3,56 +3,95 @@
 
 .chat-input-container {
   display: flex;
+  flex-direction: column;
   padding: $sp-md;
   border-top: 1px solid var(--border-color, darken($background-color, 5%));
   
-  textarea {
-    flex: 1;
-    resize: none;
-    border: 1px solid var(--border-color-dark, darken($background-color, 10%));
-    border-radius: $radius-md;
-    padding: $sp-sm $sp-md;
-    font-family: inherit;
-    font-size: $fs-md;
-    min-height: 45px;
-    max-height: 120px;
-    overflow-y: auto;
-    background-color: var(--input-background, rgba($background-color-dark, 0.1));
-    color: var(--color-text-primary, $color-text-primary);
+  .formatting-toolbar {
+    display: flex;
+    margin-bottom: 8px;
+    gap: 6px;
+    flex-wrap: wrap;
     
-    &:focus {
-      outline: none;
-      border-color: var(--primary-color, $primary-color);
-      box-shadow: 0 0 0 2px var(--primary-color-transparent, rgba($primary-color, 0.2));
-    }
-    
-    &:disabled {
-      background-color: var(--input-disabled, darken($color-light, 5%));
-      cursor: not-allowed;
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: $radius-sm;
+      background-color: var(--background-btn, $background-btn); 
+      border: 1px solid var(--border-color, $border-color);
+      color: var(--color-text-primary, $color-text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover:not(:disabled) {
+        background-color: var(--primary-color-transparent, rgba($primary-color, 0.1));
+        border-color: var(--primary-color, $primary-color);
+      }
+      
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
   }
   
-  .send-button {
-    background-color: var(--primary-color, $primary-color);
-    color: var(--button-text-color, white);
-    border: none;
-    border-radius: $radius-md;
-    width: 40px;
-    height: 40px;
-    margin-left: $sp-sm;
+  .message-form {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+    align-items: flex-end;
     
-    &:hover:not(.disabled) {
-      background-color: var(--primary-hover, $primary-hover);
+    .message-textarea {
+      flex: 1;
+      resize: none;
+      min-height: 45px;
+      max-height: 120px;
+      border-radius: $radius-md;
+      border: 1px solid var(--border-color-dark, darken($background-color, 10%));
+      background-color: var(--input-background, rgba($background-color, 0.1));
+      color: var(--color-text-primary, $color-text-primary);
+      padding: $sp-sm $sp-md;
+      font-family: inherit;
+      font-size: $fs-md;
+      line-height: 1.5;
+      overflow-y: auto;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color, $primary-color);
+        box-shadow: 0 0 0 2px var(--primary-color-transparent, rgba($primary-color, 0.2));
+      }
+      
+      &:disabled {
+        background-color: var(--input-disabled, darken($color-light, 5%));
+        cursor: not-allowed;
+      }
     }
     
-    &.disabled {
-      background-color: var(--button-disabled, darken($background-color, 20%));
-      cursor: not-allowed;
+    .send-button {
+      background-color: var(--primary-color, $primary-color);
+      color: var(--button-text-color, white);
+      border: none;
+      border-radius: $radius-md;
+      width: 40px;
+      height: 40px;
+      margin-left: $sp-sm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      
+      &:hover:not(.disabled) {
+        background-color: var(--primary-hover, $primary-hover);
+      }
+      
+      &.disabled {
+        background-color: var(--button-disabled, darken($background-color, 20%));
+        cursor: not-allowed;
+      }
     }
   }
 }
@@ -60,7 +99,13 @@
 // Ajout des styles spécifiques pour le mode sombre
 :root.dark-theme {
   .chat-input-container {
-    textarea {
+    .formatting-toolbar button {
+      background-color: var(--background-btn, $background-btn-dark);
+      color: var(--color-text-primary, $color-text-primary-dark);
+      border-color: var(--border-color, $border-color-dark);
+    }
+    
+    .message-textarea {
       background-color: var(--input-background, $background-btn-dark);
       color: var(--color-text-primary, $color-text-primary-dark);
       border-color: var(--border-color-dark, $border-color-dark);

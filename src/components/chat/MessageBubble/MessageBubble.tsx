@@ -1,6 +1,9 @@
 import React from 'react';
 import { FaCopy } from 'react-icons/fa';
 import { Message } from '../../../types/chat.types';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
 import './MessageBubble.scss';
 
 interface MessageBubbleProps {
@@ -15,18 +18,15 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onCopy, isStream
   // Sécurité supplémentaire pour s'assurer que le contenu est une chaîne de caractères
   const safeContent = typeof content === 'string' ? content : '';
   
-  // Formatage du contenu pour l'affichage (conservation des sauts de ligne)
-  const formattedContent = safeContent.split('\n').map((line, i) => (
-    <React.Fragment key={i}>
-      {line}
-      {i < safeContent.split('\n').length - 1 && <br />}
-    </React.Fragment>
-  ));
-
   return (
     <div className={`message-bubble ${isBot ? 'bot' : 'user'} ${isStreaming ? 'streaming' : ''}`}>
       <div className="message-content">
-        {formattedContent}
+        <ReactMarkdown 
+          remarkPlugins={[remarkGfm]} 
+          rehypePlugins={[rehypeHighlight]}
+        >
+          {safeContent}
+        </ReactMarkdown>
         {isStreaming && (
           <span className="cursor-blink">|</span>
         )}
