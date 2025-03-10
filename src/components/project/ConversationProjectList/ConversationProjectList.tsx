@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useConversation } from "../../../hooks/useConversation/useConversation";
 import { Conversation } from "../../../types/conversation.types";
 import "./ConversationProjectList.scss";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaComments } from "react-icons/fa";
 
 interface ConversationProjectListProps {
   projectId: number;
@@ -25,15 +25,15 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
       try {
         const conversations = await fetchProjectConversations(projectId);
         setProjectConversations(conversations || []);
-      } catch (error) {
-        console.error("Erreur lors du chargement des conversations du projet", error);
+      } catch (err) {
+        console.error("Erreur lors du chargement des conversations du projet", err);
       }
     };
 
     loadConversations();
   }, [projectId, fetchProjectConversations]);
 
-  if (loading) {
+  if (loading && projectConversations.length === 0) {
     return <div className="loading">Chargement des conversations...</div>;
   }
 
@@ -42,7 +42,13 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
   }
 
   if (projectConversations.length === 0) {
-    return <div className="empty">Aucune conversation dans ce projet</div>;
+    return (
+      <div className="empty">
+        <FaComments className="empty-icon" />
+        <p>Aucune conversation dans ce projet</p>
+        <p className="empty-hint">Créez une nouvelle conversation en utilisant le bouton ci-dessus</p>
+      </div>
+    );
   }
 
   return (

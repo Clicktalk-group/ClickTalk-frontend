@@ -15,14 +15,55 @@
     border-bottom: 1px solid var(--border-color, $border-color);
     background-color: var(--background-color, white);
 
-    h1 {
+    .project-title-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 0.5rem;
-      color: var(--color-text-primary, $color-text-primary);
+
+      h1 {
+        margin: 0;
+        color: var(--color-text-primary, $color-text-primary);
+      }
+
+      .project-actions {
+        display: flex;
+        gap: 0.5rem;
+
+        .edit-btn {
+          padding: 0.5rem;
+          background: none;
+          border: none;
+          color: var(--color-text-secondary, $color-text-secondary);
+          cursor: pointer;
+          border-radius: 4px;
+          
+          &:hover {
+            color: var(--primary-color, $primary-color);
+            background-color: var(--background-btn, $background-btn);
+          }
+        }
+
+        .delete-btn {
+          padding: 0.5rem 1rem;
+          background-color: transparent;
+          color: $danger-color;
+          border: 1px solid $danger-color;
+          border-radius: 4px;
+          cursor: pointer;
+          
+          &:hover {
+            background-color: rgba($danger-color, 0.1);
+          }
+        }
+      }
     }
 
     .project-context {
       color: var(--color-text-secondary, $color-text-secondary);
       font-size: 0.9rem;
+      margin: 0;
+      margin-top: 0.5rem;
     }
   }
 
@@ -62,40 +103,6 @@
         margin: 1rem 0;
         font-size: 1.1rem;
         color: var(--color-text-primary, $color-text-primary);
-      }
-
-      .project-conv-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-
-        li {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0.75rem;
-          border-radius: 5px;
-          cursor: pointer;
-          margin-bottom: 0.5rem;
-          background-color: var(--background-btn-grey, #f5f8fa);
-          color: var(--color-text-primary, $color-text-primary);
-
-          &:hover {
-            background-color: var(--background-btn, #e8f0fe);
-          }
-
-          button {
-            background: none;
-            border: none;
-            color: $danger-color;
-            cursor: pointer;
-            opacity: 0.7;
-            
-            &:hover {
-              opacity: 1;
-            }
-          }
-        }
       }
     }
 
@@ -148,5 +155,37 @@
     color: var(--color-text-secondary, $color-text-secondary);
     font-style: italic;
     padding: 1rem 0;
+  }
+}
+
+/* Media queries pour la responsivité */
+@media (max-width: $tablet) {
+  .project-page {
+    .project-content {
+      flex-direction: column;
+      
+      .project-sidebar {
+        width: 100%;
+        min-width: 100%;
+        max-height: 300px;
+      }
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .project-page {
+    .project-header {
+      .project-title-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        
+        .project-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    }
   }
 }

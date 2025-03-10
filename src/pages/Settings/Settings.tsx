@@ -206,7 +206,7 @@ const Settings: React.FC = () => {
                 <div
                   key={color}
                   className={`color-option ${color === selectedColor ? 'active' : ''}`}
-                  style={{ backgroundColor: color }}
+                  data-color={color}
                   onClick={() => changeThemeColor(color)}
                   aria-label={`Couleur thème ${color}`}
                 />

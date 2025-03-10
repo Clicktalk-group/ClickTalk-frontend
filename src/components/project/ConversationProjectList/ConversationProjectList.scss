@@ -59,7 +59,28 @@
     }
   }
   
-  .loading, .error, .empty {
+  .empty {
+    text-align: center;
+    padding: $sp-lg;
+    color: var(--color-text-secondary, $color-text-secondary);
+    
+    .empty-icon {
+      font-size: $fs-xl;
+      margin-bottom: $sp-sm;
+      opacity: 0.6;
+    }
+    
+    p {
+      margin: $sp-xs 0;
+    }
+    
+    .empty-hint {
+      font-size: $fs-sm;
+      font-style: italic;
+    }
+  }
+  
+  .loading, .error {
     padding: $sp-md;
     text-align: center;
     color: var(--color-text-secondary, $color-text-secondary);

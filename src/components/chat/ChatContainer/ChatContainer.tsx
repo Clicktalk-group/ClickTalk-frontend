@@ -13,12 +13,14 @@ import { useConversation } from '../../../hooks/useConversation/useConversation'
 interface ChatContainerProps {
   onMessageSent?: () => void;
   projectId?: number;
+  conversationId?: number; // Ajout de cette prop pour résoudre l'erreur
 }
 
-const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId }) => {
+const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId, conversationId }) => {
   // Récupérer l'ID de conversation de l'URL si disponible
-  const { conversationId } = useParams<{ conversationId?: string }>();
-  const convId = conversationId ? parseInt(conversationId, 10) : undefined;
+  const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
+  // Priorité à la prop, puis au paramètre d'URL
+  const convId = conversationId ? conversationId : urlConversationId ? parseInt(urlConversationId, 10) : undefined;
   const navigate = useNavigate();
   
   const [isNewConversation, setIsNewConversation] = useState(!convId);
@@ -39,9 +41,11 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
   useEffect(() => {
     if (isNewConversation && currentConversation?.id) {
       setIsNewConversation(false);
-      navigate(`/chat/${currentConversation.id}`);
+      if (!projectId) { // Ne naviguer que s'il ne s'agit pas d'un chat dans un projet
+        navigate(`/chat/${currentConversation.id}`);
+      }
     }
-  }, [currentConversation, isNewConversation, navigate]);
+  }, [currentConversation, isNewConversation, navigate, projectId]);
 
   // Utiliser useCallback pour éviter de recréer cette fonction à chaque rendu
   const handleTogglePerformanceMetrics = useCallback(() => {
@@ -59,7 +63,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
           : content;
 
         // Envoyer le message qui créera automatiquement la conversation
-        sendMessage(undefined, content);
+        sendMessage(undefined, content, projectId);
         
         // Notifier le parent que nous sommes en mode chat
         if (onMessageSent) {
@@ -70,14 +74,14 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId 
       }
     } else {
       // Conversation existante, envoyer simplement le message
-      sendMessage(convId, content);
+      sendMessage(convId, content, projectId);
       
       // Notifier le parent que nous sommes en mode chat
       if (onMessageSent) {
         onMessageSent();
       }
     }
-  }, [isNewConversation, sendMessage, convId, onMessageSent]);
+  }, [isNewConversation, sendMessage, convId, onMessageSent, projectId]);
 
   return (
     <div className="chat-container">

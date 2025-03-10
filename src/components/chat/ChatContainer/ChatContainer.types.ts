@@ -1,2 +1,7 @@
 // src/components/chat/ChatContainer/ChatContainer.types.ts
-export {};
+export interface ChatContainerProps {
+    onMessageSent?: () => void;
+    projectId?: number;
+    conversationId?: number;
+  }
+  

@@ -10,6 +10,15 @@
     color: var(--color-text-primary, $color-text-primary);
   }
   
+  .error-message {
+    padding: $sp-sm;
+    margin-bottom: $sp-md;
+    background-color: rgba($danger-color, 0.1);
+    color: $danger-color;
+    border-radius: $radius-sm;
+    font-size: $fs-sm;
+  }
+  
   .form-group {
     margin-bottom: $sp-md;
     
@@ -20,7 +29,7 @@
       color: var(--color-text-secondary, $color-text-secondary);
     }
     
-    input, textarea {
+    .textarea-input {
       width: 100%;
       padding: $sp-sm;
       border: 1px solid var(--border-color, darken($background-color, 10%));
@@ -36,9 +45,16 @@
       }
     }
     
-    textarea {
+    textarea.textarea-input {
       min-height: 120px;
       resize: vertical;
+    }
+    
+    .context-hint {
+      font-size: $fs-sm;
+      color: var(--color-text-secondary, $color-text-secondary);
+      margin-top: $sp-xs;
+      font-style: italic;
     }
   }
   
@@ -66,6 +82,25 @@
       
       &:hover {
         background-color: var(--primary-hover, $primary-hover);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .project-form {
+    padding: $sp-md;
+    
+    .form-actions {
+      flex-direction: column-reverse;
+      
+      button {
+        width: 100%;
       }
     }
   }

@@ -92,27 +92,41 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData 
           <input
             type="text"
             id="title"
+            name="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Entrez un titre pour le projet"
             required
+            className="textarea-input"
           />
         </div>
         <div className="form-group">
-          <label htmlFor="context">Contexte du projet (optionnel)(en cours de construction)</label>
+          <label htmlFor="context">Contexte du projet</label>
           <textarea
             id="context"
             value={context}
             onChange={(e) => setContext(e.target.value)}
             placeholder="Décrivez le contexte de ce projet"
             rows={4}
+            className="textarea-input"
           />
+          <p className="context-hint">
+            Décrivez l'objectif et les spécificités de ce projet pour guider les conversations
+          </p>
         </div>
         <div className="form-actions">
-          <button type="button" onClick={onClose} className="btn-cancel">
+          <button 
+            type="button" 
+            className="btn-cancel"
+            onClick={onClose}
+          >
             Annuler
           </button>
-          <button type="submit" className="btn-submit" disabled={loading || !title.trim()}>
+          <button 
+            type="submit" 
+            className="btn-submit"
+            disabled={loading || !title.trim()}
+          >
             {loading ? (isEditMode ? "Modification..." : "Création...") : (isEditMode ? "Modifier" : "Créer")}
           </button>
         </div>

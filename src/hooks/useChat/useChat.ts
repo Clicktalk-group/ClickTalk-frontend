@@ -156,13 +156,13 @@ const useChat = (conversationId?: number) => {
   }, [recordStreamingChunk]);
 
   // Envoyer un message avec support de streaming et métriques
-  const sendMessage = useCallback(async (convId: number | undefined, content: string) => {
+  const sendMessage = useCallback(async (convId: number | undefined, content: string, projectId?: number) => {
     if (!content.trim()) {
       console.warn("Empty message, not sending");
       return;
     }
     
-    console.log(`📤 Sending message "${content}" to conversation: ${convId || 'new'}`);
+    console.log(`📤 Sending message "${content}" to conversation: ${convId || 'new'} for project: ${projectId || 'none'}`);
 
     // Générer des IDs temporaires uniques
     const tempUserId = `temp-user-${Date.now()}`;
@@ -213,7 +213,7 @@ const useChat = (conversationId?: number) => {
       const payload = {
         conversationId: convId || null,
         message: content,
-        projectId: null
+        projectId: projectId || null
       };
       
       console.log("📦 API payload:", payload);
