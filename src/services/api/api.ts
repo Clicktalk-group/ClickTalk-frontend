@@ -1,3 +1,4 @@
+import { Message } from './../../types/conversation.types';
 import axios from 'axios';
 
 // Configuration de base pour axios
@@ -127,8 +128,8 @@ const extractMessageContent = (response: ApiResponse): string => {
   // Vérifier chaque possibilité de structure dans l'ordre
   
   // 1. Structure .botResponse.content
-  if (response.botResponse && typeof response.botResponse.content === 'string') {
-    return response.botResponse.content;
+  if (response.botResponse && typeof response.botResponse.message.content === 'string') {
+    return response.botResponse.message.content;
   }
   
   // 2. Structure .content directe

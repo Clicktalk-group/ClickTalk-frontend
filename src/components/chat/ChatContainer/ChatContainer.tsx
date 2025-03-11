@@ -1,11 +1,12 @@
 // src/components/chat/ChatContainer/ChatContainer.tsx
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ChatMessages from '../ChatMessages';
 import ChatInput from '../ChatInput';
 import useChat from '../../../hooks/useChat/useChat';
 import PerformanceMonitor from '../PerformanceMonitor';
+import InstructionsPreview from '../../project/InstructionsPreview';
+import { useProject } from '../../../hooks/useProject/useProject';
 import './ChatContainer.scss';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useConversation } from '../../../hooks/useConversation/useConversation';
@@ -36,6 +37,36 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
     streamingMessage,
     performanceMetrics // Nouvelle propriété pour les métriques
   } = useChat(convId);
+
+  // Utiliser le hook useProject pour récupérer les détails du projet si projectId est défini
+  const { fetchProjects } = useProject();
+  const [projectInstructions, setProjectInstructions] = useState<string | undefined>(undefined);
+
+  // Charger les instructions du projet si projectId est fourni
+  useEffect(() => {
+    if (projectId) {
+      // Récupérer tous les projets puis filtrer pour celui dont on a besoin
+      const loadProjectInstructions = async () => {
+        try {
+          const projects = await fetchProjects();
+          const project = projects.find(p => p.id === projectId);
+          
+          if (project && project.context) {
+            setProjectInstructions(project.context);
+          } else {
+            setProjectInstructions(undefined);
+          }
+        } catch (err) {
+          console.error("Erreur lors du chargement des instructions du projet:", err);
+          setProjectInstructions(undefined);
+        }
+      };
+      
+      loadProjectInstructions();
+    } else {
+      setProjectInstructions(undefined);
+    }
+  }, [projectId, fetchProjects]);
 
   // Si la conversation est créée, naviguer vers son URL
   useEffect(() => {
@@ -100,6 +131,11 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
           metrics={performanceMetrics} 
           visible={true}
         />
+      )}
+      
+      {/* Afficher les instructions du projet si disponibles */}
+      {projectInstructions && (
+        <InstructionsPreview instructions={projectInstructions} />
       )}
       
       <ChatMessages 

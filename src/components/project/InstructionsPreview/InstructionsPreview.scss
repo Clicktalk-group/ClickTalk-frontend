@@ -1,0 +1,97 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.instructions-preview {
+  padding: $sp-md;
+  margin-bottom: $sp-md;
+  background-color: var(--background-btn-grey, $background-btn-grey);
+  border-radius: $radius-md;
+  border-left: 3px solid var(--primary-color, $primary-color);
+  
+  &__header {
+    display: flex;
+    align-items: center;
+    margin-bottom: $sp-sm;
+    
+    svg {
+      color: var(--primary-color, $primary-color);
+      margin-right: $sp-xs;
+      font-size: $fs-md;
+    }
+    
+    h3 {
+      font-size: $fs-md;
+      color: var(--color-text-primary, $color-text-primary);
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+  
+  &__content {
+    color: var(--color-text-secondary, $color-text-secondary);
+    font-size: $fs-sm;
+    line-height: 1.5;
+    
+    p {
+      margin-top: 0;
+      margin-bottom: $sp-sm;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--color-text-primary, $color-text-primary);
+      margin-top: $sp-md;
+      margin-bottom: $sp-xs;
+    }
+    
+    ul, ol {
+      padding-left: $sp-lg;
+      margin-bottom: $sp-sm;
+    }
+    
+    code {
+      background-color: var(--background-btn, $background-btn);
+      padding: 2px 4px;
+      border-radius: $radius-sm;
+      font-family: monospace;
+    }
+    
+    pre {
+      background-color: var(--background-btn, $background-btn);
+      padding: $sp-sm;
+      border-radius: $radius-sm;
+      overflow-x: auto;
+      margin-bottom: $sp-sm;
+    }
+    
+    blockquote {
+      border-left: 3px solid var(--secondary-color, $secondary-color);
+      padding-left: $sp-md;
+      margin-left: 0;
+      color: var(--color-text-secondary, $color-text-secondary);
+    }
+  }
+
+  &--empty {
+    display: none;
+  }
+  
+  hr {
+    border: none;
+    border-top: 1px solid var(--border-color, $border-color);
+    margin: $sp-sm 0;
+  }
+}
+
+@media (max-width: $mobile) {
+  .instructions-preview {
+    padding: $sp-sm;
+    
+    &__content {
+      font-size: $fs-sm;
+    }
+  }
+}

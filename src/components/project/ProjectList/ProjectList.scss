@@ -29,12 +29,31 @@
       .project-item {
         flex: 1;
         
-        .title {
-          display: block;
-          font-weight: 500;
-          font-size: $fs-md;
-          color: var(--color-text-primary, $color-text-primary);
+        .title-wrapper {
+          display: flex;
+          align-items: center;
           margin-bottom: $sp-xs;
+          
+          .title {
+            font-weight: 500;
+            font-size: $fs-md;
+            color: var(--color-text-primary, $color-text-primary);
+          }
+          
+          .instructions-badge {
+            display: inline-flex;
+            margin-left: $sp-xs;
+            color: var(--primary-color, $primary-color);
+            font-size: $fs-sm;
+            
+            svg {
+              transition: all 0.2s ease;
+            }
+            
+            &:hover svg {
+              transform: scale(1.2);
+            }
+          }
         }
         
         .context {

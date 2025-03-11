@@ -16,9 +16,11 @@ export const useProject = () => {
       const data = await projectService.getAllProjects();
       setProjects(data);
       setError(null);
+      return data;
     } catch (err) {
       setError('Erreur lors du chargement des projets');
       console.error(err);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -28,21 +30,25 @@ export const useProject = () => {
   const fetchProjectById = useCallback(async (id: number) => {
     setLoading(true);
     try {
-      const data = await projectService.getProjectById(id);
-      if (data) {
-        setCurrentProject(data);
-        // Mettre à jour le projet dans la liste si présent
-        setProjects(prev => {
-          const exists = prev.some(p => p.id === data.id);
-          if (exists) {
-            return prev.map(p => p.id === data.id ? data : p);
-          } else {
-            return [...prev, data];
-          }
-        });
+      // Chercher dans les projets déjà chargés
+      let projectData = projects.find(p => p.id === id);
+      
+      if (!projectData) {
+        // Si pas trouvé, charger tous les projets
+        const allProjects = await projectService.getAllProjects();
+        setProjects(allProjects);
+        projectData = allProjects.find(p => p.id === id);
       }
+      
+      // Si on a trouvé le projet, on le définit comme projet courant
+      if (projectData) {
+        setCurrentProject(projectData);
+      } else {
+        setCurrentProject(null);
+      }
+      
       setError(null);
-      return data;
+      return projectData || null;
     } catch (err) {
       setError(`Erreur lors du chargement du projet ${id}`);
       console.error(err);
@@ -50,7 +56,7 @@ export const useProject = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [projects]);
 
   // Créer un nouveau projet
   const createProject = useCallback(async (data: CreateProjectRequest) => {
@@ -74,7 +80,28 @@ export const useProject = () => {
   const updateProject = useCallback(async (data: UpdateProjectRequest) => {
     setLoading(true);
     try {
-      const updatedProject = await projectService.updateProject(data);
+      // Vérifier que tous les champs requis sont présents
+      if (!data.id) {
+        throw new Error('ID du projet manquant pour la mise à jour');
+      }
+      
+      // Trouver le projet existant pour récupérer les champs manquants
+      const existingProject = projects.find(p => p.id === data.id);
+      if (!existingProject) {
+        throw new Error(`Projet avec l'ID ${data.id} non trouvé pour la mise à jour`);
+      }
+      
+      // Fusionner les données existantes avec les nouvelles
+      const completeData: Project = {
+        id: data.id,
+        userId: data.userId || existingProject.userId,
+        title: data.title || existingProject.title,
+        context: data.context !== undefined ? data.context : existingProject.context
+      };
+      
+      console.log('Mise à jour du projet avec les données:', completeData);
+      
+      const updatedProject = await projectService.updateProject(completeData);
       
       setProjects(prev => 
         prev.map(project => project.id === updatedProject.id ? updatedProject : project)
@@ -87,13 +114,14 @@ export const useProject = () => {
       setError(null);
       return updatedProject;
     } catch (err) {
-      setError(`Erreur lors de la mise à jour du projet ${data.id}`);
-      console.error(err);
+      const errorMsg = `Erreur lors de la mise à jour du projet ${data.id}`;
+      console.error(errorMsg, err);
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [currentProject]);
+  }, [currentProject, projects]);
 
   // Supprimer un projet
   const deleteProject = useCallback(async (id: number) => {
@@ -143,7 +171,6 @@ export const useProject = () => {
     setLoading(true);
     try {
       console.log(`Removing conversation ${convId} from project ${projectId}`);
-      // Vérification des IDs
       if (!projectId || !convId) {
         throw new Error('Project ID or Conversation ID is invalid');
       }

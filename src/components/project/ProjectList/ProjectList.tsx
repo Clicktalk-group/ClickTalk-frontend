@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { useProject } from "../../../hooks/useProject/useProject";
 import "./ProjectList.scss";
-import { FaTrash, FaEdit, FaExternalLinkAlt } from "react-icons/fa";
+import { FaTrash, FaEdit, FaExternalLinkAlt, FaInfoCircle } from "react-icons/fa";
 import { Project } from "../../../types/project.types"; 
 
 interface ProjectListProps {
@@ -57,7 +57,14 @@ const ProjectList: React.FC<ProjectListProps> = ({
               className="project-item" 
               onClick={() => onSelect && onSelect(project.id)}
             >
-              <span className="title">{project.title}</span>
+              <div className="title-wrapper">
+                <span className="title">{project.title}</span>
+                {project.context && (
+                  <span className="instructions-badge" title="Ce projet contient des instructions">
+                    <FaInfoCircle />
+                  </span>
+                )}
+              </div>
               {project.context && <p className="context">{project.context}</p>}
             </div>
 

@@ -1,3 +1,4 @@
+// /src/services/project/project.ts
 import { apiService } from '../api/api';
 import { Project, CreateProjectRequest, UpdateProjectRequest } from '../../types/project.types';
 
@@ -11,12 +12,11 @@ export const projectService = {
         return [];
       }
       
-      // Convertir la réponse API en format compatible avec notre frontend
       return response.map(project => ({
         id: project.projectId || project.id,
-        userId: project.userId || 0,
+        userId: project.userId || 0, 
         title: project.title || "Sans titre",
-        context: project.content || project.context || "" // API renvoie 'content' mais notre modèle utilise 'context'
+        context: project.content || project.context || "" 
       }));
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -24,21 +24,18 @@ export const projectService = {
     }
   },
   
-  // Récupérer un projet spécifique
+  // Récupérer un projet spécifique - en filtrant parmi tous les projets
   getProjectById: async (id: number): Promise<Project | null> => {
     try {
-      const response = await apiService.get<any>(`/project/${id}`);
+      const projects = await projectService.getAllProjects();
+      const project = projects.find(p => p.id === id);
       
-      if (!response) {
+      if (!project) {
+        console.warn(`Project with id ${id} not found in the list of all projects`);
         return null;
       }
       
-      return {
-        id: response.projectId || response.id,
-        userId: response.userId || 0,
-        title: response.title || "Sans titre",
-        context: response.content || response.context || ""
-      };
+      return project;
     } catch (error) {
       console.error(`Error fetching project with id ${id}:`, error);
       return null;
@@ -48,29 +45,26 @@ export const projectService = {
   // Créer un nouveau projet
   createProject: async (data: CreateProjectRequest): Promise<Project> => {
     try {
-      // Adaptation au format attendu par l'API
-      // Le backend Project.java attend 'context', mais le DTO utilise 'content'
+      // Convertir les données pour correspondre au format attendu par l'API
       const requestData = {
         userId: data.userId,
         title: data.title,
-        content: data.context // Adapter le nom du champ pour l'API
+        context: data.context // Le backend attend "context" et non "content"
       };
       
       console.log('Sending project data to API:', requestData);
       
       const response = await apiService.post<any>('/project/add', requestData);
       
-      // Vérifier si la réponse est valide
       if (!response) {
         throw new Error('Empty response from API');
       }
       
-      // Convertir la réponse API au format frontend
       return {
         id: response.id || response.projectId,
         userId: response.userId,
         title: response.title,
-        context: response.context || response.content || "" // Handle both formats
+        context: response.context || ""
       };
     } catch (error) {
       console.error('Error creating project:', error);
@@ -81,22 +75,24 @@ export const projectService = {
   // Mettre à jour un projet
   updateProject: async (data: UpdateProjectRequest): Promise<Project> => {
     try {
-      // Adaptation au format attendu par l'API
+      // IMPORTANT: Le backend attend les mêmes champs que dans l'entité Project
       const requestData = {
         id: data.id,
-        userId: data.userId,
+        userId: data.userId, 
         title: data.title,
-        content: data.context // Adapter le nom du champ pour l'API
+        context: data.context // Utiliser "context" comme dans Project.java
       };
+      
+      // Debug avant envoi pour vérifier les données
+      console.log("Données envoyées pour mise à jour:", requestData);
       
       const response = await apiService.put<any>('/project/update', requestData);
       
-      // Convertir la réponse API au format frontend
       return {
-        id: response.id || response.projectId,
+        id: response.id || 0,
         userId: response.userId,
         title: response.title,
-        context: response.context || response.content || ""
+        context: response.context
       };
     } catch (error) {
       console.error(`Error updating project with id ${data.id}:`, error);
@@ -138,17 +134,15 @@ export const projectService = {
   // Supprimer une conversation d'un projet
   removeConversationFromProject: async (projectId: number, convId: number): Promise<void> => {
     try {
-      // Vérification des paramètres
       if (!projectId || !convId) {
         throw new Error('Invalid project ID or conversation ID');
       }
       
       console.log(`Attempting to delete conversation ${convId}`);
-      // Utiliser l'endpoint de suppression de conversation directement
-      await apiService.delete(`/conversation/delete/${convId}`);
-      console.log('Conversation successfully deleted');
+      await apiService.delete(`/project/${projectId}/remove-conversation/${convId}`);
+      console.log('Conversation successfully removed from project');
     } catch (error) {
-      console.error(`Error deleting conversation ${convId}:`, error);
+      console.error(`Error removing conversation ${convId} from project ${projectId}:`, error);
       throw error;
     }
   }

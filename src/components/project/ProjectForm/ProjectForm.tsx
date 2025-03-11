@@ -16,7 +16,7 @@ interface ProjectFormProps {
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData }) => {
-  const { user } = useAuth(); // Récupérer l'utilisateur directement
+  const { user } = useAuth();
   const [title, setTitle] = useState<string>(initialData?.title || "");
   const [context, setContext] = useState<string>(initialData?.context || "");
   const [error, setError] = useState<string>("");
@@ -45,32 +45,29 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData 
     
     try {
       if (isEditMode && initialData) {
-        console.log("Mise à jour du projet avec données:", {
+        // Pour la mise à jour, s'assurer que tous les champs requis sont présents
+        const updateData = {
           id: initialData.id,
           userId: effectiveUserId,
           title: title.trim(),
           context: context.trim()
-        });
+        };
         
-        await updateProject({
-          id: initialData.id,
-          userId: effectiveUserId,
-          title: title.trim(),
-          context: context.trim()
-        });
+        console.log("Mise à jour du projet avec données:", updateData);
+        
+        await updateProject(updateData);
         console.log("Projet mis à jour avec succès");
       } else {
-        console.log("Création d'un projet avec données:", {
+        // Pour la création
+        const createData = {
           userId: effectiveUserId,
           title: title.trim(),
           context: context.trim()
-        });
+        };
         
-        await createProject({
-          title: title.trim(),
-          context: context.trim(),
-          userId: effectiveUserId
-        });
+        console.log("Création d'un projet avec données:", createData);
+        
+        await createProject(createData);
         console.log("Projet créé avec succès");
       }
       onClose();
