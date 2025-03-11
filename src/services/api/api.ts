@@ -1,4 +1,3 @@
-import { Message } from './../../types/conversation.types';
 import axios from 'axios';
 
 // Configuration de base pour axios

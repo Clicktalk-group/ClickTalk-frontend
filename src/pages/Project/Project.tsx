@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProject } from '../../hooks/useProject/useProject';
-import { useConversation } from '../../hooks/useConversation/useConversation';
-import { Project as ProjectType } from '../../types/project.types';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import ProjectForm from '../../components/project/ProjectForm/ProjectForm';
 import { Modal } from '../../components/common/Modal';
@@ -26,18 +24,12 @@ const Project: React.FC = () => {
   
   const { 
     projects,
-    currentProject,
     fetchProjects,
     fetchProjectById,
-    updateProject,
     deleteProject,
     removeConversationFromProject
   } = useProject();
   
-  const {
-    deleteConversation,
-    fetchProjectConversations
-  } = useConversation();
 
   // Charger le projet spécifique quand l'ID est disponible
   useEffect(() => {
