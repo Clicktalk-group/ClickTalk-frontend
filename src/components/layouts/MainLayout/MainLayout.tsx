@@ -1,12 +1,22 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Sidebar } from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
 import { useConversation } from "../../../hooks/useConversation/useConversation";
 import { useProject } from "../../../hooks/useProject/useProject";
 import { useAuth } from "../../../hooks/useAuth/useAuth";
-import ProjectForm from "../../../components/project/ProjectForm/ProjectForm";
 import "./MainLayout.scss";
+
+// Lazy loaded components
+const ProjectForm = lazy(() => import("../../../components/project/ProjectForm/ProjectForm"));
+
+// Fallback pour le ProjectForm
+const FormLoading = () => (
+  <div className="form-loading">
+    <div className="spinner"></div>
+    <p>Chargement du formulaire...</p>
+  </div>
+);
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -34,15 +44,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const isChatPage = location.pathname.includes('/chat');
   const isProjectPage = location.pathname.includes('/project');
   
-  // Gestionnaires d'événements
-  const handleToggleSidebar = () => {
+  // Gestionnaires d'événements - Memoized with useCallback
+  const handleToggleSidebar = useCallback(() => {
     setSidebarOpen(!sidebarOpen);
-  };
+  }, [sidebarOpen]);
   
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     console.log("Déconnexion");
     // Logique de déconnexion à implémenter
-  };
+  }, []);
   
   const handleNewConversation = useCallback(() => {
     console.log("Nouvelle conversation");
@@ -81,27 +91,20 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   
   // Gérer la sélection d'un projet
   const handleSelectProject = useCallback((id: string | number) => {
-    console.log(`Sélection projet ${id}`, typeof id);
-    
     // Si l'ID est une chaîne, convertissez-la en nombre
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
-    
-    // Debug supplémentaire
-    console.log("Projects available:", projects);
     
     // Navigation directe
     navigate(`/project/${numericId}`);
     setSidebarOpen(false);
-  }, [navigate, projects]);
+  }, [navigate]);
   
   const handleDeleteProject = useCallback((id: string | number) => {
     // Convertir en numérique si nécessaire
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
-    console.log(`Suppression du projet ${numericId}`);
     
     deleteProject(numericId)
       .then(() => {
-        console.log(`Projet ${numericId} supprimé avec succès`);
         fetchProjects(); // Rafraîchir la liste après suppression
       })
       .catch(error => {
@@ -109,13 +112,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       });
   }, [deleteProject, fetchProjects]);
   
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = useCallback(() => {
     setSidebarOpen(false);
-  };
-
-  // Log pour debug
-  console.log("Rendered MainLayout with projects:", projects);
-  console.log("User ID from auth:", user?.id);
+  }, []);
   
   return (
     <div className="main-layout">
@@ -151,23 +150,23 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {children}
           </div>
         ) : (
-          <>
-            <div className="main-content">
-              {children}
-            </div>
-          </>
+          <div className="main-content">
+            {children}
+          </div>
         )}
       </div>
       
-      {/* Modal pour la création/édition de projet */}
+      {/* Modal pour la création/édition de projet - lazy loaded */}
       {showProjectForm && (
         <div className="modal-overlay">
           <div className="modal-container">
-            <ProjectForm 
-              onClose={handleCloseProjectForm} 
-              userId={user?.id || 0} 
-              initialData={editingProject}
-            />
+            <Suspense fallback={<FormLoading />}>
+              <ProjectForm 
+                onClose={handleCloseProjectForm} 
+                userId={user?.id || 0} 
+                initialData={editingProject}
+              />
+            </Suspense>
           </div>
         </div>
       )}
@@ -175,4 +174,4 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   );
 };
 
-export default MainLayout;
+export default React.memo(MainLayout);

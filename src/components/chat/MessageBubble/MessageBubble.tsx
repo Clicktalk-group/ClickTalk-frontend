@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { FaCopy } from 'react-icons/fa';
 import { Message } from '../../../types/chat.types';
 import ReactMarkdown from 'react-markdown';
@@ -9,10 +9,11 @@ import './MessageBubble.scss';
 interface MessageBubbleProps {
   message: Message;
   onCopy: () => void;
-  isStreaming?: boolean; // NOUVEAU: Pour indiquer si le message est en train de streamer
+  isStreaming?: boolean;
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onCopy, isStreaming = false }) => {
+// Utilisation de React.memo pour éviter les rendus inutiles
+const MessageBubble: React.FC<MessageBubbleProps> = memo(({ message, onCopy, isStreaming = false }) => {
   const { content, isBot } = message;
   
   // Sécurité supplémentaire pour s'assurer que le contenu est une chaîne de caractères
@@ -42,6 +43,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onCopy, isStream
       )}
     </div>
   );
-};
+});
 
 export default MessageBubble;

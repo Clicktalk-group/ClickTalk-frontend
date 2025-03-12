@@ -1,4 +1,6 @@
 import axios from 'axios';
+// Utilisation de type 'any' pour éviter les problèmes de compatibilité
+type AxiosRequestConfig = any;
 
 // Configuration de base pour axios
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
@@ -18,18 +20,46 @@ interface ApiResponse {
   [key: string]: any; // Index signature pour permettre l'accès dynamique
   botResponse?: {
     content: string;
+    message?: {
+      content: string;
+    };
     [key: string]: any;
   };
-  content?: string; // Ajout de content au niveau racine pour supporter différents formats
-  message?: string; // Ajout pour les API qui retournent "message"
-  response?: string; // Ajout pour les API qui retournent "response"
-  text?: string; // Ajout pour les API qui retournent "text"
-  data?: any; // Pour les API qui encapsulent dans "data"
+  content?: string;
+  message?: string;
+  response?: string;
+  text?: string;
+  data?: any;
   convId?: number;
   conversationId?: number;
   id?: number;
   userId?: number;
 }
+
+// Cache pour les requêtes GET - optimisation via mise en cache
+const requestCache = new Map<string, {data: any, timestamp: number}>();
+const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes
+
+// Fonction pour vérifier si une requête est mise en cache
+const getCachedResponse = (url: string, params?: any) => {
+  const cacheKey = `${url}?${JSON.stringify(params || {})}`;
+  const cachedItem = requestCache.get(cacheKey);
+  
+  if (cachedItem && (Date.now() - cachedItem.timestamp) < CACHE_EXPIRATION) {
+    return cachedItem.data;
+  }
+  
+  return null;
+};
+
+// Fonction pour mettre en cache une réponse
+const cacheResponse = (url: string, params: any, data: any) => {
+  const cacheKey = `${url}?${JSON.stringify(params || {})}`;
+  requestCache.set(cacheKey, {
+    data,
+    timestamp: Date.now()
+  });
+};
 
 // Intercepteur pour ajouter le token JWT à chaque requête
 axiosInstance.interceptors.request.use(
@@ -41,18 +71,21 @@ axiosInstance.interceptors.request.use(
       const cleanToken = token.replace(/^"|"$/g, '');
       config.headers.Authorization = `Bearer ${cleanToken}`;
       
-      // Log pour déboguer
-      console.log("🔑 Token utilisé:", cleanToken.slice(0, 15) + "...");
-    } else if (!token && config.url && !config.url.includes('/auth/')) {
-      // Avertissement si token manquant pour requête authentifiée
+      // Log pour déboguer (uniquement en développement)
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔑 Token utilisé:", cleanToken.slice(0, 15) + "...");
+      }
+    } else if (!token && config.url && !config.url.includes('/auth/') && process.env.NODE_ENV === 'development') {
+      // Avertissement si token manquant pour requête authentifiée (uniquement en développement)
       console.warn("⚠️ Requête authentifiée sans token:", config.url);
     }
     
-    console.log("📤 Requête API envoyée:", { 
-      url: config.url, 
-      method: config.method,
-      data: config.data || 'No data' 
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log("📤 Requête API envoyée:", { 
+        url: config.url, 
+        method: config.method
+      });
+    }
     return config;
   },
   (error) => {
@@ -60,15 +93,15 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
 // Intercepteur pour gérer les erreurs de réponse (ex: token expiré)
 axiosInstance.interceptors.response.use(
   (response: any) => {
-    console.log("📩 Réponse API reçue:", { 
-      url: response.config.url, 
-      status: response.status,
-      dataSize: response.data ? JSON.stringify(response.data).length : 0
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log("📩 Réponse API reçue:", { 
+        url: response.config.url, 
+        status: response.status
+      });
+    }
     
     // Vérification simplifiée des données renvoyées
     if (response.data === undefined || response.data === null) {
@@ -93,23 +126,19 @@ axiosInstance.interceptors.response.use(
     // Gérer le cas d'accès refusé (code 403)
     else if (error.response?.status === 403) {
       console.error("🚫 Erreur d'autorisation (403) - Accès refusé");
-      // On pourrait rediriger vers une page d'erreur spécifique
     }
-    // CORRECTION ICI - Gestion spécifique des erreurs 500
+    // Gestion spécifique des erreurs 500
     else if (error.response?.status === 500) {
       console.error("⛔ Erreur serveur (500):", {
         url: error.config?.url,
-        responseData: error.response?.data,
-        message: error.response?.data?.message || error.message,
-        stack: error.stack
+        message: error.response?.data?.message || error.message
       });
     }
     else {
       console.error("❌ Erreur API:", {
         url: error.config?.url,
         status: error.response?.status,
-        message: error.response?.data?.message || error.message,
-        headers: error.config?.headers,
+        message: error.response?.data?.message || error.message
       });
     }
     
@@ -118,86 +147,75 @@ axiosInstance.interceptors.response.use(
 );
 
 /**
- * Fonction utilitaire pour trouver le contenu du message dans différentes structures de réponse API
+ * Fonction utilitaire optimisée pour trouver le contenu du message dans différentes structures
  */
 const extractMessageContent = (response: ApiResponse): string => {
-  // Afficher toute la structure de la réponse pour le débogage
-  console.log('API Response Structure:', JSON.stringify(response, null, 2));
-  
-  // Vérifier chaque possibilité de structure dans l'ordre
-  
-  // 1. Structure .botResponse.content
-  if (response.botResponse && typeof response.botResponse.message.content === 'string') {
-    return response.botResponse.message.content;
+  // Éviter le log en production
+  if (process.env.NODE_ENV === 'development') {
+    console.log('API Response Structure:', Object.keys(response));
   }
   
-  // 2. Structure .content directe
-  if (response.content && typeof response.content === 'string') {
-    return response.content;
-  }
-  
-  // 3. Structure .message directe
-  if (response.message && typeof response.message === 'string') {
-    return response.message;
-  }
-  
-  // 4. Structure .response directe
-  if (response.response && typeof response.response === 'string') {
-    return response.response;
-  }
-  
-  // 5. Structure .text directe
-  if (response.text && typeof response.text === 'string') {
-    return response.text;
-  }
-  
-  // 6. Si le message est encapsulé dans .data
-  if (response.data) {
-    // Vérifier .data.botResponse.content
-    if (response.data.botResponse && typeof response.data.botResponse.content === 'string') {
-      return response.data.botResponse.content;
+  // Fonction optimisée pour trouver le contenu plus efficacement
+  if (response) {
+    // Vérifications les plus courantes en premier pour une performance optimale
+    if (typeof response === 'string') {
+      return response;
     }
     
-    // Vérifier .data.content
-    if (response.data.content && typeof response.data.content === 'string') {
-      return response.data.content;
+    if (response.content && typeof response.content === 'string') {
+      return response.content;
     }
     
-    // Vérifier .data.message
-    if (response.data.message && typeof response.data.message === 'string') {
-      return response.data.message;
+    if (response.message && typeof response.message === 'string') {
+      return response.message;
     }
     
-    // Vérifier .data.response
-    if (response.data.response && typeof response.data.response === 'string') {
-      return response.data.response;
+    if (response.botResponse?.message?.content && typeof response.botResponse.message.content === 'string') {
+      return response.botResponse.message.content;
     }
     
-    // Vérifier si .data est directement une chaîne
-    if (typeof response.data === 'string') {
-      return response.data;
+    if (response.botResponse?.content && typeof response.botResponse.content === 'string') {
+      return response.botResponse.content;
+    }
+    
+    if (response.response && typeof response.response === 'string') {
+      return response.response;
+    }
+    
+    if (response.text && typeof response.text === 'string') {
+      return response.text;
+    }
+    
+    if (response.data) {
+      if (typeof response.data === 'string') {
+        return response.data;
+      }
+      
+      if (response.data.content && typeof response.data.content === 'string') {
+        return response.data.content;
+      }
+      
+      if (response.data.message && typeof response.data.message === 'string') {
+        return response.data.message;
+      }
+      
+      if (response.data.response && typeof response.data.response === 'string') {
+        return response.data.response;
+      }
     }
   }
   
-  // 7. Solution extrême: Si la réponse entière est une chaîne de caractères
-  if (typeof response === 'string') {
-    return response;
-  }
-  
-  // Recherche récursive dans l'objet pour trouver une propriété qui pourrait contenir le message
+  // Recherche récursive dans l'objet pour les cas complexes
   const findTextContent = (obj: any, depth = 0): string | null => {
-    // Limiter la profondeur de recherche
-    if (depth > 3) return null;
+    if (!obj || depth > 3) return null;
     
     for (const key in obj) {
       const value = obj[key];
       
-      // Si c'est une chaîne de caractères assez longue, c'est probablement notre contenu
       if (typeof value === 'string' && value.length > 20) {
         return value;
       }
       
-      // Si c'est un objet, chercher récursivement
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         const result = findTextContent(value, depth + 1);
         if (result) return result;
@@ -207,25 +225,32 @@ const extractMessageContent = (response: ApiResponse): string => {
     return null;
   };
   
-  // Essayer la recherche récursive
   const recursiveResult = findTextContent(response);
   if (recursiveResult) {
     return recursiveResult;
   }
   
-  // Si tout échoue, renvoyer une chaîne vide
-  console.error('No message content found in API response');
   return '';
 };
 
 /**
- * Service pour effectuer des requêtes API
+ * Service optimisé pour effectuer des requêtes API
  */
 export const apiService = {
-  // GET request
-  get: async <T>(url: string, params?: any, config?: any): Promise<T> => {
+  // GET request avec mise en cache
+  get: async <T>(url: string, params?: any, config?: AxiosRequestConfig): Promise<T> => {
     try {
+      // Vérifier si la réponse est en cache
+      const cachedResponse = getCachedResponse(url, params);
+      if (cachedResponse) {
+        return cachedResponse as T;
+      }
+      
       const response = await axiosInstance.get(url, { params, ...config });
+      
+      // Mettre en cache la réponse
+      cacheResponse(url, params, response);
+      
       return response as T;
     } catch (error: any) {
       console.error(`❌ GET error for ${url}:`, error.message);
@@ -234,7 +259,7 @@ export const apiService = {
   },
   
   // POST request
-  post: async <T>(url: string, data?: any, config?: any): Promise<T> => {
+  post: async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
     try {
       const response = await axiosInstance.post(url, data, config);
       return response as T;
@@ -245,7 +270,7 @@ export const apiService = {
   },
   
   // PUT request
-  put: async <T>(url: string, data?: any, config?: any): Promise<T> => {
+  put: async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
     try {
       const response = await axiosInstance.put(url, data, config);
       return response as T;
@@ -255,12 +280,29 @@ export const apiService = {
     }
   },
   
-  // DELETE request - CORRECTION ICI
-  delete: async <T>(url: string, config?: any): Promise<T> => {
+  // DELETE request - amélioré
+  delete: async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      console.log(`🗑️ Sending DELETE request to: ${url}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🗑️ Sending DELETE request to: ${url}`);
+      }
+      
       const response = await axiosInstance.delete(url, config);
-      console.log(`✅ DELETE success for ${url}:`, response);
+      
+      // Invalider tout cache lié à cette URL
+      const cacheKeysToDelete: string[] = [];
+      requestCache.forEach((_, key) => {
+        if (key.startsWith(url)) {
+          cacheKeysToDelete.push(key);
+        }
+      });
+      
+      cacheKeysToDelete.forEach(key => requestCache.delete(key));
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ DELETE success for ${url}`);
+      }
+      
       return response as T;
     } catch (error: any) {
       console.error(`❌ DELETE error for ${url}:`, error.message);
@@ -269,8 +311,7 @@ export const apiService = {
       if (error.response?.status === 500) {
         console.error('Détails de l\'erreur 500:', {
           responseData: error.response?.data,
-          message: error.response?.data?.message || error.message,
-          stack: error.stack
+          message: error.response?.data?.message || error.message
         });
       }
       
@@ -279,13 +320,14 @@ export const apiService = {
   },
   
   // AMÉLIORÉ: Streaming request avec meilleure extraction de contenu
-  stream: async <T>(url: string, data?: any, onChunk?: (chunk: string) => void, config?: any): Promise<T> => {
+  stream: async <T>(url: string, data?: any, onChunk?: (chunk: string) => void, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      console.log(`🔄 Streaming request to ${url} initiated with:`, data);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔄 Streaming request to ${url} initiated`);
+      }
       
       // Envoi de la requête normale d'abord
       const response = await axiosInstance.post(url, data, config) as unknown as ApiResponse;
-      console.log("Stream response structure:", Object.keys(response));
       
       // Utiliser la fonction utilitaire pour extraire le contenu
       const messageContent = extractMessageContent(response);
@@ -293,9 +335,13 @@ export const apiService = {
       // Si du contenu a été trouvé, simuler le streaming
       if (messageContent && messageContent.length > 0) {
         const totalLength = messageContent.length;
-        console.log(`✅ Simulating stream for message with ${totalLength} characters`);
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`✅ Simulating stream for message with ${totalLength} characters`);
+        }
         
         // Simuler le streaming en divisant le message en plusieurs parties
+        // Calcul dynamique de la taille des morceaux basé sur la longueur du message
         const chunkSize = Math.max(5, Math.floor(totalLength / 20)); // Diviser en ~20 parties
         
         // Si une fonction de callback est fournie pour traiter les morceaux
@@ -307,21 +353,36 @@ export const apiService = {
           onChunk(initialChunk);
           currentPosition = chunkSize;
           
-          // Puis continuer avec le reste
-          while (currentPosition < totalLength) {
-            await new Promise(resolve => setTimeout(resolve, 30 + Math.random() * 50)); // Délai aléatoire
+          // Puis continuer avec le reste avec une vitesse variable plus naturelle
+          const sendNextChunk = async () => {
+            if (currentPosition >= totalLength) return;
             
-            const endPosition = Math.min(currentPosition + chunkSize, totalLength);
+            // Délai adaptatif: plus lent pour les messages courts, plus rapide pour les longs
+            const baseDelay = totalLength > 1000 ? 20 : 50;
+            await new Promise(resolve => setTimeout(resolve, baseDelay + Math.random() * 20));
+            
+            // Taille de morceau variable pour une apparence plus naturelle
+            const variableChunkSize = Math.max(3, Math.min(chunkSize, 
+              chunkSize + Math.floor(Math.random() * 5) - 2));
+              
+            const endPosition = Math.min(currentPosition + variableChunkSize, totalLength);
             const chunk = messageContent.substring(currentPosition, endPosition);
             
-            console.log(`Sending chunk: "${chunk.substring(0, 15)}${chunk.length > 15 ? '...' : ''}"`);
             onChunk(chunk);
-            
             currentPosition = endPosition;
-          }
+            
+            // Continuer si nécessaire
+            if (currentPosition < totalLength) {
+              await sendNextChunk();
+            }
+          };
+          
+          await sendNextChunk();
         }
       } else {
-        console.warn("⚠️ Stream simulation not applicable - No valid message content found");
+        if (process.env.NODE_ENV === 'development') {
+          console.warn("⚠️ Stream simulation not applicable - No valid message content found");
+        }
         
         // Même sans contenu identifié, essayer d'envoyer quelque chose
         if (onChunk && typeof onChunk === 'function') {
@@ -331,6 +392,7 @@ export const apiService = {
       
       // Retourner la réponse complète à la fin
       return response as unknown as T;
+      
     } catch (error: any) {
       console.error(`❌ STREAM error for ${url}:`, error.message);
       

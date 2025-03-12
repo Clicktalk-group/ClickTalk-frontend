@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback, memo, useMemo } from 'react';
 import { Message } from '../../../types/chat.types';
 import MessageBubble from '../MessageBubble';
 import LoadingIndicator from '../LoadingIndicator';
@@ -8,10 +8,10 @@ interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
   onCopyMessage: (content: string) => void;
-  streamingMessage: string | null; // NOUVEAU: pour afficher le message en streaming
+  streamingMessage: string | null;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ 
+const ChatMessages: React.FC<ChatMessagesProps> = memo(({ 
   messages, 
   isLoading, 
   onCopyMessage,
@@ -20,6 +20,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+  // Optimisation: utiliser useCallback pour éviter les recréations de fonctions
+  const copyMessageCallback = useCallback((content: string) => {
+    onCopyMessage(content);
+  }, [onCopyMessage]);
+
   // Auto-scroll to bottom when new messages come in
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -27,22 +32,26 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   }, [messages, streamingMessage]); 
 
+  // Developpement logs uniquement en environnement de développement
   useEffect(() => {
-    console.log(`Rendering ${messages.length} messages`);
-    if (streamingMessage) {
-      console.log(`Current streaming message: ${streamingMessage.substring(0, 30)}...`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Rendering ${messages.length} messages`);
+      if (streamingMessage) {
+        console.log(`Current streaming message: ${streamingMessage.substring(0, 30)}...`);
+      }
     }
   }, [messages, streamingMessage]);
 
-  // Trouver le dernier message bot temporaire sans utiliser findLast
-  let lastBotMessage: Message | undefined = undefined;
-  for (let i = messages.length - 1; i >= 0; i--) {
-    const msg = messages[i];
-    if (msg.isBot && typeof msg.id === 'string' && msg.id.includes('temp-bot')) {
-      lastBotMessage = msg;
-      break;
+  // Trouver le dernier message bot temporaire de manière optimisée
+  const lastBotMessage = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg.isBot && typeof msg.id === 'string' && msg.id.includes('temp-bot')) {
+        return msg;
+      }
     }
-  }
+    return undefined;
+  }, [messages]);
 
   return (
     <div className="chat-messages" ref={messagesContainerRef}>
@@ -64,7 +73,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
               <MessageBubble 
                 key={typeof message.id === 'string' ? message.id : `msg-${index}`}
                 message={{...message, content: displayContent}}
-                onCopy={() => onCopyMessage(displayContent)}
+                onCopy={() => copyMessageCallback(displayContent)}
                 isStreaming={isStreaming}
               />
             );
@@ -83,6 +92,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       <div ref={messagesEndRef} />
     </div>
   );
-};
+});
 
 export default ChatMessages;

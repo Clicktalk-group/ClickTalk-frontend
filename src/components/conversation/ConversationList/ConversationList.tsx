@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useConversation } from "../../../hooks/useConversation/useConversation";
 import { Conversation } from "../../../types/conversation.types";
 import "./ConversationList.scss";
@@ -10,34 +10,64 @@ interface ConversationListProps {
   onEdit?: (conversation: Conversation) => void;
 }
 
-const ConversationList: React.FC<ConversationListProps> = ({ 
+const ConversationList = React.memo(({ 
   onSelect, 
   onDelete,
   onEdit 
-}) => {
+}: ConversationListProps) => {
   const { conversations, fetchConversations, loading, error } = useConversation();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
+  // Utilisation de useEffect avec fetchConversations qui est mémoïsé par le hook
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
 
-  if (loading) {
-    return <div className="loading">Chargement des conversations...</div>;
-  }
+  // Optimisation du gestionnaire d'événements de sélection de conversation
+  const handleSelect = useCallback((id: number) => {
+    setSelectedId(id);
+    onSelect(id);
+  }, [onSelect]);
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
+  // Optimisation du gestionnaire d'événements de suppression
+  const handleDelete = useCallback((id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete(id);
+    }
+  }, [onDelete]);
 
-  if (conversations.length === 0) {
-    return <div className="empty">Aucune conversation trouvée</div>;
-  }
+  // Optimisation du gestionnaire d'événements d'édition
+  const handleEdit = useCallback((conversation: Conversation, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEdit) {
+      onEdit(conversation);
+    }
+  }, [onEdit]);
 
-  return (
-    <div className="conversation-list">
+  // Rendu conditionnel mémoïsé
+  const renderContent = useMemo(() => {
+    if (loading) {
+      return <div className="loading" role="status">Chargement des conversations...</div>;
+    }
+
+    if (error) {
+      return <div className="error" role="alert">{error}</div>;
+    }
+
+    if (conversations.length === 0) {
+      return <div className="empty">Aucune conversation trouvée</div>;
+    }
+
+    return (
       <ul>
         {conversations.map((conversation) => (
-          <li key={conversation.id} onClick={() => onSelect(conversation.id)}>
+          <li 
+            key={conversation.id} 
+            onClick={() => handleSelect(conversation.id)}
+            className={selectedId === conversation.id ? 'selected' : ''}
+            data-selected={selectedId === conversation.id}
+          >
             <span className="title">{conversation.title}</span>
             {(onEdit || onDelete) && (
               <div className="actions">
@@ -46,10 +76,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                     className="edit-btn" 
                     aria-label={`Modifier la conversation ${conversation.title}`}
                     title={`Modifier la conversation ${conversation.title}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(conversation);
-                    }}
+                    onClick={(e) => handleEdit(conversation, e)}
                   >
                     <FaEdit />
                   </button>
@@ -59,10 +86,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                     className="delete-btn" 
                     aria-label={`Supprimer la conversation ${conversation.title}`}
                     title={`Supprimer la conversation ${conversation.title}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(conversation.id);
-                    }}
+                    onClick={(e) => handleDelete(conversation.id, e)}
                   >
                     <FaTrash />
                   </button>
@@ -72,8 +96,16 @@ const ConversationList: React.FC<ConversationListProps> = ({
           </li>
         ))}
       </ul>
+    );
+  }, [conversations, loading, error, handleSelect, handleEdit, handleDelete, selectedId, onEdit, onDelete]);
+
+  return (
+    <div className="conversation-list">
+      {renderContent}
     </div>
   );
-};
+});
+
+ConversationList.displayName = 'ConversationList';
 
 export default ConversationList;

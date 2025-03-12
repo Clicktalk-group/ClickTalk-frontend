@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/components/auth/RegisterForm/RegisterForm.tsx
+import React, { useState, useCallback, useMemo } from 'react';
 import { RegisterFormProps } from './RegisterForm.types';
 import { Input } from '../../common/Input/Input';
 import { Button } from '../../common/Button/Button';
@@ -12,7 +13,8 @@ import {
 import './RegisterForm.scss';
 import { useNavigate } from 'react-router-dom';
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLoginClick }) => {
+export const RegisterForm: React.FC<RegisterFormProps> = React.memo(({ className = '', onLoginClick }) => {
+  // État unifié pour les données du formulaire
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -20,6 +22,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLo
     confirmPassword: ''
   });
   
+  // État séparé pour les erreurs
   const [errors, setErrors] = useState<{
     username: string | undefined;
     email: string | undefined;
@@ -32,23 +35,63 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLo
     confirmPassword: undefined
   });
   
+  // État pour suivre les champs touchés (améliore l'UX)
+  const [touched, setTouched] = useState({
+    username: false,
+    email: false,
+    password: false,
+    confirmPassword: false
+  });
+  
   const { register, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Gestionnaire d'événement optimisé pour les changements de champs
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
     
-    // Effacer l'erreur du champ modifié
-    setErrors({ ...errors, [name]: undefined });
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Marquer le champ comme touché
+    setTouched(prev => ({ ...prev, [name]: true }));
+    
+    // Réinitialiser l'erreur pour ce champ
+    setErrors(prev => ({ ...prev, [name]: undefined }));
+    
+    // Valider à la volée pour donner un feedback immédiat
+    if (touched[name as keyof typeof touched]) {
+      let fieldError: string | undefined;
+      
+      switch (name) {
+        case 'username':
+          fieldError = validateUsername(value);
+          break;
+        case 'email':
+          fieldError = validateEmail(value);
+          break;
+        case 'password':
+          fieldError = validatePassword(value);
+          // Si le mot de passe change, revalider la confirmation
+          if (formData.confirmPassword) {
+            const confirmError = validateConfirmPassword(value, formData.confirmPassword);
+            setErrors(prev => ({ ...prev, confirmPassword: confirmError }));
+          }
+          break;
+        case 'confirmPassword':
+          fieldError = validateConfirmPassword(formData.password, value);
+          break;
+      }
+      
+      if (fieldError) {
+        setErrors(prev => ({ ...prev, [name]: fieldError }));
+      }
+    }
+    
     clearError();
-  };
+  }, [formData, touched, clearError]);
   
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    
-    // Validation des champs
+  // Fonction de validation complète du formulaire
+  const validateForm = useCallback(() => {
     const usernameError = validateUsername(formData.username);
     const emailError = validateEmail(formData.email);
     const passwordError = validatePassword(formData.password);
@@ -57,93 +100,128 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLo
       formData.confirmPassword
     );
     
-    if (usernameError || emailError || passwordError || confirmPasswordError) {
-      setErrors({
-        username: usernameError,
-        email: emailError,
-        password: passwordError,
-        confirmPassword: confirmPasswordError
-      });
-      return;
-    }
+    const newErrors = {
+      username: usernameError,
+      email: emailError,
+      password: passwordError,
+      confirmPassword: confirmPasswordError
+    };
+    
+    setErrors(newErrors);
+    
+    // Marquer tous les champs comme touchés
+    setTouched({
+      username: true,
+      email: true,
+      password: true,
+      confirmPassword: true
+    });
+    
+    // Le formulaire est valide si aucune erreur n'est présente
+    return !usernameError && !emailError && !passwordError && !confirmPasswordError;
+  }, [formData]);
+  
+  // Gestionnaire de soumission optimisé
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    
+    // Valider tous les champs avant de soumettre
+    if (!validateForm()) return;
     
     try {
+      console.log("Tentative d'inscription avec:", formData.email);
       await register(formData);
+      // Si register réussit (pas d'erreur lancée), on navigue vers la page d'accueil
       navigate('/');
     } catch (err) {
       // L'erreur est déjà gérée dans le hook useAuth
+      console.error("Erreur d'inscription:", err);
     }
-  };
+  }, [clearError, register, formData, navigate, validateForm]);
+  
+  // Mémoisation des valeurs calculées
+  const buttonText = useMemo(() => 
+    isLoading ? 'Inscription en cours...' : 'Créer un compte', 
+    [isLoading]
+  );
+  
+  const formClassName = useMemo(() => 
+    `register-form ${className}`, 
+    [className]
+  );
+
+  // Composant de champ réutilisable pour réduire la duplication
+  const renderField = useCallback((
+    id: string,
+    label: string,
+    type: 'text' | 'email' | 'password' | 'number' | 'search',
+    placeholder: string = '',
+    autoComplete: string = ''
+  ) => (
+    <div className="form-field">
+      <Input
+        type={type}
+        id={id}
+        name={id}
+        label={label}
+        value={formData[id as keyof typeof formData] as string}
+        onChange={handleChange}
+        error={errors[id as keyof typeof errors]}
+        placeholder={placeholder}
+        required
+        autoComplete={autoComplete}
+        aria-invalid={!!errors[id as keyof typeof errors]}
+      />
+    </div>
+  ), [formData, errors, handleChange]);
   
   return (
-    <form className={`register-form ${className}`} onSubmit={handleSubmit} data-testid="register-form">
+    <form className={formClassName} onSubmit={handleSubmit} data-testid="register-form">
       <h2 className="form-title">Inscription</h2>
       
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message" role="alert">{error}</div>}
       
-      <div className="form-field">
-        <Input
-          type="text"
-          id="username"
-          name="username"
-          label="Nom d'utilisateur"
-          value={formData.username}
-          onChange={handleChange}
-          error={errors.username}
-          placeholder="Votre nom d'utilisateur"
-          required
-        />
-      </div>
+      {renderField(
+        'username', 
+        "Nom d'utilisateur", 
+        'text', 
+        "Votre nom d'utilisateur", 
+        'username'
+      )}
       
-      <div className="form-field">
-        <Input
-          type="email"
-          id="email"
-          name="email"
-          label="Email"
-          value={formData.email}
-          onChange={handleChange}
-          error={errors.email}
-          placeholder="Votre adresse email"
-          required
-        />
-      </div>
+      {renderField(
+        'email', 
+        'Email', 
+        'email', 
+        'Votre adresse email', 
+        'email'
+      )}
       
-      <div className="form-field">
-        <Input
-          type="password"
-          id="password"
-          name="password"
-          label="Mot de passe"
-          value={formData.password}
-          onChange={handleChange}
-          error={errors.password}
-          placeholder="Votre mot de passe (8 caractères min.)"
-          required
-        />
-      </div>
+      {renderField(
+        'password', 
+        'Mot de passe', 
+        'password', 
+        'Votre mot de passe (8 caractères min.)', 
+        'new-password'
+      )}
       
-      <div className="form-field">
-        <Input
-          type="password"
-          id="confirmPassword"
-          name="confirmPassword"
-          label="Confirmer le mot de passe"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          error={errors.confirmPassword}
-          placeholder="Confirmez votre mot de passe"
-          required
-        />
-      </div>
+      {renderField(
+        'confirmPassword', 
+        'Confirmer le mot de passe', 
+        'password', 
+        'Confirmez votre mot de passe', 
+        'new-password'
+      )}
       
       <Button 
         type="submit" 
         variant="primary" 
         fullWidth 
         disabled={isLoading}
+        aria-busy={isLoading}
       >
-        {isLoading ? 'Inscription en cours...' : 'Créer un compte'}
+        {buttonText}
       </Button>
       
       <div className="form-footer">
@@ -160,6 +238,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ className = '', onLo
       </div>
     </form>
   );
-};
+});
+
+RegisterForm.displayName = 'RegisterForm';
 
 export default RegisterForm;

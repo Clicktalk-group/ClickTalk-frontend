@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo, useCallback } from 'react';
 import classNames from 'classnames';
 import { InputProps } from './Input.types';
 import './Input.scss';
@@ -24,42 +24,97 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const inputClasses = classNames(
-      'input-field',
-      {
-        error: !!error,
-        'with-icon': !!icon,
-      },
-      className
+    // Mémoïsation des noms de classes pour éviter de les recalculer à chaque rendu
+    const inputClasses = useMemo(() => 
+      classNames(
+        'input-field',
+        {
+          error: !!error,
+          'with-icon': !!icon,
+          'disabled': disabled,
+        },
+        className
+      ),
+      [error, icon, disabled, className]
     );
+
+    // Optimisations des gestionnaires d'événements
+    const handleFocus = useCallback(() => {
+      if (onFocus && !disabled) {
+        onFocus();
+      }
+    }, [onFocus, disabled]);
+
+    const handleBlur = useCallback(() => {
+      if (onBlur && !disabled) {
+        onBlur();
+      }
+    }, [onBlur, disabled]);
+
+    const handleChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!disabled && onChange) {
+          onChange(e);
+        }
+      },
+      [disabled, onChange]
+    );
+
+    // Générer un identifiant unique si non fourni
+    const inputId = useMemo(() => id || `input-${name}`, [id, name]);
+
+    // Attributs d'accessibilité
+    const ariaAttributes = useMemo(() => {
+      const attrs: {[key: string]: string} = {};
+      
+      if (error) {
+        attrs['aria-invalid'] = 'true';
+        attrs['aria-describedby'] = `${inputId}-error`;
+      }
+      
+      if (required) {
+        attrs['aria-required'] = 'true';
+      }
+      
+      return attrs;
+    }, [error, required, inputId]);
 
     return (
       <div className="input-wrapper">
         {label && (
-          <label htmlFor={id || name} className="input-label">
+          <label htmlFor={inputId} className="input-label">
             {label}
-            {required && <span className="required-star">*</span>}
+            {required && <span className="required-star" aria-hidden="true">*</span>}
           </label>
         )}
         <div className="input-container">
           <input
             ref={ref}
-            id={id || name}
+            id={inputId}
             name={name}
             type={type}
             value={value}
-            onChange={onChange}
+            onChange={handleChange}
             placeholder={placeholder}
             disabled={disabled}
             required={required}
             className={inputClasses}
             autoComplete={autoComplete}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            {...ariaAttributes}
           />
-          {icon && <div className="input-icon">{icon}</div>}
+          {icon && <div className="input-icon" aria-hidden="true">{icon}</div>}
         </div>
-        {error && <p className="error-message">{error}</p>}
+        {error && (
+          <p 
+            className="error-message" 
+            id={`${inputId}-error`}
+            role="alert"
+          >
+            {error}
+          </p>
+        )}
       </div>
     );
   }

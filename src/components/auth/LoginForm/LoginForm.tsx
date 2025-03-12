@@ -1,5 +1,5 @@
 // src/components/auth/LoginForm/LoginForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { LoginFormProps } from './LoginForm.types';
 import { Input } from '../../common/Input/Input';
 import { Button } from '../../common/Button/Button';
@@ -8,23 +8,44 @@ import { validateEmail, validatePassword } from '../../../utils/validators/valid
 import './LoginForm.scss';
 import { useNavigate } from 'react-router-dom';
 
-export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegisterClick }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export const LoginForm: React.FC<LoginFormProps> = React.memo(({ className = '', onRegisterClick }) => {
+  // Regrouper les états liés dans un seul objet pour réduire les re-rendus
+  const [formState, setFormState] = useState({
+    email: '',
+    password: '',
+  });
+
+  // État d'erreurs distinct car sa fréquence de mise à jour est différente
   const [errors, setErrors] = useState<{
     email: string | undefined;
     password: string | undefined;
   }>({ email: undefined, password: undefined });
   
   const { login, isLoading, error, clearError } = useAuth();
-  
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
+  // Optimisation des gestionnaires d'événements avec useCallback
+  const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setFormState(prev => ({ ...prev, email: newEmail }));
     
-    // Validation des champs
+    // Effacer les erreurs d'email lors de la modification
+    setErrors(prev => ({ ...prev, email: undefined }));
+    clearError();
+  }, [clearError]);
+
+  const handlePasswordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setFormState(prev => ({ ...prev, password: newPassword }));
+    
+    // Effacer les erreurs de mot de passe lors de la modification
+    setErrors(prev => ({ ...prev, password: undefined }));
+    clearError();
+  }, [clearError]);
+
+  // Validation de formulaire optimisée
+  const validateForm = useCallback(() => {
+    const { email, password } = formState;
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
     
@@ -33,23 +54,45 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegister
         email: emailError,
         password: passwordError,
       });
-      return;
+      return false;
     }
+    return true;
+  }, [formState]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    
+    if (!validateForm()) return;
     
     try {
-      await login(email, password);
+      console.log('Tentative de connexion avec:', formState.email);
+      await login(formState.email, formState.password);
+      // Si login réussit (pas d'erreur lancée), on navigue vers la page d'accueil
       navigate('/');
     } catch (err) {
       console.error("Erreur de connexion:", err);
       // L'erreur est déjà gérée dans le hook useAuth
     }
-  };
+  }, [clearError, login, formState, navigate, validateForm]);
   
+  // Mémoisation du texte du bouton
+  const buttonText = useMemo(() => 
+    isLoading ? 'Connexion en cours...' : 'Se connecter', 
+    [isLoading]
+  );
+  
+  // Mémoisation de la classe CSS
+  const formClassName = useMemo(() => 
+    `login-form ${className}`, 
+    [className]
+  );
+
   return (
-    <form className={`login-form ${className}`} onSubmit={handleSubmit} data-testid="login-form">
+    <form className={formClassName} onSubmit={handleSubmit} data-testid="login-form">
       <h2 className="form-title">Connexion</h2>
       
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message" role="alert">{error}</div>}
       
       <div className="form-field">
         <Input
@@ -57,11 +100,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegister
           id="email"
           name="email"
           label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formState.email}
+          onChange={handleEmailChange}
           error={errors.email}
           placeholder="Votre adresse email"
           required
+          autoComplete="username"
+          aria-invalid={!!errors.email}
         />
       </div>
       
@@ -71,11 +116,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegister
           id="password"
           name="password"
           label="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formState.password}
+          onChange={handlePasswordChange}
           error={errors.password}
           placeholder="Votre mot de passe"
           required
+          autoComplete="current-password"
+          aria-invalid={!!errors.password}
         />
       </div>
       
@@ -84,8 +131,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegister
         variant="primary" 
         fullWidth 
         disabled={isLoading}
+        aria-busy={isLoading}
       >
-        {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+        {buttonText}
       </Button>
       
       <div className="form-footer">
@@ -102,6 +150,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ className = '', onRegister
       </div>
     </form>
   );
-};
+});
+
+LoginForm.displayName = 'LoginForm';
 
 export default LoginForm;

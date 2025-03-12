@@ -1,5 +1,5 @@
 // src/contexts/ThemeContext.tsx
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
 
 export type ThemeMode = 'light' | 'dark';
 export type ThemeColor = 'default' | 'blue' | 'green' | 'purple' | 'orange';
@@ -14,19 +14,45 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Validation des valeurs stockées localement
+const validateThemeMode = (value: string | null): ThemeMode => {
+  return (value === 'light' || value === 'dark') ? value as ThemeMode : 'light';
+};
+
+const validateThemeColor = (value: string | null): ThemeColor => {
+  return (value === 'default' || value === 'blue' || 
+          value === 'green' || value === 'purple' ||
+          value === 'orange') ? value as ThemeColor : 'default';
+};
+
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Utiliser les préférences stockées ou les valeurs par défaut
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+  // Utiliser les préférences stockées avec validation
+  const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
     const savedMode = localStorage.getItem('themeMode');
-    return (savedMode === 'light' || savedMode === 'dark') ? savedMode : 'light';
+    return validateThemeMode(savedMode);
   });
 
-  const [themeColor, setThemeColor] = useState<ThemeColor>(() => {
+  const [themeColor, setThemeColorState] = useState<ThemeColor>(() => {
     const savedColor = localStorage.getItem('themeColor');
-    return (savedColor === 'default' || savedColor === 'blue' || 
-            savedColor === 'green' || savedColor === 'purple' ||
-            savedColor === 'orange') ? savedColor as ThemeColor : 'default';
+    return validateThemeColor(savedColor);
   });
+
+  // Optimisation avec useCallback pour réduire les rendus inutiles
+  const setThemeMode = useCallback((mode: ThemeMode) => {
+    setThemeModeState(mode);
+    localStorage.setItem('themeMode', mode);
+  }, []);
+
+  const setThemeColor = useCallback((color: ThemeColor) => {
+    setThemeColorState(color);
+    localStorage.setItem('themeColor', color);
+  }, []);
+
+  const toggleThemeMode = useCallback(() => {
+    const newMode = themeMode === 'light' ? 'dark' : 'light';
+    setThemeModeState(newMode);
+    localStorage.setItem('themeMode', newMode);
+  }, [themeMode]);
 
   // Appliquer le thème au document
   useEffect(() => {
@@ -48,17 +74,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Ajouter la nouvelle classe de couleur
     document.body.classList.add(`theme-color-${themeColor}`);
     
-    // Sauvegarder les préférences
-    localStorage.setItem('themeMode', themeMode);
-    localStorage.setItem('themeColor', themeColor);
-    
-    console.log(`Theme updated: ${themeMode}, color: ${themeColor}`);
+    // Logs uniquement en développement
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Theme updated: ${themeMode}, color: ${themeColor}`);
+    }
   }, [themeMode, themeColor]);
-
-  // Toggle entre les thèmes clair et sombre
-  const toggleThemeMode = () => {
-    setThemeMode(themeMode === 'light' ? 'dark' : 'light');
-  };
 
   return (
     <ThemeContext.Provider

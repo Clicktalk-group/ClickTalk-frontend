@@ -1,10 +1,10 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { SidebarProps } from "./Sidebar.types";
 import "./Sidebar.scss";
 import { FaSignOutAlt, FaComments, FaFolder, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { BiHomeAlt } from "react-icons/bi";
 
-export const Sidebar: React.FC<SidebarProps> = ({
+export const Sidebar: React.FC<SidebarProps> = memo(({
   isOpen,
   conversations,
   projects,
@@ -17,7 +17,57 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   onToggleSidebar,
 }) => {
-  console.log("Projects in sidebar:", projects); // Debugging
+  
+  // Optimised item renderers
+  const renderConversationItem = useCallback((item: any) => (
+    <li
+      key={item.id}
+      className="list-item"
+      onClick={() => onSelectConversation(item.id)}
+    >
+      {item.title}
+    </li>
+  ), [onSelectConversation]);
+
+  const handleDeleteProject = useCallback((e: React.MouseEvent, itemId: number, itemTitle: string) => {
+    e.stopPropagation();
+    if (window.confirm(`Voulez-vous vraiment supprimer le projet "${itemTitle}" ?`)) {
+      onDeleteProject(itemId);
+    }
+  }, [onDeleteProject]);
+  
+  const renderProjectItem = useCallback((item: any) => (
+    <li
+      key={item.id}
+      className="list-item project-item"
+    >
+      <span 
+        className="project-title" 
+        onClick={() => onSelectProject(item.id)}
+      >
+        {item.title}
+      </span>
+      <div className="project-actions">
+        <button 
+          className="action-btn edit-btn" 
+          onClick={(e) => {
+            e.stopPropagation();
+            onRenameProject(item);
+          }}
+          title="Modifier le projet"
+        >
+          <FaEdit />
+        </button>
+        <button 
+          className="action-btn delete-btn" 
+          onClick={(e) => handleDeleteProject(e, item.id, item.title)}
+          title="Supprimer le projet"
+        >
+          <FaTrash />
+        </button>
+      </div>
+    </li>
+  ), [onSelectProject, onRenameProject, handleDeleteProject]);
   
   return (
     <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
@@ -38,15 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
           <div className="section-list-container">
             <ul className="section-list">
-              {conversations.map((item) => (
-                <li
-                  key={item.id}
-                  className="list-item"
-                  onClick={() => onSelectConversation(item.id)}
-                >
-                  {item.title}
-                </li>
-              ))}
+              {conversations.map(renderConversationItem)}
             </ul>
           </div>
         </div>
@@ -63,43 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
           <div className="section-list-container">
             <ul className="section-list">
-              {projects.map((item) => (
-                <li
-                  key={item.id}
-                  className="list-item project-item"
-                >
-                  <span 
-                    className="project-title" 
-                    onClick={() => onSelectProject(item.id)}
-                  >
-                    {item.title}
-                  </span>
-                  <div className="project-actions">
-                  <button 
-                  className="action-btn edit-btn" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRenameProject(item);
-                  }}
-                  title="Modifier le projet"
-                >
-                  <FaEdit />
-                </button>
-                    <button 
-                      className="action-btn delete-btn" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (window.confirm(`Voulez-vous vraiment supprimer le projet "${item.title}" ?`)) {
-                          onDeleteProject(item.id);
-                        }
-                      }}
-                      title="Supprimer le projet"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </li>
-              ))}
+              {projects.map(renderProjectItem)}
             </ul>
           </div>
         </div>
@@ -112,4 +118,4 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </button>
     </div>
   );
-};
+});

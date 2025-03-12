@@ -1,6 +1,6 @@
 // src/hooks/useChat/useChat.ts
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Message, Conversation, ChatState, ApiMessageResponse } from '../../types/chat.types';
 import apiService from '../../services/api/api';
 import usePerformanceMetrics from '../usePerformanceMetrics/usePerformanceMetrics';
@@ -11,19 +11,21 @@ const useChat = (conversationId?: number) => {
     isLoading: false,
     currentConversation: null,
     error: null,
-    streamingMessage: null // NOUVEAU: pour le message en cours de streaming
+    streamingMessage: null
   });
 
-  // Utiliser notre hook de métriques de performance
+  // Extraction des métriques de performance avec mémoïsation
+  const metrics = usePerformanceMetrics();
+  
+  // Mémoïsation des fonctions de métriques pour éviter les re-rendus
   const {
-    metrics,
     recordMessageStart,
     recordMessageEnd,
     recordStreamingChunk,
     recordRenderStart,
     recordRenderEnd,
     clearMetrics
-  } = usePerformanceMetrics();
+  } = useMemo(() => metrics, [metrics]);
 
   // Ref pour accéder aux messages actuels sans créer de dépendances
   const messagesRef = useRef<Message[]>([]);
@@ -33,42 +35,52 @@ const useChat = (conversationId?: number) => {
     messagesRef.current = state.messages;
   }, [state.messages]);
 
-  // Déclaration préliminaire pour résoudre la dépendance circulaire
+  // Références pour les fonctions pour résoudre les dépendances circulaires
   const loadMessagesRef = useRef(async (convId: number) => {});
   const loadConversationRef = useRef(async (convId: number) => {});
 
-  // Charger les messages d'une conversation
+  // Version optimisée de setState avec fonction de mise à jour
+  const safeSetState = useCallback((updater: (prevState: ChatState) => ChatState) => {
+    setState(prevState => {
+      try {
+        return updater(prevState);
+      } catch (error) {
+        console.error('Error updating state:', error);
+        return prevState;
+      }
+    });
+  }, []);
+
+  // Charger les messages d'une conversation - avec memoization optimisée
   const loadMessages = useCallback(async (convId: number) => {
     if (!convId) {
       console.error("No conversation ID provided to loadMessages");
       return;
     }
     
-    setState(prevState => ({ ...prevState, isLoading: true }));
+    safeSetState(prevState => ({ ...prevState, isLoading: true }));
     
     try {
       console.log(`🔄 Loading messages for conversation ID: ${convId}`);
       recordRenderStart(`loadMessages-${convId}`);
       const response = await apiService.get<Message[]>(`/messages/conv/${convId}`);
       recordRenderEnd(`loadMessages-${convId}`);
-      console.log(`✅ Received ${response?.length || 0} messages from API:`, response);
       
       if (Array.isArray(response)) {
-        setState(prevState => ({
+        safeSetState(prevState => ({
           ...prevState,
           messages: response,
           isLoading: false
         }));
       } else if (response === null || response === undefined) {
-        // Pas d'erreur mais pas de messages - conversation vide
-        setState(prevState => ({
+        safeSetState(prevState => ({
           ...prevState,
           messages: [],
           isLoading: false
         }));
       } else {
         console.error("❌ API returned non-array response for messages:", response);
-        setState(prevState => ({
+        safeSetState(prevState => ({
           ...prevState,
           error: 'Format de réponse invalide du serveur',
           isLoading: false
@@ -76,13 +88,13 @@ const useChat = (conversationId?: number) => {
       }
     } catch (error) {
       console.error('❌ Error loading messages:', error);
-      setState(prevState => ({
+      safeSetState(prevState => ({
         ...prevState,
         error: 'Échec du chargement des messages',
         isLoading: false
       }));
     }
-  }, [recordRenderStart, recordRenderEnd]);
+  }, [safeSetState, recordRenderStart, recordRenderEnd]);
 
   // Assigner la fonction réelle à la référence
   useEffect(() => {
@@ -96,12 +108,10 @@ const useChat = (conversationId?: number) => {
       return;
     }
     
-    setState(prevState => ({ 
+    safeSetState(prevState => ({ 
       ...prevState, 
       isLoading: true, 
       error: null,
-      // Ne pas effacer les messages pour éviter le clignotement de l'UI
-      // messages: []
     }));
     
     try {
@@ -109,10 +119,9 @@ const useChat = (conversationId?: number) => {
       recordRenderStart(`loadConversation-${convId}`);
       const response = await apiService.get<Conversation>(`/conversation/${convId}`);
       recordRenderEnd(`loadConversation-${convId}`);
-      console.log("✅ Conversation loaded:", response);
       
       // Mettre à jour les détails de la conversation
-      setState(prevState => ({
+      safeSetState(prevState => ({
         ...prevState,
         currentConversation: response
       }));
@@ -122,49 +131,73 @@ const useChat = (conversationId?: number) => {
     } catch (error) {
       console.error("❌ Error loading conversation:", error);
       
-      setState(prevState => ({
+      safeSetState(prevState => ({
         ...prevState,
         error: 'Échec du chargement de la conversation',
         isLoading: false
       }));
     }
-  }, [loadMessages, recordRenderStart, recordRenderEnd]);
+  }, [loadMessages, recordRenderStart, recordRenderEnd, safeSetState]);
   
   // Assigner la fonction réelle à la référence
   useEffect(() => {
     loadConversationRef.current = loadConversation;
   }, [loadConversation]);
 
-  // NOUVEAU: Fonction pour traiter les chunks (morceaux) de texte en streaming avec métriques
+  // Gestionnaire de chunks optimisé
   const handleStreamChunk = useCallback((chunk: string) => {
-    // Enregistrer les métriques pour cette portion de streaming
+    // Enregistrer les métriques seulement si nécessaire
     if (chunk.length > 0) {
       recordStreamingChunk(chunk);
+      
+      safeSetState(prevState => {
+        // Ajouter le nouveau morceau au message en streaming
+        const newStreamingContent = (prevState.streamingMessage || '') + chunk;
+        return {
+          ...prevState,
+          streamingMessage: newStreamingContent
+        };
+      });
     }
-    
-    setState(prevState => {
-      // Ajouter le nouveau morceau au message en streaming
-      const newStreamingContent = (prevState.streamingMessage || '') + chunk;
-      
-      console.log(`📈 Streaming chunk received: "${chunk}" (Total: ${newStreamingContent.length} chars)`);
-      
-      return {
-        ...prevState,
-        streamingMessage: newStreamingContent
-      };
-    });
-  }, [recordStreamingChunk]);
+  }, [recordStreamingChunk, safeSetState]);
 
-  // Envoyer un message avec support de streaming et métriques
+  // Mémoïsation optimisée pour la création de conversation
+  const createConversation = useCallback(async (title: string) => {
+    if (!title.trim()) {
+      console.warn("Empty title, not creating conversation");
+      return null;
+    }
+
+    safeSetState(prevState => ({ ...prevState, isLoading: true, error: null }));
+    
+    try {
+      recordRenderStart('createConversation');
+      const response = await apiService.post<Conversation>('/conversation/add', { title });
+      recordRenderEnd('createConversation');
+      
+      safeSetState(prevState => ({ ...prevState, isLoading: false }));
+      return response;
+    } catch (error) {
+      console.error("❌ Error creating conversation:", error);
+      
+      safeSetState(prevState => ({
+        ...prevState,
+        error: 'Échec de création de la conversation',
+        isLoading: false
+      }));
+      
+      return null;
+    }
+  }, [recordRenderStart, recordRenderEnd, safeSetState]);
+
+  // Envoyer un message avec support de streaming et métriques - optimisé
   const sendMessage = useCallback(async (convId: number | undefined, content: string, projectId?: number) => {
     if (!content.trim()) {
       console.warn("Empty message, not sending");
       return;
     }
     
-    console.log(`📤 Sending message "${content}" to conversation: ${convId || 'new'} for project: ${projectId || 'none'}`);
-
-    // Générer des IDs temporaires uniques
+    // Générer des IDs temporaires uniques une seule fois
     const tempUserId = `temp-user-${Date.now()}`;
     const tempBotId = `temp-bot-${Date.now()}`;
     
@@ -175,7 +208,7 @@ const useChat = (conversationId?: number) => {
     recordMessageStart(tempUserId);
     
     // Ajouter le message utilisateur immédiatement à l'UI
-    setState(prevState => ({
+    safeSetState(prevState => ({
       ...prevState,
       messages: [
         ...prevState.messages, 
@@ -188,13 +221,13 @@ const useChat = (conversationId?: number) => {
         }
       ],
       isLoading: true,
-      error: null, // Réinitialiser les erreurs précédentes
-      streamingMessage: null // Réinitialiser le message en streaming
+      error: null,
+      streamingMessage: null
     }));
     
-    // Ajouter un message bot vide qui sera rempli progressivement
-    setTimeout(() => {
-      setState(prevState => ({
+    // Ajouter un message bot vide avec requestAnimationFrame pour optimiser le rendu
+    requestAnimationFrame(() => {
+      safeSetState(prevState => ({
         ...prevState,
         messages: [
           ...prevState.messages,
@@ -207,7 +240,7 @@ const useChat = (conversationId?: number) => {
           }
         ]
       }));
-    }, 300);
+    });
     
     try {
       const payload = {
@@ -216,48 +249,29 @@ const useChat = (conversationId?: number) => {
         projectId: projectId || null
       };
       
-      console.log("📦 API payload:", payload);
-      
-      // NOUVEAU: Utiliser la fonction de streaming avec métriques
+      // Appel API avec streaming
       recordRenderStart(`apiCall-${tempBotId}`);
       const response = await apiService.stream<ApiMessageResponse>(
         '/messages/add', 
         payload,
-        handleStreamChunk // Passer le gestionnaire de chunks
+        handleStreamChunk
       );
       recordRenderEnd(`apiCall-${tempBotId}`);
       
       // Enregistrer la fin du message et sa taille
       recordMessageEnd(tempUserId, content.length);
       
-      console.log("📩 API response:", response);
-      
-      // Déterminer l'ID de conversation à partir de la réponse
-      let responseConvId: number | null = null;
-      
-      // Vérifier différentes formes possibles de réponse pour l'ID de conversation
-      if (response) {
-        if (response.convId) {
-          responseConvId = Number(response.convId);
-        } else if (response.conversationId) {
-          responseConvId = Number(response.conversationId);
-        } else if (response.id && response.userId) {
-          // Si la réponse est elle-même une conversation
-          responseConvId = Number(response.id);
-        } else if (convId) {
-          // Utiliser l'ID existant si aucun nouveau n'est fourni
-          responseConvId = convId;
-        }
-      }
+      // Déterminer l'ID de conversation
+      const responseConvId = response?.convId || response?.conversationId || 
+                            (response?.id && response?.userId ? response.id : null) || 
+                            convId || null;
       
       if (responseConvId) {
-        console.log(`✅ Message successfully processed for conversation ID: ${responseConvId}`);
-        
-        // Intégrer le message en streaming dans la liste des messages
-        setState(prevState => {
+        // Intégrer le message en streaming dans la liste des messages avec une seule mise à jour d'état
+        safeSetState(prevState => {
           const updatedMessages = prevState.messages.map(msg => {
             if (typeof msg.id === 'string' && msg.id === tempBotId && prevState.streamingMessage) {
-              // Remplacer le message temporaire du bot par le contenu complet streamé
+              // Remplacer le message temporaire du bot
               return {
                 ...msg,
                 content: prevState.streamingMessage
@@ -274,26 +288,38 @@ const useChat = (conversationId?: number) => {
           return {
             ...prevState,
             messages: updatedMessages,
-            streamingMessage: null, // Réinitialiser le message en streaming
+            streamingMessage: null,
             isLoading: false
           };
         });
         
-        // Charger la conversation complète après un court délai
-        const finalConvId = responseConvId;
-        setTimeout(async () => {
-          try {
-            if (!convId || convId !== finalConvId) {
-              // Si c'est une nouvelle conversation ou si l'ID a changé
-              await loadConversationRef.current(finalConvId);
+        // Charger la conversation complète après un court délai avec requestIdleCallback si disponible
+        const finalConvId = Number(responseConvId);
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback(() => {
+            try {
+              if (!convId || convId !== finalConvId) {
+                loadConversationRef.current(finalConvId);
+              }
+            } catch (err) {
+              console.error("Error refreshing conversation after send:", err);
             }
-          } catch (err) {
-            console.error("Error refreshing conversation after send:", err);
-          }
-        }, 200);
+          });
+        } else {
+          // Fallback pour les navigateurs qui ne supportent pas requestIdleCallback
+          setTimeout(() => {
+            try {
+              if (!convId || convId !== finalConvId) {
+                loadConversationRef.current(finalConvId);
+              }
+            } catch (err) {
+              console.error("Error refreshing conversation after send:", err);
+            }
+          }, 200);
+        }
       } else {
         console.error("❌ No conversation ID found in response", response);
-        setState(prevState => ({
+        safeSetState(prevState => ({
           ...prevState,
           error: "Erreur: Impossible d'identifier la conversation",
           isLoading: false,
@@ -308,72 +334,56 @@ const useChat = (conversationId?: number) => {
     } catch (error) {
       console.error("❌ Error sending message:", error);
       
-      setState(prevState => ({
+      safeSetState(prevState => ({
         ...prevState,
         error: "Erreur lors de l'envoi du message. Veuillez réessayer.",
         isLoading: false,
         streamingMessage: null,
-        // Restaurer l'état précédent sans les messages temporaires
         messages: currentMessages
       }));
     }
-  // IMPORTANT: Ne pas inclure state.messages dans les dépendances
-  }, [handleStreamChunk, recordMessageStart, recordMessageEnd, recordRenderStart, recordRenderEnd]); 
-
-  // Créer une nouvelle conversation
-  const createConversation = useCallback(async (title: string) => {
-    setState(prevState => ({ ...prevState, isLoading: true, error: null }));
-    
-    try {
-      console.log(`🆕 Creating new conversation with title: "${title}"`);
-      recordRenderStart('createConversation');
-      const response = await apiService.post<Conversation>('/conversation/add', { title });
-      recordRenderEnd('createConversation');
-      console.log("✅ Conversation created:", response);
-      
-      setState(prevState => ({ ...prevState, isLoading: false }));
-      return response;
-    } catch (error) {
-      console.error("❌ Error creating conversation:", error);
-      
-      setState(prevState => ({
-        ...prevState,
-        error: 'Échec de création de la conversation',
-        isLoading: false
-      }));
-      
-      return null;
-    }
-  }, [recordRenderStart, recordRenderEnd]);
+  }, [handleStreamChunk, recordMessageStart, recordMessageEnd, recordRenderStart, recordRenderEnd, safeSetState]); 
 
   // Charger les messages au montage du composant
   useEffect(() => {
     if (conversationId && conversationId > 0) {
-      console.log(`🔄 Initial load for conversation ID: ${conversationId}`);
       loadConversation(conversationId);
-    } else {
-      console.log("No conversation ID provided at mount, starting fresh");
     }
     
     // Clear metrics when conversation changes
     clearMetrics();
+    
+    // Cleanup function to cancel any pending operations
+    return () => {
+      clearMetrics();
+    };
   }, [conversationId, loadConversation, clearMetrics]);
   
-  // Copier un message
+  // Copier un message - optimisé avec mémoïsation
   const copyMessage = useCallback((content: string) => {
+    if (!content) return;
+    
     navigator.clipboard.writeText(content)
       .then(() => console.log('✅ Message copied to clipboard'))
       .catch(err => console.error('❌ Could not copy message:', err));
   }, []);
 
-  return {
+  // Mémoïsation du résultat final pour éviter les re-rendus inutiles
+  return useMemo(() => ({
     ...state,
     sendMessage,
     createConversation,
     loadConversation,
     copyMessage,
-    performanceMetrics: metrics // Nouvelle propriété pour exposer les métriques
-  };
+    performanceMetrics: metrics.metrics
+  }), [
+    state,
+    sendMessage,
+    createConversation,
+    loadConversation,
+    copyMessage,
+    metrics.metrics
+  ]);
 };
 
 export default useChat;

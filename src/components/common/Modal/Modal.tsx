@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback, memo } from 'react';
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 import { ModalProps } from './Modal.types';
 import './Modal.scss';
 
-export const Modal: React.FC<ModalProps> = ({
+export const Modal: React.FC<ModalProps> = memo(({
   isOpen,
   onClose,
   title,
@@ -32,12 +32,28 @@ export const Modal: React.FC<ModalProps> = ({
   }, [isOpen, onClose]);
 
   // Gestion de la fermeture en cliquant hors du modal
-  const handleBackdropClick = (event: React.MouseEvent) => {
+  const handleBackdropClick = useCallback((event: React.MouseEvent) => {
     if (event.target === event.currentTarget && onClose) {
       onClose();
     }
-  };
+  }, [onClose]);
 
+  // Optimisation des transitions d'entrée/sortie
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      // Force le re-flow pour permettre l'animation CSS
+      const modal = modalRef.current; // Capture la référence
+      void modal.offsetWidth;
+      modal.classList.add('visible');
+      
+      // Utilise la variable capturée dans le cleanup
+      return () => {
+        modal.classList.remove('visible');
+      };
+    }
+    return undefined;
+  }, [isOpen]);
+  
   // Si le modal n'est pas ouvert, ne retourne rien
   if (!isOpen) return null;
 
@@ -67,6 +83,7 @@ export const Modal: React.FC<ModalProps> = ({
             className="close-modal"
             onClick={onClose}
             aria-label="Close modal"
+            type="button"
           >
             ×
           </button>
@@ -76,6 +93,6 @@ export const Modal: React.FC<ModalProps> = ({
     </div>,
     document.body
   );
-};
+});
 
 Modal.displayName = 'Modal';

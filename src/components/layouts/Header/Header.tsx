@@ -1,17 +1,20 @@
-// src/components/layout/Header/Header.tsx
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import "./Header.scss";
 import { HeaderProps } from "./Header.types";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaHome } from "react-icons/fa";
 import HeaderMenu from "../../common/HeaderMenu/HeaderMenu";
 
-const Header: React.FC<HeaderProps> = ({ isSidebarOpen, toggleSidebar }) => {
+const Header: React.FC<HeaderProps> = memo(({ isSidebarOpen, toggleSidebar }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => {
+  const toggleMenu = useCallback(() => {
     setIsMenuOpen(!isMenuOpen);
-  };
+  }, [isMenuOpen]);
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
 
   return (
     <header className="header">
@@ -25,9 +28,15 @@ const Header: React.FC<HeaderProps> = ({ isSidebarOpen, toggleSidebar }) => {
       {/* Si la sidebar est ouverte, on met un div vide pour maintenir l'alignement */}
       {isSidebarOpen && <div className="placeholderLeft"></div>}
 
-      {/* Logo centré */}
+      {/* Logo centré avec image optimisée - suppression de l'attribut loading pour compatibilité */}
       <div className="logoContainer" data-testid="logo-container">
-        <img src="/assets/images/logo.png" alt="ClickTalk Logo" className="logo" />
+        <img 
+          src="/assets/images/logo.png" 
+          alt="ClickTalk Logo" 
+          className="logo" 
+          width="120" 
+          height="40" 
+        />
       </div>
 
       {/* Menu Button - ouvre maintenant le menu déroulant */}
@@ -42,10 +51,12 @@ const Header: React.FC<HeaderProps> = ({ isSidebarOpen, toggleSidebar }) => {
       {/* Menu déroulant */}
       <HeaderMenu 
         isOpen={isMenuOpen} 
-        onClose={() => setIsMenuOpen(false)} 
+        onClose={closeMenu} 
       />
     </header>
   );
-};
+});
+
+Header.displayName = 'Header';
 
 export default Header;

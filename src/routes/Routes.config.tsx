@@ -1,14 +1,30 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Navigate, RouteObject } from 'react-router-dom';
-import Home from '../pages/Home/Home';
-import Auth from '../pages/Auth/Auth';
-import NotFound from '../pages/NotFound/NotFound';
 import { ProtectedRoute } from '../components/route/ProtectedRoute';
 import MainLayout from '../components/layouts/MainLayout/MainLayout';
-import Chat from '../pages/Chat/Chat';
-import Project from '../pages/Project/Project';
-import Settings from '../pages/Settings/Settings';
 
+// Loader spinner component
+const LoadingSpinner = () => (
+  <div className="route-loading-spinner">
+    <div className="spinner"></div>
+    <span>Chargement...</span>
+  </div>
+);
+
+// Lazy loaded components
+const Home = lazy(() => import('../pages/Home/Home'));
+const Auth = lazy(() => import('../pages/Auth/Auth'));
+const NotFound = lazy(() => import('../pages/NotFound/NotFound'));
+const Chat = lazy(() => import('../pages/Chat/Chat'));
+const Project = lazy(() => import('../pages/Project/Project'));
+const Settings = lazy(() => import('../pages/Settings/Settings'));
+
+// Helper to wrap components with Suspense
+const withSuspense = (Component: React.ComponentType<any>) => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <Component />
+  </Suspense>
+);
 
 // Routes publiques (accessibles à tous)
 export const publicRoutes: RouteObject[] = [
@@ -18,25 +34,25 @@ export const publicRoutes: RouteObject[] = [
   },
   {
     path: '/auth',
-    element: <Auth />,
+    element: withSuspense(Auth),
     children: [
       {
         path: 'login',
-        element: <Auth />
+        element: withSuspense(Auth)
       },
       {
         path: 'register',
-        element: <Auth />
+        element: withSuspense(Auth)
       },
       {
         index: true,
-        element: <Auth />
+        element: withSuspense(Auth)
       }
     ] 
   },
   {
     path: '*',
-    element: <NotFound />
+    element: withSuspense(NotFound)
   }
 ];
 
@@ -47,7 +63,7 @@ export const privateRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <Home />
+          {withSuspense(Home)}
         </MainLayout>
       </ProtectedRoute>
     )
@@ -57,7 +73,7 @@ export const privateRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <Chat />
+          {withSuspense(Chat)}
         </MainLayout>
       </ProtectedRoute>
     )
@@ -67,7 +83,7 @@ export const privateRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <Chat />
+          {withSuspense(Chat)}
         </MainLayout>
       </ProtectedRoute>
     )
@@ -77,7 +93,7 @@ export const privateRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <Project />
+          {withSuspense(Project)}
         </MainLayout>
       </ProtectedRoute>
     )
@@ -87,7 +103,7 @@ export const privateRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <Settings />
+          {withSuspense(Settings)}
         </MainLayout>
       </ProtectedRoute>
     )
@@ -98,6 +114,6 @@ export const privateRoutes: RouteObject[] = [
   },
   {
     path: '*',
-    element: <NotFound />
+    element: withSuspense(NotFound)
   }
 ];
