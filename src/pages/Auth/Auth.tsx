@@ -38,7 +38,7 @@ export const Auth = () => {
       <Card className="auth-card">
         <div className="app-branding">
           <h1 className="app-title">ClickTalk</h1>
-          <img src="/assets/images/logo.png" alt="ClickTalk Logo" className="app-logo" />
+          <img src="/assets/images/logo.webp" alt="ClickTalk Logo" className="app-logo" />
         </div>
         
         <div className="auth-tabs">

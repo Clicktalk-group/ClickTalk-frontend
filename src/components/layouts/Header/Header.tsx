@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = memo(({ isSidebarOpen, toggleSidebar }) =>
       {/* Logo centré avec image optimisée - suppression de l'attribut loading pour compatibilité */}
       <div className="logoContainer" data-testid="logo-container">
         <img 
-          src="/assets/images/logo.png" 
+          src="/assets/images/logo.webp" 
           alt="ClickTalk Logo" 
           className="logo" 
           width="120" 
