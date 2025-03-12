@@ -4,9 +4,8 @@
 .instructions-preview {
   padding: $sp-md;
   margin-bottom: $sp-md;
-  background-color: var(--background-btn-grey, $background-btn-grey);
   border-radius: $radius-md;
-  border-left: 3px solid var(--primary-color, $primary-color);
+  border: 2px solid var(--primary-color, $primary-color);
   
   &__header {
     display: flex;
@@ -21,14 +20,12 @@
     
     h3 {
       font-size: $fs-md;
-      color: var(--color-text-primary, $color-text-primary);
       margin: 0;
       font-weight: 500;
     }
   }
   
   &__content {
-    color: var(--color-text-secondary, $color-text-secondary);
     font-size: $fs-sm;
     line-height: 1.5;
     
@@ -84,8 +81,51 @@
     border-top: 1px solid var(--border-color, $border-color);
     margin: $sp-sm 0;
   }
-}
 
+  // Styles pour le thème sombre
+  html[data-theme="dark"] .instructions-preview & {
+    background-color: $background-color-dark;
+    border-left-color: var(--primary-color, $primary-color);
+    
+    &__content {
+      pre, code {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+    }
+    &__header {
+      display: flex;
+      align-items: center;
+      margin-bottom: $sp-sm;
+      
+      svg {
+        color: var(--primary-color, $primary-color);
+        margin-right: $sp-xs;
+        font-size: $fs-md;
+      }
+      
+      h3 {
+        font-size: $fs-md;
+        color:$color-text-primary-light;
+        margin: 0;
+        font-weight: 500;
+      }
+    }
+    
+    &__content {
+      color: $color-text-primary-light;
+      font-size: $fs-sm;
+      line-height: 1.5;
+      
+      p {
+        margin-top: 0;
+        margin-bottom: $sp-sm;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
 @media (max-width: $mobile) {
   .instructions-preview {
     padding: $sp-sm;
@@ -95,3 +135,5 @@
     }
   }
 }
+}
+

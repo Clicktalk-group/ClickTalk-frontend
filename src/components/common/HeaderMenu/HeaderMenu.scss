@@ -10,14 +10,13 @@
 }
 
 .header-menu-dropdown {
-  background-color: $background-color;
+  background-color: $border-color-dark;
+  border: 1px solid;
   border-radius: $radius-md;
   box-shadow: $shadow-md;
   min-width: 200px;
   overflow: hidden;
-  
   .menu-items {
-    padding: $sp-xs 0;
     
     .menu-item {
       display: flex;
@@ -25,7 +24,7 @@
       width: 100%;
       padding: $sp-md $sp-lg;
       text-decoration: none;
-      color: $color-text-primary;
+      color: $color-text-primary-dark;
       border: none;
       background: none;
       text-align: left;
@@ -36,11 +35,11 @@
       svg {
         font-size: 1.2rem;
         margin-right: $sp-md;
-        color: $primary-color;
+        // color: $background-btn-grey;
       }
       
       &:hover {
-        background-color: rgba($primary-color, 0.1);
+        background-color: var(--primary-color, #7c3aed);
       }
       
       &:last-child {
@@ -49,12 +48,21 @@
         }
         
         &:hover {
-          background-color: rgba($danger-color, 0.1);
+          background-color: var(--primary-color, #7c3aed);
         }
       }
     }
   }
 }
+
+  /* Séparateur */
+  .divider {
+    width: 90%;
+    border: none;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0.05rem auto;
+  }
 
 // Styles pour le contenu des modales
 .settings-modal-content, 

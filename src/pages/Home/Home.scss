@@ -1,4 +1,3 @@
-// src/pages/Home/Home.scss
 @import '../../styles/variables';
 @import '../../styles/mixins';
 
@@ -37,12 +36,41 @@
       padding-left: 0;
       
       li {
-        padding: 8px 0;
+        padding: 12px 10px;
         border-bottom: 1px solid var(--border-color, $border-color);
         color: var(--color-text-primary, $color-text-primary);
+        transition: background-color 0.2s ease, transform 0.1s ease;
         
         &:last-child {
           border-bottom: none;
+        }
+        
+        &.action-item {
+          cursor: pointer;
+          position: relative;
+          padding-left: 25px;
+          
+          &:hover {
+            background-color: rgba(var(--primary-color, $primary-color), .05);
+            transform: translateX(8px);
+          }
+          
+          &:active {
+            text-decoration: underline;
+          }
+          
+          &::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+          }
+          
+          &:hover::before {
+            opacity: 1;
+            transform: translateX(5px);
+          }
         }
       }
     }
@@ -62,6 +90,17 @@
       flex: 1;
       border-radius: 0;
       box-shadow: none;
+    }
+  }
+}
+
+// Support pour le mode sombre
+html[data-theme="dark"] .home-page {
+  .quick-actions {
+    .action-item {
+      &:hover {
+        background-color: rgba(var(--primary-color-dark, $primary-color-dark), 0.1);
+      }
     }
   }
 }

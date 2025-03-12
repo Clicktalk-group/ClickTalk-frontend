@@ -190,6 +190,7 @@ const Project: React.FC = () => {
               variant="danger"
               onClick={handleDeleteProject}
               title="Supprimer le projet"
+              className="button button--primary button--md button--full-width new-conv-btn"
             >
               Supprimer
             </Button>

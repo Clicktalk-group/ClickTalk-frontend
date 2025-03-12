@@ -28,8 +28,8 @@
     margin-bottom: $sp-sm;
     
     .performance-toggle-btn {
-      background-color: var(--button-secondary-background, #f0f0f0);
-      color: var(--button-secondary-text, #333);
+      background-color: $background-btn-dark;
+      color: $color-text-light;
       font-size: 12px;
       padding: 6px 12px;
       border-radius: 4px;
@@ -38,7 +38,8 @@
       transition: all 0.2s ease;
       
       &:hover {
-        background-color: var(--button-secondary-hover, #e0e0e0);
+        background-color: var( --background-btn-hover);
+        color: $color-text-light;
       }
     }
   }

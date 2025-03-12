@@ -63,7 +63,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ metrics, visibl
     <div className="performance-monitor">
       <h3>Performance Metrics</h3>
       <div className="metrics-grid">
-        <div className="metric-card">
+        <div className="metric-card metric-card--delivery">
           <h4>Message Delivery</h4>
           <p>Average: {calculatedMetrics.messageDelivery.average} ms</p>
           <p>Min: {calculatedMetrics.messageDelivery.min} ms</p>
@@ -71,7 +71,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ metrics, visibl
           <p>Samples: {calculatedMetrics.messageDelivery.samples}</p>
         </div>
         
-        <div className="metric-card">
+        <div className="metric-card metric-card--render">
           <h4>Component Render</h4>
           <p>Average: {calculatedMetrics.render.average} ms</p>
           <p>Min: {calculatedMetrics.render.min} ms</p>
@@ -79,7 +79,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ metrics, visibl
           <p>Samples: {calculatedMetrics.render.samples}</p>
         </div>
         
-        <div className="metric-card">
+        <div className="metric-card metric-card--streaming">
           <h4>Streaming Rate</h4>
           <p>Average: {calculatedMetrics.streaming.average} chars/s</p>
           <p>Min: {calculatedMetrics.streaming.min} chars/s</p>
@@ -87,7 +87,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ metrics, visibl
           <p>Samples: {calculatedMetrics.streaming.samples}</p>
         </div>
         
-        <div className="metric-card">
+        <div className="metric-card metric-card--response">
           <h4>Response Size</h4>
           <p>Average: {calculatedMetrics.responseSize.average} bytes</p>
           <p>Min: {calculatedMetrics.responseSize.min} bytes</p>

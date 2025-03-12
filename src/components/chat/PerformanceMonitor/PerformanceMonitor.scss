@@ -1,8 +1,8 @@
 // src/components/chat/PerformanceMonitor/PerformanceMonitor.scss
 @import '../../../styles/variables.scss';
+@import '../../../styles/mixins.scss';
 
 .performance-monitor {
-  background-color: $message-bg-bot;
   border: 1px solid $border-color;
   border-radius: $radius-md;
   padding: $sp-md;
@@ -13,7 +13,6 @@
     margin-top: 0;
     margin-bottom: $sp-md;
     font-size: $fs-lg;
-    color: $color-text-primary;
     font-weight: 600;
   }
 
@@ -24,73 +23,243 @@
   }
 
   .metric-card {
-    background-color: $message-bg-user;
+    border: 1px solid $border-color;
     border-radius: $radius-sm;
     padding: $sp-md;
     box-shadow: $shadow-sm;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100%;
+      background-color: rgba($background-color, 0.05);
+      transition: width 0.3s ease;
+      z-index: 0;
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+
+      &::before {
+        width: 100%;
+      }
+    }
 
     h4 {
       margin-top: 0;
       margin-bottom: $sp-sm;
       font-size: $fs-md;
-      color: $color-text-primary;
       font-weight: 500;
+      position: relative;
+      z-index: 1;
     }
 
     p {
       margin: $sp-xs 0;
       font-size: $fs-sm;
-      color: $color-text-secondary;
+      position: relative;
+      z-index: 1;
+    }
+    
+    // Couleurs spécifiques pour chaque type de métrique
+    &--delivery {
+      border-left: 3px solid $border-color-dark;
+    }
+    
+    &--render {
+      border-left: 3px solid $border-color;
+    }
+    
+    &--streaming {
+      border-left: 3px solid adjust-hue($primary-color, 3deg);
+    }
+    
+    &--response {
+      border-left: 3px solid adjust-hue($primary-color, 30deg);
     }
   }
 }
 
 // Support pour le mode sombre
-[data-theme="dark"] {
-  .performance-monitor {
-    background-color: darken($background-color-dark, 3%);
+html[data-theme="dark"] .performance-monitor {
+  background-color: $message-bg-bot-dark;
+  border-color: $border-color-dark;
+  
+  h3 {
+    color: $color-text-primary-dark;
+  }
+  
+  .metric-card {
+    background-color: $message-bg-user-dark;
     border-color: $border-color-dark;
     
-    h3 {
+    &::before {
+      background-color: rgba($primary-color-dark, 0.1);
+    }
+    
+    h4 {
       color: $color-text-primary-dark;
     }
     
-    .metric-card {
-      background-color: $background-color-dark;
-      
-      h4 {
-        color: $color-text-primary-dark;
-      }
-      
-      p {
-        color: $color-text-secondary-dark;
-      }
+    p {
+      color: $color-text-secondary-dark;
+    }
+    
+    // Versions sombres des bordures colorées
+    &--delivery {
+      border-left-color: $primary-color-dark;
+    }
+    
+    &--render {
+      border-left-color: $secondary-color-dark;
+    }
+    
+    &--streaming {
+      border-left-color: adjust-hue($primary-color-dark, 30deg);
+    }
+    
+    &--response {
+      border-left-color: adjust-hue($secondary-color-dark, 15deg);
     }
   }
 }
 
 // Support pour les thèmes de couleurs personnalisés
-[data-color-scheme="blue"] {
-  .performance-monitor {
-    .metric-card {
-      border-left: 3px solid #3b82f6;
+html[data-color-scheme="blue"] .performance-monitor {
+  .metric-card {
+    &--delivery {
+      border-left-color: #3b82f6;
+      
+      &:hover::before {
+        background-color: rgba(#3b82f6, 0.05);
+      }
+    }
+    
+    &--render {
+      border-left-color: #60a5fa;
+      
+      &:hover::before {
+        background-color: rgba(#60a5fa, 0.05);
+      }
+    }
+    
+    &--streaming {
+      border-left-color: #2563eb;
+      
+      &:hover::before {
+        background-color: rgba(#2563eb, 0.05);
+      }
+    }
+    
+    &--response {
+      border-left-color: #93c5fd;
+      
+      &:hover::before {
+        background-color: rgba(#93c5fd, 0.05);
+      }
     }
   }
 }
 
-[data-color-scheme="green"] {
-  .performance-monitor {
-    .metric-card {
-      border-left: 3px solid #10b981;
+html[data-color-scheme="green"] .performance-monitor {
+  .metric-card {
+    &--delivery {
+      border-left-color: #10b981;
+      
+      &:hover::before {
+        background-color: rgba(#10b981, 0.05);
+      }
+    }
+    
+    &--render {
+      border-left-color: #34d399;
+      
+      &:hover::before {
+        background-color: rgba(#34d399, 0.05);
+      }
+    }
+    
+    &--streaming {
+      border-left-color: #059669;
+      
+      &:hover::before {
+        background-color: rgba(#059669, 0.05);
+      }
+    }
+    
+    &--response {
+      border-left-color: #6ee7b7;
+      
+      &:hover::before {
+        background-color: rgba(#6ee7b7, 0.05);
+      }
     }
   }
 }
 
-[data-color-scheme="purple"] {
-  .performance-monitor {
-    .metric-card {
-      border-left: 3px solid $primary-color;
+html[data-color-scheme="purple"] .performance-monitor {
+  .metric-card {
+    &--delivery {
+      border-left-color: $primary-color;
+      
+      &:hover::before {
+        background-color: rgba($primary-color, 0.05);
+      }
     }
+    
+    &--render {
+      border-left-color: $secondary-color;
+      
+      &:hover::before {
+        background-color: rgba($secondary-color, 0.05);
+      }
+    }
+    
+    &--streaming {
+      border-left-color: adjust-hue($primary-color, 15deg);
+      
+      &:hover::before {
+        background-color: rgba(adjust-hue($primary-color, 15deg), 0.05);
+      }
+    }
+    
+    &--response {
+      border-left-color: adjust-hue($secondary-color, 30deg);
+      
+      &:hover::before {
+        background-color: rgba(adjust-hue($secondary-color, 30deg), 0.05);
+      }
+    }
+  }
+}
+
+// Animation pulse améliorée
+@keyframes pulse-glow {
+  0% {
+    box-shadow: $shadow-sm;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.01);
+  }
+  100% {
+    box-shadow: $shadow-sm;
+    transform: scale(1);
+  }
+}
+
+// Application de l'animation individuelle au survol
+.metric-card {
+  &:hover {
+    animation: pulse-glow 1.2s infinite ease-in-out;
   }
 }
 
@@ -108,56 +277,16 @@
   &:hover {
     background-color: $dropdown-hover;
   }
+}
   
-  // Styles pour le mode sombre
-  [data-theme="dark"] & {
-    background-color: $background-btn-dark;
-    color: $color-text-primary-dark;
-    border-color: $border-color-dark;
-    
-    &:hover {
-      background-color: lighten($background-btn-dark, 5%);
-    }
-  }
-}
-
-// Animation subtile pour les métriques
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.01);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.performance-monitor {
-  transition: all 0.3s ease;
+// Styles pour le mode sombre du bouton
+html[data-theme="dark"] .performance-toggle-btn {
+  background-color: $background-btn-dark;
+  color: $color-text-primary-dark;
+  border-color: $border-color-dark;
   
   &:hover {
-    .metric-card {
-      animation: pulse 2s infinite ease-in-out;
-      animation-delay: calc(var(--animation-order, 0) * 0.1s);
-    }
-    
-    .metric-card:nth-child(1) {
-      --animation-order: 1;
-    }
-    
-    .metric-card:nth-child(2) {
-      --animation-order: 2;
-    }
-    
-    .metric-card:nth-child(3) {
-      --animation-order: 3;
-    }
-    
-    .metric-card:nth-child(4) {
-      --animation-order: 4;
-    }
+    background-color: lighten($background-btn-dark, 5%);
   }
 }
 

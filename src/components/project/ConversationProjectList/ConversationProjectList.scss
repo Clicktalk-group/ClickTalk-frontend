@@ -23,8 +23,8 @@
       justify-content: space-between;
       padding: 0.75rem;
       margin-bottom: 0.5rem;
-      background-color: var(--background-btn-grey, $background-btn-grey);
       border-radius: $radius-md;
+      border: 2px solid var(--border-color, $border-color);
       cursor: pointer;
       transition: all 0.2s;
       

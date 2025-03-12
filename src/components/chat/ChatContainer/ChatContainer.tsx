@@ -1,27 +1,20 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+// src/components/chat/ChatContainer/ChatContainer.tsx
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ChatMessages from '../ChatMessages';
 import ChatInput from '../ChatInput';
 import useChat from '../../../hooks/useChat/useChat';
+import PerformanceMonitor from '../PerformanceMonitor';
+import InstructionsPreview from '../../project/InstructionsPreview';
 import { useProject } from '../../../hooks/useProject/useProject';
 import './ChatContainer.scss';
-
-// Lazy loaded components
-const ChatMessages = lazy(() => import('../ChatMessages'));
-const InstructionsPreview = lazy(() => import('../../project/InstructionsPreview'));
-const PerformanceMonitor = lazy(() => import('../PerformanceMonitor'));
-
-// Loading components
-const MessagesLoading = () => (
-  <div className="messages-loading">
-    <div className="spinner"></div>
-    <p>Chargement des messages...</p>
-  </div>
-);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useConversation } from '../../../hooks/useConversation/useConversation';
 
 interface ChatContainerProps {
   onMessageSent?: () => void;
   projectId?: number;
-  conversationId?: number;
+  conversationId?: number; // Ajout de cette prop pour résoudre l'erreur
 }
 
 const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId, conversationId }) => {
@@ -42,7 +35,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
     copyMessage,
     currentConversation,
     streamingMessage,
-    performanceMetrics
+    performanceMetrics // Nouvelle propriété pour les métriques
   } = useChat(convId);
 
   // Utiliser le hook useProject pour récupérer les détails du projet si projectId est défini
@@ -52,6 +45,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
   // Charger les instructions du projet si projectId est fourni
   useEffect(() => {
     if (projectId) {
+      // Récupérer tous les projets puis filtrer pour celui dont on a besoin
       const loadProjectInstructions = async () => {
         try {
           const projects = await fetchProjects();
@@ -78,22 +72,31 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
   useEffect(() => {
     if (isNewConversation && currentConversation?.id) {
       setIsNewConversation(false);
-      if (!projectId) {
+      if (!projectId) { // Ne naviguer que s'il ne s'agit pas d'un chat dans un projet
         navigate(`/chat/${currentConversation.id}`);
       }
     }
   }, [currentConversation, isNewConversation, navigate, projectId]);
 
+  // Utiliser useCallback pour éviter de recréer cette fonction à chaque rendu
   const handleTogglePerformanceMetrics = useCallback(() => {
     setShowPerformanceMetrics(prev => !prev);
   }, []);
 
   // Fonction pour envoyer un message
   const handleSendMessage = useCallback(async (content: string) => {
+    // Pour une nouvelle conversation, créer d'abord la conversation visuellement
     if (isNewConversation) {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const messageTitle = content.length > 30 
+          ? content.substring(0, 30) + "..." 
+          : content;
+
+        // Envoyer le message qui créera automatiquement la conversation
         sendMessage(undefined, content, projectId);
         
+        // Notifier le parent que nous sommes en mode chat
         if (onMessageSent) {
           onMessageSent();
         }
@@ -101,8 +104,10 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
         console.error("Erreur lors de la création de la conversation:", error);
       }
     } else {
+      // Conversation existante, envoyer simplement le message
       sendMessage(convId, content, projectId);
       
+      // Notifier le parent que nous sommes en mode chat
       if (onMessageSent) {
         onMessageSent();
       }
@@ -122,29 +127,23 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
       
       {/* Utiliser le composant PerformanceMonitor uniquement si visible */}
       {showPerformanceMetrics && (
-        <Suspense fallback={<div>Chargement des métriques...</div>}>
-          <PerformanceMonitor 
-            metrics={performanceMetrics} 
-            visible={true}
-          />
-        </Suspense>
+        <PerformanceMonitor 
+          metrics={performanceMetrics} 
+          visible={true}
+        />
       )}
       
       {/* Afficher les instructions du projet si disponibles */}
       {projectInstructions && (
-        <Suspense fallback={<div>Chargement des instructions...</div>}>
-          <InstructionsPreview instructions={projectInstructions} />
-        </Suspense>
+        <InstructionsPreview instructions={projectInstructions} />
       )}
       
-      <Suspense fallback={<MessagesLoading />}>
-        <ChatMessages 
-          messages={messages} 
-          isLoading={isLoading} 
-          onCopyMessage={copyMessage} 
-          streamingMessage={streamingMessage}
-        />
-      </Suspense>
+      <ChatMessages 
+        messages={messages} 
+        isLoading={isLoading} 
+        onCopyMessage={copyMessage} 
+        streamingMessage={streamingMessage}
+      />
       
       <ChatInput 
         onSendMessage={handleSendMessage}
@@ -156,4 +155,4 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
   );
 };
 
-export default React.memo(ChatContainer);
+export default ChatContainer;

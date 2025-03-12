@@ -102,6 +102,8 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isOpen, onClose }) => {
                 <span>Thème</span>
               </button>
               
+              <hr className="divider" />
+
               <button 
                 className="menu-item" 
                 onClick={() => handleOpenModal('help')}
@@ -112,7 +114,9 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ isOpen, onClose }) => {
                 <FaQuestionCircle aria-hidden="true" />
                 <span>Aide</span>
               </button>
-              
+
+              <hr className="divider" />
+
               <button 
                 className="menu-item" 
                 onClick={() => handleOpenModal('logout')}
