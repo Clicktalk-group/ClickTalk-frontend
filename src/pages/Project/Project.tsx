@@ -1,35 +1,40 @@
-// /src/pages/Project/Project.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProject } from '../../hooks/useProject/useProject';
+import { projectService } from '../../services/project/project';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import ProjectForm from '../../components/project/ProjectForm/ProjectForm';
 import { Modal } from '../../components/common/Modal';
-import './Project.scss';
-import { FaPlus, FaEdit, FaArrowLeft, FaHome } from 'react-icons/fa';
-import { useAuth } from '../../hooks/useAuth/useAuth';
-import ConversationProjectList from '../../components/project/ConversationProjectList/ConversationProjectList';
+import { ProjectSidebar } from '../../components/project/ProjectSidebar/ProjectSidebar';
+import { ProjectContextPopup } from '../../components/project/ProjectContextPopup/ProjectContextPopup';
 import { Button } from '../../components/common/Button';
+import { FaEdit, FaHome, FaBars, FaFileAlt } from 'react-icons/fa';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import './Project.scss';
 
 const Project: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
+  // États locaux
   const [isNewConversation, setIsNewConversation] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
-  const { 
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+  const [contextPopupOpen, setContextPopupOpen] = useState(false);
+  const [projectConversations, setProjectConversations] = useState<any[]>([]);
+
+  // Hooks projet et conversations
+  const {
     projects,
     fetchProjects,
     fetchProjectById,
     deleteProject,
     removeConversationFromProject
   } = useProject();
-  
 
   // Charger le projet spécifique quand l'ID est disponible
   useEffect(() => {
@@ -46,15 +51,18 @@ const Project: React.FC = () => {
         
         if (existingProject) {
           setIsLoading(false);
-          return;
-        }
-        
-        // Si pas trouvé, charger depuis l'API
-        if (fetchProjectById) {
-          await fetchProjectById(Number(projectId));
         } else {
-          await fetchProjects();
+          // Si pas trouvé, charger depuis l'API
+          if (fetchProjectById) {
+            await fetchProjectById(Number(projectId));
+          } else {
+            await fetchProjects();
+          }
         }
+
+        // Charger les conversations du projet
+        const conversations = await projectService.getProjectConversations(Number(projectId));
+        setProjectConversations(conversations);
         
         setError(null);
       } catch (error: any) {
@@ -75,12 +83,32 @@ const Project: React.FC = () => {
   const handleNewConversation = () => {
     setIsNewConversation(true);
     setCurrentConversationId(null);
+    
+    // Fermer la sidebar sur mobile après sélection
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
+  };
+
+  // Toggle de la sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  // Toggle du popup de contexte
+  const toggleContextPopup = () => {
+    setContextPopupOpen(!contextPopupOpen);
   };
 
   // Sélectionner une conversation existante
   const handleSelectConversation = (conversationId: number) => {
     setCurrentConversationId(conversationId);
     setIsNewConversation(false);
+    
+    // Fermer la sidebar sur mobile après sélection
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
   };
 
   // Supprimer une conversation
@@ -90,15 +118,16 @@ const Project: React.FC = () => {
         throw new Error("Project ID is missing");
       }
       
-      console.log(`Attempting to remove conversation ${conversationId} from project ${projectId}`);
       await removeConversationFromProject(Number(projectId), conversationId);
-      console.log('Conversation removed successfully');
       
       // Si c'était la conversation actuellement ouverte, revenir à l'écran de sélection
       if (currentConversationId === conversationId) {
         setCurrentConversationId(null);
         setIsNewConversation(false);
       }
+      
+      // Mettre à jour la liste des conversations du projet
+      setProjectConversations(prev => prev.filter(conv => conv.id !== conversationId));
       
       setError(null);
       return true;
@@ -155,11 +184,18 @@ const Project: React.FC = () => {
         <h2>Projet non trouvé</h2>
         <p>Le projet que vous recherchez n'existe pas ou a été supprimé.</p>
         <Button onClick={() => navigate('/')} variant="primary">
-          <FaArrowLeft /> Retour à l'accueil
+          <FaHome /> Retour à l'accueil
         </Button>
       </div>
     );
   }
+
+  // Récupération du titre de la conversation courante
+  const getActiveConversationTitle = () => {
+    if (isNewConversation) return "Nouvelle conversation";
+    const activeConversation = projectConversations.find(c => c.id === currentConversationId);
+    return activeConversation?.title || "Sélectionner une conversation";
+  };
 
   return (
     <div className="project-page">
@@ -190,7 +226,6 @@ const Project: React.FC = () => {
               variant="danger"
               onClick={handleDeleteProject}
               title="Supprimer le projet"
-              className="button button--primary button--md button--full-width new-conv-btn"
             >
               Supprimer
             </Button>
@@ -203,26 +238,45 @@ const Project: React.FC = () => {
       </div>
       
       <div className="project-content">
-        <div className="project-sidebar">
-          <Button 
-            variant="primary" 
-            className="new-conv-btn" 
-            onClick={handleNewConversation}
-            fullWidth
-          >
-            <FaPlus /> Nouvelle conversation
-          </Button>
-          
-          {projectId && (
-            <ConversationProjectList 
-              projectId={Number(projectId)}
-              onSelect={handleSelectConversation}
-              onRemove={handleRemoveConversation}
-            />
-          )}
+        {/* Sidebar rétractable */}
+        <div className={`project-sidebar-container ${sidebarOpen ? 'open' : 'closed'}`}>
+          <ProjectSidebar
+            projectId={Number(projectId)}
+            onNewConversation={handleNewConversation}
+            onSelectConversation={handleSelectConversation}
+            onRemoveConversation={handleRemoveConversation}
+            selectedConversationId={currentConversationId}
+            onClose={toggleSidebar}
+          />
         </div>
         
         <div className="project-chat-area">
+          {/* Barre d'outils maintenant visible sur tous les formats */}
+          <div className="mobile-toolbar">
+            <Button 
+              variant="ghost"
+              onClick={toggleSidebar}
+              className="sidebar-toggle"
+              title={sidebarOpen ? "Masquer la liste" : "Afficher la liste"}
+            >
+              <FaBars />
+            </Button>
+            
+            <div className="active-conversation-title">
+              {getActiveConversationTitle()}
+            </div>
+            
+            <Button
+              variant="ghost"
+              onClick={toggleContextPopup}
+              className="context-toggle"
+              title="Afficher le contexte du projet"
+            >
+              <FaFileAlt />
+            </Button>
+          </div>
+          
+          {/* Zone de chat */}
           {isNewConversation ? (
             <ChatContainer projectId={Number(projectId)} />
           ) : currentConversationId ? (
@@ -234,7 +288,7 @@ const Project: React.FC = () => {
                 variant="primary"
                 onClick={handleNewConversation}
               >
-                <FaPlus /> Démarrer une nouvelle conversation
+                Démarrer une nouvelle conversation
               </Button>
             </div>
           )}
@@ -255,6 +309,14 @@ const Project: React.FC = () => {
           />
         </Modal>
       )}
+
+      {/* Popup de contexte (visible uniquement en mode mobile) */}
+      <ProjectContextPopup
+        isOpen={contextPopupOpen}
+        onClose={toggleContextPopup}
+        context={currentProjectData.context || "Aucun contexte défini pour ce projet."}
+        title={currentProjectData.title}
+      />
     </div>
   );
 };

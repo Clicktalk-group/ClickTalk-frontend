@@ -1,0 +1,148 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+
+.project-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  background-color: var(--background-color, $background-color);
+  
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $sp-md;
+    border-bottom: 1px solid var(--border-color, $border-color);
+    
+    h2 {
+      margin: 0;
+      font-size: $fs-lg;
+      font-weight: 600;
+      color: var(--color-text-primary, $color-text-primary);
+    }
+    
+    .close-sidebar {
+      display: none; // Masqué par défaut en desktop
+    }
+  }
+  
+  .new-conversation-btn {
+    margin: $sp-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $sp-sm;
+    padding: $sp-sm $sp-md;
+    border-radius: $radius-md;
+    font-weight: 500;
+    
+    svg {
+      font-size: 1rem;
+    }
+  }
+  
+  .conversations-list {
+    padding: 0 $sp-md;
+    
+    .conversation-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: $sp-md;
+      border-radius: $radius-md;
+      margin-bottom: $sp-sm;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background-color: var(--background-btn, $background-btn-light);
+      border: 1px solid transparent;
+      
+      &:hover {
+        background-color: var(--background-btn, darken($background-btn-light, 5%));
+      }
+      
+      &.active {
+        border-color: var(--primary-color, $primary-color);
+        background-color: rgba(var(--primary-color, $primary-color), 0.05);
+      }
+      
+      .conversation-info {
+        display: flex;
+        align-items: center;
+        gap: $sp-md;
+        flex: 1;
+        min-width: 0; // Pour que l'ellipsis fonctionne correctement
+        
+        .conversation-icon {
+          color: var(--color-text-secondary, $color-text-secondary);
+          font-size: $fs-lg;
+        }
+        
+        .conversation-details {
+          flex: 1;
+          min-width: 0; // Pour que l'ellipsis fonctionne correctement
+          
+          .conversation-title {
+            font-weight: 500;
+            color: var(--color-text-primary, $color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          
+          .conversation-date {
+            font-size: $fs-sm;
+            color: var(--color-text-secondary, $color-text-secondary);
+          }
+        }
+      }
+      
+      .delete-conversation {
+        background: none;
+        border: none;
+        color: var(--color-text-secondary, $color-text-secondary);
+        cursor: pointer;
+        padding: $sp-xs;
+        border-radius: $radius-sm;
+        opacity: 0.7;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          color: $danger-color;
+          background-color: rgba($danger-color, 0.1);
+          opacity: 1;
+        }
+      }
+    }
+    
+    .empty-conversations {
+      padding: $sp-md;
+      text-align: center;
+      color: var(--color-text-secondary, $color-text-secondary);
+      font-style: italic;
+    }
+  }
+  
+  .sidebar-loading,
+  .sidebar-error {
+    padding: $sp-md;
+    text-align: center;
+    color: var(--color-text-secondary, $color-text-secondary);
+    
+    &.sidebar-error {
+      color: $danger-color;
+    }
+  }
+}
+
+// Media queries pour la responsivité
+@media (max-width: $tablet) {
+  .project-sidebar {
+    .sidebar-header {
+      .close-sidebar {
+        display: block; // Afficher sur mobile et tablette uniquement
+      }
+    }
+  }
+}

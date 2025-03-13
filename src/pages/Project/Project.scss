@@ -1,11 +1,10 @@
-// /src/pages/Project/Project.scss
 @import '../../styles/variables.scss';
 @import '../../styles/mixins';
 
 .project-page {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
   width: 100%;
   overflow: hidden;
   background-color: var(--background-color, $background-color);
@@ -15,6 +14,7 @@
     padding: 1rem;
     border-bottom: 1px solid var(--border-color, $border-color);
     background-color: var(--background-color, white);
+    z-index: 10;
 
     // Style adaptatif pour le bouton de retour à l'accueil
     .back-to-home {
@@ -74,33 +74,6 @@
       .project-actions {
         display: flex;
         gap: 0.5rem;
-
-        .edit-btn {
-          padding: 0.5rem;
-          background: none;
-          border: none;
-          color: var(--color-text-secondary, $color-text-secondary);
-          cursor: pointer;
-          border-radius: 4px;
-          
-          &:hover {
-            color: var(--primary-color, $primary-color);
-            background-color: var(--background-btn, $background-btn);
-          }
-        }
-
-        .delete-btn {
-          padding: 0.5rem 1rem;
-          background-color: transparent;
-          color: $danger-color;
-          border: 1px solid $danger-color;
-          border-radius: 4px;
-          cursor: pointer;
-          
-          &:hover {
-            background-color: rgba($danger-color, 0.1);
-          }
-        }
       }
     }
 
@@ -109,45 +82,39 @@
       font-size: 0.9rem;
       margin: 0;
       margin-top: 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .error-notification {
+      margin-top: $sp-sm;
+      padding: $sp-sm;
+      background-color: rgba($danger-color, 0.1);
+      color: $danger-color;
+      border-radius: $radius-sm;
+      font-size: $fs-sm;
     }
   }
 
   .project-content {
     display: flex;
-    height: calc(100% - 80px);
+    height: calc(100vh - 150px); // Ajuster selon la hauteur du header
     overflow: hidden;
+    position: relative;
 
-    .project-sidebar {
-      width: 25%;
-      min-width: 250px;
+    .project-sidebar-container {
+      height: 100%;
+      width: $sidebar-width;
       border-right: 1px solid var(--border-color, $border-color);
-      padding: 1rem;
-      overflow-y: auto;
       background-color: var(--background-color, white);
-
-      .new-conv-btn {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: var(--primary-color, $primary-color);
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-
-        &:hover {
-          background-color: var(--primary-hover, $primary-hover);
-        }
-      }
-
-      h3 {
-        margin: 1rem 0;
-        font-size: 1.1rem;
-        color: var(--color-text-primary, $color-text-primary);
+      transition: all 0.3s ease-in-out;
+      z-index: 5;
+      
+      &.closed {
+        width: 0;
+        overflow: hidden;
       }
     }
 
@@ -157,6 +124,42 @@
       flex-direction: column;
       overflow: hidden;
       background-color: var(--background-color, white);
+      position: relative;
+
+      .mobile-toolbar {
+        display: flex; // Toujours afficher la toolbar pour permettre la toggle
+        padding: $sp-sm;
+        border-bottom: 1px solid var(--border-color, $border-color);
+        background-color: var(--background-color, $background-color);
+        justify-content: space-between;
+        align-items: center;
+        
+        .sidebar-toggle, .context-toggle {
+          padding: $sp-xs;
+          background: none;
+          color: var(--color-text-secondary, $color-text-secondary);
+          border: none;
+          border-radius: $radius-sm;
+          cursor: pointer;
+          
+          &:hover {
+            background-color: var(--background-btn, $background-btn);
+          }
+          
+          svg {
+            font-size: 1.2rem;
+          }
+        }
+        
+        .active-conversation-title {
+          font-weight: 600;
+          color: var(--color-text-primary, $color-text-primary);
+          max-width: 70%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
 
       .select-conversation-msg {
         display: flex;
@@ -167,6 +170,7 @@
         text-align: center;
         color: var(--color-text-secondary, $color-text-secondary);
         gap: $sp-md;
+        padding: $sp-lg;
       }
     }
   }
@@ -197,24 +201,29 @@
       }
     }
   }
-
-  .empty-list, .loading {
-    color: var(--color-text-secondary, $color-text-secondary);
-    font-style: italic;
-    padding: 1rem 0;
-  }
 }
 
 /* Media queries pour la responsivité */
 @media (max-width: $tablet) {
   .project-page {
+    .project-header {
+      .project-context {
+        display: none; // Masquer le contexte sur tablette/mobile, remplacé par le popup
+      }
+    }
+    
     .project-content {
-      flex-direction: column;
-      
-      .project-sidebar {
-        width: 100%;
-        min-width: 100%;
-        max-height: 300px;
+      .project-sidebar-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        z-index: 10;
+        box-shadow: $shadow-lg;
+        
+        &.open {
+          width: 100%;
+        }
       }
     }
   }

@@ -1,0 +1,122 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+
+.project-context-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .context-popup-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+  
+  .context-popup-content {
+    position: relative;
+    z-index: 101;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    background-color: var(--background-color, white);
+    border-radius: $radius-md;
+    box-shadow: $shadow-lg;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    @include fade-in(0.3s);
+    
+    .context-popup-header {
+      padding: $sp-md;
+      border-bottom: 1px solid var(--border-color, $border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      h3 {
+        margin: 0;
+        color: var(--color-text-primary, $color-text-primary);
+        font-size: $fs-lg;
+        font-weight: 600;
+      }
+      
+      .context-popup-close {
+        background: none;
+        border: none;
+        color: var(--color-text-secondary, $color-text-secondary);
+        cursor: pointer;
+        padding: $sp-xs;
+        border-radius: $radius-sm;
+        
+        &:hover {
+          color: $danger-color;
+          background-color: rgba($danger-color, 0.1);
+        }
+        
+        svg {
+          font-size: $fs-lg;
+        }
+      }
+    }
+    
+    .context-popup-body {
+      padding: $sp-md;
+      overflow-y: auto;
+      
+      h4 {
+        margin-top: 0;
+        margin-bottom: $sp-md;
+        color: var(--color-text-primary, $color-text-primary);
+        font-size: $fs-md;
+        font-weight: 600;
+      }
+      
+      p {
+        color: var(--color-text-secondary, $color-text-secondary);
+        font-size: $fs-md;
+        line-height: 1.6;
+        white-space: pre-wrap; // Préserver les sauts de ligne
+      }
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .project-context-popup {
+    .context-popup-content {
+      width: 95%;
+      max-height: 90vh;
+      
+      .context-popup-header {
+        padding: $sp-sm;
+        
+        h3 {
+          font-size: $fs-md;
+        }
+      }
+      
+      .context-popup-body {
+        padding: $sp-sm;
+        
+        h4 {
+          font-size: $fs-sm;
+        }
+        
+        p {
+          font-size: $fs-sm;
+        }
+      }
+    }
+  }
+}
