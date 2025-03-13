@@ -8,6 +8,7 @@ export const createAppRouter = (isAuthenticated: boolean) => {
     ? [...privateRoutes] //
     : [...publicRoutes]; //
     
+
   // Configurer les drapeaux de fonctionnalités futures pour supprimer les avertissements
   return createBrowserRouter(routes, {
     future: {

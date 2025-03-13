@@ -22,9 +22,16 @@ type AuthProviderProps = {
 };
 
 // Provider d'authentification qui encapsule la logique d'authentification
+// Provider d'authentification qui encapsule la logique d'authentification
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string>('');
+  // Initialisation des valeurs d'état à partir du localStorage
+  const initialToken = localStorage.getItem("token") || "";
+  const initialUser = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")!)
+    : null;
+
+  const [user, setUser] = useState<User | null>(initialUser);
+  const [accessToken, setAccessToken] = useState<string>(initialToken);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
