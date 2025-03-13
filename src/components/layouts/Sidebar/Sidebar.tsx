@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useState } from "react";
 import { SidebarProps } from "./Sidebar.types";
 import "./Sidebar.scss";
 import { FaSignOutAlt, FaComments, FaFolder, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
@@ -12,34 +12,138 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
   onNewProject,
   onSelectConversation,
   onSelectProject,
+  onRenameConversation = () => {}, // Valeur par défaut pour éviter les erreurs
+  onDeleteConversation = () => {}, // Valeur par défaut pour éviter les erreurs
   onRenameProject,
   onDeleteProject,
   onLogout,
   onToggleSidebar,
 }) => {
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   
-  // Optimised item renderers
+  // Gestionnaire pour la suppression de conversation
+  const handleDeleteConversation = useCallback((e: React.MouseEvent, itemId: number | string, itemTitle: string) => {
+    e.stopPropagation();
+
+    // Éviter le traitement multiple
+    if (isProcessing) return;
+    
+    try {
+      setIsProcessing(true);
+      
+      if (window.confirm(`Voulez-vous vraiment supprimer la conversation "${itemTitle}" ?`)) {
+        // Conversion de l'ID en string pour assurer la compatibilité
+        const stringId = String(itemId);
+        
+        // Appel de la fonction avec un délai minimal pour permettre à l'UI de se mettre à jour
+        setTimeout(() => {
+          onDeleteConversation(stringId);
+          setIsProcessing(false);
+        }, 10);
+      } else {
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la conversation:", error);
+      setIsProcessing(false);
+    }
+  }, [onDeleteConversation, isProcessing]);
+
+  // Gestionnaire pour le renommage de conversation
+  const handleRenameConversation = useCallback((e: React.MouseEvent, itemId: number | string, currentTitle: string) => {
+    e.stopPropagation();
+    
+    // Éviter le traitement multiple
+    if (isProcessing) return;
+    
+    try {
+      setIsProcessing(true);
+      
+      const newTitle = window.prompt("Entrez le nouveau nom de la conversation :", currentTitle);
+      
+      if (newTitle && newTitle.trim() !== "" && newTitle !== currentTitle) {
+        // Conversion de l'ID en string pour assurer la compatibilité
+        const stringId = String(itemId);
+        
+        // Appel de la fonction avec un délai minimal pour permettre à l'UI de se mettre à jour
+        setTimeout(() => {
+          onRenameConversation(stringId, newTitle.trim());
+          setIsProcessing(false);
+        }, 10);
+      } else {
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error("Erreur lors du renommage de la conversation:", error);
+      setIsProcessing(false);
+    }
+  }, [onRenameConversation, isProcessing]);
+  
   const renderConversationItem = useCallback((item: any) => (
     <li
       key={item.id}
-      className="list-item"
-      onClick={() => onSelectConversation(item.id)}
+      className="list-item conversation-item"
+      data-conversation-id={item.id}
     >
-      {item.title}
+      <span 
+        className="conversation-title" 
+        onClick={() => onSelectConversation(item.id)}
+      >
+        {item.title}
+      </span>
+      <div className="conversation-actions">
+        <button 
+          className="action-btn edit-btn" 
+          onClick={(e) => handleRenameConversation(e, item.id, item.title)}
+          title="Modifier la conversation"
+          disabled={isProcessing}
+        >
+          <FaEdit />
+        </button>
+        <button 
+          className="action-btn delete-btn" 
+          onClick={(e) => handleDeleteConversation(e, item.id, item.title)}
+          title="Supprimer la conversation"
+          disabled={isProcessing}
+        >
+          <FaTrash />
+        </button>
+      </div>
     </li>
-  ), [onSelectConversation]);
+  ), [onSelectConversation, handleRenameConversation, handleDeleteConversation, isProcessing]);
 
-  const handleDeleteProject = useCallback((e: React.MouseEvent, itemId: number, itemTitle: string) => {
+  const handleDeleteProject = useCallback((e: React.MouseEvent, itemId: number | string, itemTitle: string) => {
     e.stopPropagation();
-    if (window.confirm(`Voulez-vous vraiment supprimer le projet "${itemTitle}" ?`)) {
-      onDeleteProject(itemId);
+    
+    // Éviter le traitement multiple
+    if (isProcessing) return;
+    
+    try {
+      setIsProcessing(true);
+      
+      if (window.confirm(`Voulez-vous vraiment supprimer le projet "${itemTitle}" ?`)) {
+        // Conversion de l'ID en string pour assurer la compatibilité
+        const stringId = String(itemId);
+        
+        // Appel de la fonction avec un délai minimal pour permettre à l'UI de se mettre à jour
+        setTimeout(() => {
+          onDeleteProject(stringId);
+          setIsProcessing(false);
+        }, 10);
+      } else {
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression du projet:", error);
+      setIsProcessing(false);
     }
-  }, [onDeleteProject]);
+  }, [onDeleteProject, isProcessing]);
   
   const renderProjectItem = useCallback((item: any) => (
     <li
       key={item.id}
       className="list-item project-item"
+      data-project-id={item.id}
     >
       <span 
         className="project-title" 
@@ -55,6 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
             onRenameProject(item);
           }}
           title="Modifier le projet"
+          disabled={isProcessing}
         >
           <FaEdit />
         </button>
@@ -62,15 +167,16 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
           className="action-btn delete-btn" 
           onClick={(e) => handleDeleteProject(e, item.id, item.title)}
           title="Supprimer le projet"
+          disabled={isProcessing}
         >
           <FaTrash />
         </button>
       </div>
     </li>
-  ), [onSelectProject, onRenameProject, handleDeleteProject]);
+  ), [onSelectProject, onRenameProject, handleDeleteProject, isProcessing]);
   
   return (
-    <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
+    <div className={`sidebar ${isOpen ? "open" : "closed"}`} role="complementary">
       <div className="sidebar-header">
         <div className="home-icon-container" onClick={onToggleSidebar}>
           <BiHomeAlt className="home-icon" />
@@ -83,7 +189,11 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
             <FaComments />
             <span className="section-title">Conversations</span>
           </div>
-          <button className="add-btn" onClick={onNewConversation}>
+          <button 
+            className="add-btn" 
+            onClick={onNewConversation} 
+            disabled={isProcessing}
+          >
             <FaPlus className="add-icon" /> Nouvelle Conversation
           </button>
           <div className="section-list-container">
@@ -100,7 +210,11 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
             <FaFolder />
             <span className="section-title">Projets</span>
           </div>
-          <button className="add-btn" onClick={onNewProject}>
+          <button 
+            className="add-btn" 
+            onClick={onNewProject}
+            disabled={isProcessing}
+          >
             <FaPlus className="add-icon" /> Nouveau Projet
           </button>
           <div className="section-list-container">
@@ -113,7 +227,11 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
         <hr className="divider" />
       </div>
 
-      <button className="logout-btn" onClick={onLogout}>
+      <button 
+        className="logout-btn" 
+        onClick={onLogout}
+        disabled={isProcessing}
+      >
         <FaSignOutAlt className="logout-icon" /> Déconnexion
       </button>
     </div>

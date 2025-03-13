@@ -8,8 +8,8 @@ export interface SidebarProps {
   onSelectProject: (id: string | number) => void;
   onRenameConversation: (id: string | number, newTitle: string) => void;
   onDeleteConversation: (id: string | number) => void;
-  onMoveConversation: (id: string | number, projectId: string | number) => void;
-  onRenameProject: (project: any) => void; // Modifié pour accepter l'objet projet entier
+  onMoveConversation: (id: string, projectId: string) => void;
+  onRenameProject: (project: any) => void;
   onDeleteProject: (id: string | number) => void;
   onLogout: () => void;
   onToggleSidebar: () => void;

@@ -32,7 +32,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { user } = useAuth();
   
   // Utilisation des hooks réels pour les données
-  const { conversations, fetchConversationById } = useConversation();
+  const { 
+    conversations, 
+    fetchConversationById, 
+    deleteConversation
+  } = useConversation();
+  
   const { projects, fetchProjects, deleteProject } = useProject();
   
   // Charger les projets au début
@@ -99,6 +104,48 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     setSidebarOpen(false);
   }, [navigate]);
   
+  // Gérer la suppression d'une conversation
+  const handleDeleteConversation = useCallback((id: string | number) => {
+    // Convertir en numérique si nécessaire
+    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    
+    console.log(`Suppression conversation ${numericId}`);
+    deleteConversation(numericId)
+      .then(() => {
+        // Si nous sommes sur la page de la conversation supprimée, rediriger vers /chat
+        const currentConversationId = location.pathname.split('/').pop();
+        if (currentConversationId === String(numericId)) {
+          navigate('/chat');
+        }
+      })
+      .catch((error: unknown) => {
+        console.error(`Erreur lors de la suppression de la conversation ${numericId}`, error);
+      });
+  }, [deleteConversation, navigate, location.pathname]);
+  
+  // Gérer le renommage d'une conversation
+  const handleRenameConversation = useCallback((id: string | number, newTitle: string) => {
+    // Convertir en numérique si nécessaire
+    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    
+    console.log(`Renommage conversation ${numericId} en "${newTitle}"`);
+    // Puisque updateConversation n'existe pas dans le hook, simulons une mise à jour
+    // en récupérant à nouveau les données
+    try {
+      // Ici, vous devriez implémenter l'appel API approprié pour renommer la conversation
+      // Par exemple:
+      // conversationService.updateTitle(numericId, newTitle).then(() => {
+      //   // Rafraîchir les données
+      // });
+      
+      console.log("Mise à jour du titre de la conversation");
+      // En attendant l'implémentation de l'API, rafraîchissons les données
+      fetchConversationById(numericId);
+    } catch (error: unknown) {
+      console.error(`Erreur lors du renommage de la conversation ${numericId}`, error);
+    }
+  }, [fetchConversationById]);
+  
   const handleDeleteProject = useCallback((id: string | number) => {
     // Convertir en numérique si nécessaire
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
@@ -106,14 +153,26 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     deleteProject(numericId)
       .then(() => {
         fetchProjects(); // Rafraîchir la liste après suppression
+        
+        // Si nous sommes sur la page du projet supprimé, rediriger
+        const currentProjectId = location.pathname.split('/').pop();
+        if (currentProjectId === String(numericId)) {
+          navigate('/projects');
+        }
       })
-      .catch(error => {
+      .catch((error: unknown) => {
         console.error(`Erreur lors de la suppression du projet ${numericId}`, error);
       });
-  }, [deleteProject, fetchProjects]);
+  }, [deleteProject, fetchProjects, navigate, location.pathname]);
   
   const handleCloseSidebar = useCallback(() => {
     setSidebarOpen(false);
+  }, []);
+  
+  // Fonction fictive pour gérer le déplacement de conversation (non implémentée)
+  const handleMoveConversation = useCallback((id: string, projectId: string) => {
+    console.log(`Déplacement de la conversation ${id} vers le projet ${projectId}`);
+    // Implémentation réelle à faire
   }, []);
   
   return (
@@ -131,9 +190,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         onNewProject={handleNewProject}
         onSelectConversation={handleSelectConversation}
         onSelectProject={handleSelectProject}
-        onRenameConversation={() => {}}
-        onDeleteConversation={() => {}}
-        onMoveConversation={() => {}}
+        onRenameConversation={handleRenameConversation}
+        onDeleteConversation={handleDeleteConversation}
+        onMoveConversation={handleMoveConversation}
         onRenameProject={handleEditProject}
         onDeleteProject={handleDeleteProject}
         onLogout={handleLogout}

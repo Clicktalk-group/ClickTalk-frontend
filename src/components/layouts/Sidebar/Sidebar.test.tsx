@@ -33,6 +33,8 @@ describe('Sidebar Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock la fonction window.confirm pour qu'elle retourne toujours true dans les tests
+    global.confirm = jest.fn(() => true);
   });
 
   test('renders sidebar with all sections when open', () => {
@@ -68,36 +70,36 @@ describe('Sidebar Component', () => {
   
   test('calls onNewConversation when new conversation button is clicked', () => {
     render(<Sidebar {...mockProps} />);
-    const newConversationButton = screen.getByText('+ Nouvelle Conversation');
+    const newConversationButton = screen.getByText(/Nouvelle Conversation/);
     fireEvent.click(newConversationButton);
     expect(mockProps.onNewConversation).toHaveBeenCalledTimes(1);
   });
   
   test('calls onNewProject when new project button is clicked', () => {
     render(<Sidebar {...mockProps} />);
-    const newProjectButton = screen.getByText('+ Nouveau Projet');
+    const newProjectButton = screen.getByText(/Nouveau Projet/);
     fireEvent.click(newProjectButton);
     expect(mockProps.onNewProject).toHaveBeenCalledTimes(1);
   });
   
   test('calls onSelectConversation with conversation id when a conversation is clicked', () => {
     render(<Sidebar {...mockProps} />);
-    const conversation1 = screen.getByText('Conversation 1');
+    const conversation1 = screen.getAllByText('Conversation 1')[0];
     fireEvent.click(conversation1);
     expect(mockProps.onSelectConversation).toHaveBeenCalledWith('1');
     
-    const conversation2 = screen.getByText('Conversation 2');
+    const conversation2 = screen.getAllByText('Conversation 2')[0];
     fireEvent.click(conversation2);
     expect(mockProps.onSelectConversation).toHaveBeenCalledWith(2);
   });
   
   test('calls onSelectProject with project id when a project is clicked', () => {
     render(<Sidebar {...mockProps} />);
-    const project1 = screen.getByText('Project 1');
+    const project1 = screen.getAllByText('Project 1')[0];
     fireEvent.click(project1);
     expect(mockProps.onSelectProject).toHaveBeenCalledWith('3');
     
-    const project2 = screen.getByText('Project 2');
+    const project2 = screen.getAllByText('Project 2')[0];
     fireEvent.click(project2);
     expect(mockProps.onSelectProject).toHaveBeenCalledWith(4);
   });
@@ -107,6 +109,33 @@ describe('Sidebar Component', () => {
     const logoutButton = screen.getByText('Déconnexion');
     fireEvent.click(logoutButton);
     expect(mockProps.onLogout).toHaveBeenCalledTimes(1);
+  });
+
+  test('calls onDeleteConversation when delete button is clicked on a conversation', () => {
+    render(<Sidebar {...mockProps} />);
+    
+    // Trouver les titres de conversation et cliquer sur les boutons de suppression
+    const conversationItems = screen.getAllByTitle('Supprimer la conversation');
+    expect(conversationItems.length).toBe(2);
+    
+    fireEvent.click(conversationItems[0]);
+    expect(mockProps.onDeleteConversation).toHaveBeenCalledWith('1');
+    
+    fireEvent.click(conversationItems[1]);
+    expect(mockProps.onDeleteConversation).toHaveBeenCalledWith(2);
+  });
+
+  test('calls onRenameConversation when edit button is clicked on a conversation', () => {
+    render(<Sidebar {...mockProps} />);
+    
+    const editButtons = screen.getAllByTitle('Modifier la conversation');
+    expect(editButtons.length).toBe(2);
+    
+    fireEvent.click(editButtons[0]);
+    expect(mockProps.onRenameConversation).toHaveBeenCalledWith('1', 'Conversation 1');
+    
+    fireEvent.click(editButtons[1]);
+    expect(mockProps.onRenameConversation).toHaveBeenCalledWith(2, 'Conversation 2');
   });
 
   test('renders empty lists when no items are provided', () => {
@@ -123,7 +152,7 @@ describe('Sidebar Component', () => {
     expect(screen.getByText('Projets')).toBeInTheDocument();
     
     // Vérifier que les boutons d'ajout sont toujours rendus
-    expect(screen.getByText('+ Nouvelle Conversation')).toBeInTheDocument();
-    expect(screen.getByText('+ Nouveau Projet')).toBeInTheDocument();
+    expect(screen.getByText(/Nouvelle Conversation/)).toBeInTheDocument();
+    expect(screen.getByText(/Nouveau Projet/)).toBeInTheDocument();
   });
 });
