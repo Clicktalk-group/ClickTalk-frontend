@@ -1,17 +1,34 @@
 // src/pages/Home/Home.tsx
-import React, { useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useMemo, lazy, Suspense } from 'react';
 import './Home.scss';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import { Modal } from '../../components/common/Modal/Modal';
 import ThemeModalContent from '../../components/modals/ThemeModal/ThemeModal';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useProject } from '../../hooks/useProject/useProject';
+
+// Lazy loaded components - identique à MainLayout
+const ProjectForm = lazy(() => import('../../components/project/ProjectForm/ProjectForm'));
+
+// Fallback pour le ProjectForm
+const FormLoading = () => (
+  <div className="form-loading">
+    <div className="spinner"></div>
+    <p>Chargement du formulaire...</p>
+  </div>
+);
 
 const Home: React.FC = () => {
   // État pour suivre si nous sommes en mode chat complet (uniquement après envoi d'un message)
   const [chatMode, setChatMode] = useState(false);
   // État pour la modale de thème
   const [themeModalOpen, setThemeModalOpen] = useState(false);
-  const navigate = useNavigate();
+  // État pour la modale de projet - comme dans MainLayout
+  const [showProjectForm, setShowProjectForm] = useState(false);
+  const [editingProject, setEditingProject] = useState<any>(null);
+  
+  const { user } = useAuth();
+  const { fetchProjects } = useProject();
   
   // Utilisation de useCallback pour optimiser la fonction
   const activateChatMode = useCallback(() => {
@@ -20,15 +37,22 @@ const Home: React.FC = () => {
     setChatMode(true);
   }, []);
 
-  // Fonction pour créer un nouveau projet en s'inspirant du Sidebar
+  // Fonction pour créer un nouveau projet
   const handleCreateProject = useCallback(() => {
-    // Fonction similaire à onNewProject du Sidebar
-    // Cette fonction devrait probablement ouvrir une modale ou rediriger
-    // vers la page projet avec un ID temporaire ou "new"
-    navigate('/project/new');
-  }, [navigate]);
+    console.log("Nouveau projet");
+    setEditingProject(null); // Assurez-vous de ne pas être en mode édition
+    setShowProjectForm(true); // Afficher le formulaire de création
+  }, []);
 
-  // Ouverture/fermeture de la modale de thème (comme dans HeaderMenu)
+  // Fonction pour fermer le formulaire de projet - identique à handleCloseProjectForm dans MainLayout
+  const handleCloseProjectForm = useCallback(() => {
+    setShowProjectForm(false);
+    setEditingProject(null);
+    // Rafraîchir les projets après la fermeture du formulaire
+    fetchProjects();
+  }, [fetchProjects]);
+
+  // Ouverture/fermeture de la modale de thème
   const handleOpenThemeModal = useCallback(() => {
     setThemeModalOpen(true);
   }, []);
@@ -49,7 +73,6 @@ const Home: React.FC = () => {
         <div className="quick-actions">
           <h2>Actions rapides</h2>
           <ul>
-            {/* Utiliser la même fonction que le bouton "Nouveau Projet" dans Sidebar */}
             <li className="action-item" onClick={handleCreateProject}>Créer un nouveau projet</li>
             <li className="action-item" onClick={handleOpenThemeModal}>Configurer vos préférences</li>
           </ul>
@@ -71,7 +94,7 @@ const Home: React.FC = () => {
       {introContent}
       <ChatContainer onMessageSent={activateChatMode} />
       
-      {/* Modal Thème - exactement comme dans HeaderMenu */}
+      {/* Modal Thème */}
       <Modal
         isOpen={themeModalOpen}
         onClose={handleCloseThemeModal}
@@ -80,6 +103,21 @@ const Home: React.FC = () => {
       >
         <ThemeModalContent onClose={handleCloseThemeModal} />
       </Modal>
+      
+      {/* Modal pour la création/édition de projet - exactement comme dans MainLayout */}
+      {showProjectForm && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <Suspense fallback={<FormLoading />}>
+              <ProjectForm 
+                onClose={handleCloseProjectForm} 
+                userId={user?.id || 0} 
+                initialData={editingProject}
+              />
+            </Suspense>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

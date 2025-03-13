@@ -51,7 +51,8 @@
           padding-left: 25px;
           
           &:hover {
-            background-color: rgba(var(--primary-color, $primary-color), .05);
+            text-shadow:
+            1px 1px 2px $primary-color-light;
             transform: translateX(8px);
           }
           
@@ -92,6 +93,72 @@
       box-shadow: none;
     }
   }
+  
+  // Styles pour la modale de projet
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001; // Au-dessus de la sidebar
+  }
+
+  .modal-container {
+    background-color: var(--background-color, $background-color);
+    color: var(--color-text-primary, $color-text-primary);
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: modalAppear 0.3s ease;
+  }
+
+  @keyframes modalAppear {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  // Styles pour le composant de chargement
+  .form-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary-color, $primary-color);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+    
+    p {
+      margin: 0;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  }
 }
 
 // Support pour le mode sombre
@@ -99,8 +166,12 @@ html[data-theme="dark"] .home-page {
   .quick-actions {
     .action-item {
       &:hover {
-        background-color: rgba(var(--primary-color-dark, $primary-color-dark), 0.1);
+        background-color: rgba(var(--primary-color-dark-rgb, 66, 165, 245), 0.1);
       }
     }
+  }
+  
+  .modal-container {
+    background-color: var(--background-color-dark, $background-color-dark);
   }
 }
