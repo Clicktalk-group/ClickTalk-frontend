@@ -191,7 +191,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           placeholder={placeholder}
           rows={1}
           disabled={isLoading}
-          className="message-textarea"
+          className={`message-textarea ${isLoading ? 'loading' : ''}`}
           aria-label="Message input"
         />
         <button 

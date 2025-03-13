@@ -2,121 +2,186 @@
 @import '../../../styles/mixins';
 
 .chat-input-container {
+  width: 100%;
+  background-color: var(--background-color, $background-color);
+  border-top: 1px solid var(--border-color, $border-color);
+  padding: $sp-sm $sp-md;
   display: flex;
   flex-direction: column;
-  padding: $sp-md;
-  border-top: 1px solid var(--border-color, darken($background-color, 5%));
+  transition: all 0.3s ease;
+  box-shadow: $shadow-sm;
+}
+
+.formatting-toolbar {
+  display: flex;
+  gap: $sp-xs;
+  padding: $sp-xs 0;
+  margin-bottom: $sp-xs;
+  overflow-x: auto;
   
-  .formatting-toolbar {
-    display: flex;
-    margin-bottom: 8px;
-    gap: 6px;
-    flex-wrap: wrap;
-    
-    button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: $radius-sm;
-      background-color: var(--background-btn, $background-btn); 
-      border: 1px solid var(--border-color, $border-color);
-      color: var(--color-text-primary, $color-text-primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      
-      &:hover:not(:disabled) {
-        background-color: var(--primary-color-transparent, rgba($primary-color, 0.1));
-        border-color: var(--primary-color, $primary-color);
-      }
-      
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-    }
+  // Style de scrollbar universel avec WebKit
+  &::-webkit-scrollbar {
+    height: 4px;
   }
-  
-  .message-form {
-    display: flex;
-    align-items: flex-end;
-    
-    .message-textarea {
-      flex: 1;
-      resize: none;
-      min-height: 45px;
-      max-height: 120px;
-      border-radius: $radius-md;
-      border: 1px solid var(--border-color-dark, darken($background-color, 10%));
-      background-color: var(--input-background, rgba($background-color, 0.1));
-      color: var(--color-text-primary, $color-text-primary);
-      padding: $sp-sm $sp-md;
-      font-family: inherit;
-      font-size: $fs-md;
-      line-height: 1.5;
-      overflow-y: auto;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      
-      &:focus {
-        outline: none;
-        border-color: var(--primary-color, $primary-color);
-        box-shadow: 0 0 0 2px var(--primary-color-transparent, rgba($primary-color, 0.2));
-      }
-      
-      &:disabled {
-        background-color: var(--input-disabled, darken($color-light, 5%));
-        cursor: not-allowed;
-      }
-    }
-    
-    .send-button {
-      background-color: var(--primary-color, $primary-color);
-      color: var(--button-text-color, white);
-      border: none;
-      border-radius: $radius-md;
-      width: 40px;
-      height: 40px;
-      margin-left: $sp-sm;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      
-      &:hover:not(.disabled) {
-        background-color: var(--primary-hover, $primary-hover);
-      }
-      
-      &.disabled {
-        background-color: var(--button-disabled, darken($background-color, 20%));
-        cursor: not-allowed;
-      }
-    }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-text-secondary, $color-text-secondary);
+    border-radius: $radius-sm;
   }
 }
 
-// Ajout des styles spécifiques pour le mode sombre
-:root.dark-theme {
+.formatting-button {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary, $color-text-secondary);
+  font-size: $fs-sm;
+  padding: $sp-xs;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: var(--color-text-primary, $color-text-primary);
+    background-color: var(--background-btn, $background-btn);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.message-form {
+  display: flex;
+  align-items: flex-end;
+  gap: $sp-sm;
+  width: 100%;
+  position: relative;
+}
+
+.message-textarea {
+  flex: 1;
+  min-height: 40px;
+  max-height: 200px;
+  padding: $sp-sm;
+  font-size: $fs-sm;
+  line-height: 1.4;
+  color: var(--color-text-primary, $color-text-primary);
+  background-color: var(--background-btn, $background-btn);
+  border: 1px solid var(--border-color, $border-color);
+  border-radius: $radius-md;
+  resize: none;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  
+  // Style de scrollbar universel avec WebKit
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-text-secondary, $color-text-secondary);
+    border-radius: $radius-sm;
+  }
+
+  &:focus {
+    border-color: var(--primary-color, $primary-color);
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+  }
+
+  &::placeholder {
+    color: var(--color-text-secondary, $color-text-secondary);
+  }
+
+  &:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+  }
+
+  // Classe spécifique pour l'état de chargement
+  &.loading {
+    // Ceci s'applique en mode clair et sombre
+    background-color: var(--background-btn, $background-btn);
+    color: var(--color-text-secondary, $color-text-secondary);
+    border-color: var(--border-color, $border-color);
+  }
+}
+
+.send-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-light;
+  background-color: var(--primary-color, $primary-color);
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  flex-shrink: 0;
+  margin-bottom: 1px;
+
+  &:hover:not(.disabled) {
+    background-color: var(--primary-hover, $primary-hover);
+    transform: translateY(-2px);
+  }
+
+  &:active:not(.disabled) {
+    transform: translateY(0);
+  }
+
+  &.disabled {
+    background-color: var(--background-btn, $background-btn);
+    color: var(--color-text-secondary, $color-text-secondary);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+@media screen and (max-width: $tablet) {
   .chat-input-container {
-    .formatting-toolbar button {
+    padding: $sp-xs $sp-sm;
+  }
+  
+  .formatting-toolbar {
+    overflow-x: auto;
+    padding-bottom: $sp-xs;
+    margin-bottom: $sp-xs;
+  }
+  
+  .message-textarea {
+    padding: $sp-xs;
+    font-size: $fs-sm;
+    min-height: 36px;
+  }
+  
+  .send-button {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+// Adaptation spécifique pour le thème sombre
+body.theme-dark {
+  .message-textarea {
+    &:disabled, &.loading {
       background-color: var(--background-btn, $background-btn-dark);
-      color: var(--color-text-primary, $color-text-primary-dark);
+      color: var(--color-text-secondary, $color-text-secondary-dark);
       border-color: var(--border-color, $border-color-dark);
-    }
-    
-    .message-textarea {
-      background-color: var(--input-background, $background-btn-dark);
-      color: var(--color-text-primary, $color-text-primary-dark);
-      border-color: var(--border-color-dark, $border-color-dark);
-      
-      &::placeholder {
-        color: var(--color-text-secondary, $color-text-secondary-dark);
-      }
-      
-      &:disabled {
-        background-color: var(--input-disabled, darken($background-btn-dark, 5%));
-      }
     }
   }
 }
