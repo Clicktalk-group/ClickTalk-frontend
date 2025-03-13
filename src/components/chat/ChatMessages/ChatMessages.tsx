@@ -79,11 +79,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = memo(({
             );
           })}
           
-          {/* Indicateur de chargement (seulement si aucun message en streaming) */}
-          {isLoading && !streamingMessage && !lastBotMessage && (
+          {/* Indicateur de chargement (modifié pour s'afficher correctement) */}
+          {isLoading && !streamingMessage && (
             <div className="loading-message">
               <LoadingIndicator />
-              <p>ClickTalk est en train d'écrire...</p>
+              <p>{lastBotMessage ? "ClickTalk est entraind'écrire..." : "ClickTalk est en train d'écrire..."}</p>
             </div>
           )}
         </>

@@ -28,20 +28,20 @@
   }
   
   .loading-message {
-    align-self: flex-start;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: $sp-sm;
-    background-color: var(--color-light, $color-light);
-    padding: $sp-sm $sp-md;
-    border-radius: $radius-md;
-    box-shadow: $shadow-sm;
+    gap: 8px;
+    margin: 10px 0;
     
     p {
-      color: var(--color-text-secondary, $color-text-secondary);
-      font-size: $fs-sm;
+      color: var(--text-secondary, #666);
+      font-size: 0.9rem;
+      font-style: italic;
+      margin: 0;
     }
   }
+
   
   // Override MessageBubble styles within this container
   .message-bubble {
