@@ -348,6 +348,11 @@ const useChat = (conversationId?: number) => {
   useEffect(() => {
     if (conversationId && conversationId > 0) {
       loadConversation(conversationId);
+    } else {
+      setState((prevState) => ({
+        ...prevState,
+        messages: [],
+      }));
     }
     
     // Clear metrics when conversation changes
