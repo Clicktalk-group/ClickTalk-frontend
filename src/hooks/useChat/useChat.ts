@@ -352,7 +352,7 @@ const useChat = (conversationId?: number) => {
       setState((prevState) => ({
         ...prevState,
         messages: [],
-      }));
+      }))
     }
     
     // Clear metrics when conversation changes
