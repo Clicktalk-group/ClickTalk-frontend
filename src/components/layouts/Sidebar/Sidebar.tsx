@@ -1,8 +1,7 @@
 import React, { memo, useCallback, useState } from "react";
 import { SidebarProps } from "./Sidebar.types";
 import "./Sidebar.scss";
-import { FaSignOutAlt, FaComments, FaFolder, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { BiHomeAlt } from "react-icons/bi";
+import { FaSignOutAlt, FaComments, FaFolder, FaPlus, FaEdit, FaTrash, FaChevronLeft } from "react-icons/fa";
 
 export const Sidebar: React.FC<SidebarProps> = memo(({
   isOpen,
@@ -179,7 +178,7 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
     <div className={`sidebar ${isOpen ? "open" : "closed"}`} role="complementary">
       <div className="sidebar-header">
         <div className="home-icon-container" onClick={onToggleSidebar}>
-          <BiHomeAlt className="home-icon" />
+          <FaChevronLeft className="home-icon" />
         </div>
       </div>
 

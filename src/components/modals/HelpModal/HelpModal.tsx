@@ -1,4 +1,3 @@
-// src/components/modals/HelpModal.tsx
 import React, { memo, useMemo } from 'react';
 import './HelpModal.scss';
 
@@ -29,7 +28,7 @@ const HelpModalContent: React.FC<HelpModalContentProps> = memo(({ onClose }) => 
       id: 'features',
       title: 'Fonctionnalités principales',
       content: (
-        <ul>
+        <ul className="help-list">
           <li><strong>Conversations</strong> - Discutez avec notre IA et obtenez des réponses instantanées</li>
           <li><strong>Projects</strong> - Organisez vos conversations par projets avec des instructions spécifiques</li>
           <li><strong>Personnalisation</strong> - Adaptez l'apparence de l'application selon vos préférences</li>
@@ -40,7 +39,7 @@ const HelpModalContent: React.FC<HelpModalContentProps> = memo(({ onClose }) => 
       id: 'howto',
       title: 'Comment utiliser ClickTalk',
       content: (
-        <ol>
+        <ol className="help-list">
           <li>Créez un nouveau projet ou sélectionnez un projet existant</li>
           <li>Commencez à discuter avec ClickTalk en tapant vos questions</li>
           <li>Explorez les options de personnalisation dans les paramètres</li>

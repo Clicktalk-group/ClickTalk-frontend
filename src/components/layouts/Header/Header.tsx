@@ -2,7 +2,7 @@ import React, { useState, useCallback, memo } from "react";
 import "./Header.scss";
 import { HeaderProps } from "./Header.types";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { FaHome } from "react-icons/fa";
+import { FaChevronRight } from "react-icons/fa";
 import HeaderMenu from "../../common/HeaderMenu/HeaderMenu";
 
 const Header: React.FC<HeaderProps> = memo(({ isSidebarOpen, toggleSidebar }) => {
@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = memo(({ isSidebarOpen, toggleSidebar }) =>
       {/* Home Icon - visible uniquement quand la sidebar est fermée */}
       {!isSidebarOpen && (
         <div className="homeIconContainer" onClick={toggleSidebar}>
-          <FaHome className="homeIcon" />
+          <FaChevronRight className="homeIcon" />
         </div>
       )}
       

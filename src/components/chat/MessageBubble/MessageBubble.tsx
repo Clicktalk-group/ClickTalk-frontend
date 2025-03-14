@@ -46,10 +46,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = memo(({
       </div>
       
       {isBot && !isTyping && safeContent.trim().length > 0 && (
-        <div className="message-actions">
-          <button className="copy-button" onClick={onCopy} aria-label="Copy message">
+        <div className="message-actions-outside">
+          <button className="copy-button" onClick={onCopy} aria-label="Copier le message">
             <FaCopy />
-            <span>Copier</span>
           </button>
         </div>
       )}

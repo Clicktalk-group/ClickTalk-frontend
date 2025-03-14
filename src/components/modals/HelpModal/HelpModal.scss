@@ -1,4 +1,3 @@
-// src/components/modals/HelpModal.scss
 @import '../../../styles/variables.scss';
 @import '../../../styles/mixins';
 @import '../Modals.scss';
@@ -23,5 +22,14 @@
         }
       }
     }
+
+    .help-list {
+      padding-left: 25px;
+      padding-right: 25px;
+      margin-left: 20px;
+    }
+
+    ul, ol {
+      margin-bottom: $sp-md;
+    }
   }
-  

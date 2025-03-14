@@ -4,6 +4,10 @@
 @import '../Modals.scss';
 
 .account-modal-content {
+  .field-container {
+    margin-bottom: $sp-md;
+  }
+  
   .form-group {
     margin-bottom: $sp-md;
     
@@ -23,10 +27,6 @@
         border: 1px solid $border-color;
         border-radius: $radius-sm;
         font-size: $fs-md;
-        
-        &:disabled {
-          background-color: #f9f9f9;
-        }
       }
       
       .edit-button {
@@ -43,11 +43,72 @@
     }
   }
   
+  .form-hint {
+    display: block;
+    margin-top: $sp-xs;
+    color: $color-text-light;
+    font-size: $fs-sm;
+  }
+  
+  .password-section {
+    border-top: 1px solid $border-color;
+    padding-top: $sp-md;
+    margin-top: $sp-md;
+    position: relative;
+  }
+  
+  .status-message {
+    margin-top: $sp-xs;
+    padding: $sp-xs;
+    font-size: $fs-sm;
+    border-radius: $radius-sm;
+    background-color: lighten($primary-color, 40%);
+    color: $primary-color;
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+    
+    &.password-status {
+      margin-top: $sp-md;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .password-actions {
+    margin-top: $sp-md;
+    display: flex;
+    justify-content: flex-end;
+    
+    .save-password-button {
+      padding: $sp-sm $sp-lg;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      font-weight: 500;
+      background-color: $primary-color;
+      border: none;
+      color: white;
+      
+      &:hover:not(:disabled) {
+        background-color: $primary-hover;
+      }
+      
+      &:disabled {
+        background-color: lighten($primary-color, 20%);
+        cursor: not-allowed;
+      }
+    }
+  }
+  
   .form-actions {
     display: flex;
     justify-content: flex-end;
     margin-top: $sp-lg;
     gap: $sp-md;
+    border-top: 1px solid $border-color;
+    padding-top: $sp-md;
     
     button {
       padding: $sp-sm $sp-lg;
@@ -63,16 +124,6 @@
       
       &:hover {
         background-color: darken($background-btn, 5%);
-      }
-    }
-    
-    .save-button {
-      background-color: $primary-color;
-      border: none;
-      color: white;
-      
-      &:hover {
-        background-color: $primary-hover;
       }
     }
   }
