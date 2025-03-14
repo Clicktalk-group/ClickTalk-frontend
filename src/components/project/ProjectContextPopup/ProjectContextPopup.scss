@@ -11,6 +11,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  // Utiliser isolation au lieu de contain pour une meilleure compatibilité
+  isolation: isolate;
   
   .context-popup-backdrop {
     position: absolute;
@@ -21,6 +23,8 @@
     background-color: rgba(0, 0, 0, 0.5);
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
+    will-change: opacity; // Optimisation d'animation
+    transform: translateZ(0); // Accélération GPU
   }
   
   .context-popup-content {
@@ -36,6 +40,8 @@
     display: flex;
     flex-direction: column;
     @include fade-in(0.3s);
+    transform: translateZ(0); // Optimisation pour le rendu GPU
+    will-change: transform, opacity; // Aide à l'optimisation des animations
     
     .context-popup-header {
       padding: $sp-md;
@@ -43,6 +49,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      // Utiliser isolation au lieu de contain pour compatibilité
+      isolation: isolate;
       
       h3 {
         margin: 0;
@@ -58,10 +66,16 @@
         cursor: pointer;
         padding: $sp-xs;
         border-radius: $radius-sm;
+        transform: translateZ(0); // Optimisation de rendu
         
         &:hover {
           color: $danger-color;
           background-color: rgba($danger-color, 0.1);
+        }
+        
+        &:focus-visible {
+          outline: 2px solid $danger-color;
+          outline-offset: 2px;
         }
         
         svg {
@@ -73,6 +87,12 @@
     .context-popup-body {
       padding: $sp-md;
       overflow-y: auto;
+      // Remplacer overscroll-behavior par touch-action pour meilleure compatibilité
+      @supports (touch-action: pan-y) {
+        touch-action: pan-y;
+      }
+      // Utiliser isolation au lieu de contain pour compatibilité
+      isolation: isolate;
       
       h4 {
         margin-top: 0;
@@ -87,16 +107,20 @@
         font-size: $fs-md;
         line-height: 1.6;
         white-space: pre-wrap; // Préserver les sauts de ligne
+        word-break: break-word; // Éviter les débordements de texte
       }
     }
   }
 }
 
+// Optimisations pour les appareils mobiles
 @media (max-width: $mobile) {
   .project-context-popup {
     .context-popup-content {
       width: 95%;
       max-height: 90vh;
+      // Utiliser isolation au lieu de contain pour compatibilité
+      isolation: isolate;
       
       .context-popup-header {
         padding: $sp-sm;
@@ -115,8 +139,26 @@
         
         p {
           font-size: $fs-sm;
+          // Limiter la hauteur max pour les longs contextes sur mobile
+          max-height: 60vh;
         }
       }
     }
+  }
+}
+
+// Désactiver les animations si l'utilisateur préfère des mouvements réduits
+@media (prefers-reduced-motion: reduce) {
+  .project-context-popup {
+    .context-popup-content {
+      animation: none;
+    }
+  }
+}
+
+// Chargement optimisé des polices pour l'affichage du texte
+@media (min-width: $desktop) {
+  .context-popup-body p {
+    font-display: swap; // Améliore le temps de rendu du texte
   }
 }
