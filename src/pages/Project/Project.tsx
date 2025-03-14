@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProject } from '../../hooks/useProject/useProject';
-import { projectService } from '../../services/project/project';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import ProjectForm from '../../components/project/ProjectForm/ProjectForm';
 import { Modal } from '../../components/common/Modal';
@@ -33,7 +32,8 @@ const Project: React.FC = () => {
     fetchProjects,
     fetchProjectById,
     deleteProject,
-    removeConversationFromProject
+    removeConversationFromProject,
+    getProjectConversations
   } = useProject();
 
   // Charger le projet spécifique quand l'ID est disponible
@@ -60,9 +60,14 @@ const Project: React.FC = () => {
           }
         }
 
-        // Charger les conversations du projet
-        const conversations = await projectService.getProjectConversations(Number(projectId));
-        setProjectConversations(conversations);
+        // Charger les conversations du projet en utilisant le bon endpoint
+        try {
+          // Utiliser la fonction du hook useProject qui utilise l'endpoint correct
+          const conversations = await getProjectConversations(Number(projectId));
+          setProjectConversations(Array.isArray(conversations) ? conversations : []);
+        } catch (convError) {
+          console.error("Error loading project conversations:", convError);
+        }
         
         setError(null);
       } catch (error: any) {
@@ -74,7 +79,7 @@ const Project: React.FC = () => {
     };
     
     loadProject();
-  }, [projectId, navigate, fetchProjectById, fetchProjects, projects]);
+  }, [projectId, navigate, fetchProjectById, fetchProjects, projects, getProjectConversations]);
 
   // Rechercher le projet actuel dans la liste des projets
   const currentProjectData = projectId ? projects.find(p => p.id === Number(projectId)) : null;
@@ -118,6 +123,8 @@ const Project: React.FC = () => {
         throw new Error("Project ID is missing");
       }
       
+      // On utilise maintenant une fonction qui supprime directement la conversation
+      // et non plus une fonction qui essaie de la retirer d'un projet
       await removeConversationFromProject(Number(projectId), conversationId);
       
       // Si c'était la conversation actuellement ouverte, revenir à l'écran de sélection
@@ -132,7 +139,7 @@ const Project: React.FC = () => {
       setError(null);
       return true;
     } catch (error: any) {
-      console.error("Erreur lors de la suppression de la conversation du projet:", error);
+      console.error("Erreur lors de la suppression de la conversation:", error);
       setError(`Erreur de suppression: ${error.message || "Contactez l'administrateur"}`);
       return false;
     }

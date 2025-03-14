@@ -1,7 +1,7 @@
-// /src/hooks/useProject/useProject.ts
 import { useState, useEffect, useCallback } from 'react';
 import { Project, CreateProjectRequest, UpdateProjectRequest } from '../../types/project.types';
 import { projectService } from '../../services/project/project';
+import { conversationService } from '../../services/conversation/conversation';
 
 export const useProject = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -143,22 +143,16 @@ export const useProject = () => {
     }
   }, [currentProject]);
 
-  // Ajouter une conversation à un projet
+  // Ajouter une conversation à un projet - cette fonctionnalité est maintenant gérée 
+  // automatiquement par le backend lors de la création d'une conversation
   const addConversationToProject = useCallback(async (projectId: number, convId: number) => {
-    try {
-      await projectService.addConversationToProject(projectId, convId);
-      setError(null);
-    } catch (err) {
-      setError(`Erreur lors de l'ajout de la conversation ${convId} au projet ${projectId}`);
-      console.error(err);
-      throw err;
-    }
+    console.warn("Cette fonctionnalité n'est plus supportée par l'API. La liaison de conversation à un projet doit être faite lors de la création de la conversation.");
   }, []);
 
   // Récupérer les conversations d'un projet
   const getProjectConversations = useCallback(async (projectId: number) => {
     try {
-      return await projectService.getProjectConversations(projectId);
+      return await conversationService.getProjectConversations(projectId);
     } catch (err) {
       setError(`Erreur lors de la récupération des conversations du projet ${projectId}`);
       console.error(err);
@@ -166,20 +160,21 @@ export const useProject = () => {
     }
   }, []);
 
-  // Supprimer une conversation d'un projet
+  // Supprimer une conversation (d'un projet)
   const removeConversationFromProject = useCallback(async (projectId: number, convId: number) => {
     setLoading(true);
     try {
-      console.log(`Removing conversation ${convId} from project ${projectId}`);
-      if (!projectId || !convId) {
-        throw new Error('Project ID or Conversation ID is invalid');
+      console.log(`Removing conversation ${convId}`);
+      if (!convId) {
+        throw new Error('Conversation ID is invalid');
       }
       
-      await projectService.removeConversationFromProject(projectId, convId);
-      console.log('Successfully removed conversation from project');
+      // CORRECTION: Utiliser l'API standard de suppression de conversation
+      await conversationService.deleteConversation(convId);
+      console.log('Successfully deleted conversation');
       setError(null);
     } catch (err: any) {
-      const errorMessage = `Erreur lors de la suppression de la conversation ${convId} du projet ${projectId}: ${err.message}`;
+      const errorMessage = `Erreur lors de la suppression de la conversation ${convId}: ${err.message}`;
       console.error(errorMessage);
       setError(errorMessage);
       throw err;

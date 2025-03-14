@@ -1,4 +1,3 @@
-// /src/services/project/project.ts
 import { apiService } from '../api/api';
 import { Project, CreateProjectRequest, UpdateProjectRequest } from '../../types/project.types';
 
@@ -113,7 +112,8 @@ export const projectService = {
   // Récupérer toutes les conversations d'un projet
   getProjectConversations: async (projectId: number): Promise<any[]> => {
     try {
-      const response = await apiService.get<any[]>(`/project/${projectId}/conversations`);
+      // Correction: utiliser l'endpoint correct pour récupérer les conversations d'un projet
+      const response = await apiService.get<any[]>(`/conversation/project/${projectId}`);
       return Array.isArray(response) ? response : [];
     } catch (error) {
       console.error(`Error fetching conversations for project ${projectId}:`, error);
@@ -121,28 +121,25 @@ export const projectService = {
     }
   },
   
-  // Ajouter une conversation à un projet
+  // Fonctionnalité qui n'est plus supportée par l'API backend - à conserver pour rétrocompatibilité
   addConversationToProject: async (projectId: number, convId: number): Promise<void> => {
-    try {
-      await apiService.post(`/project/${projectId}/add-conversation/${convId}`);
-    } catch (error) {
-      console.error(`Error adding conversation ${convId} to project ${projectId}:`, error);
-      throw error;
-    }
+    console.warn(`Endpoint to add conversation to project is not available in the API.
+    This operation should be handled by the backend when creating a conversation with a projectId.`);
   },
   
-  // Supprimer une conversation d'un projet
+  // Supprimer une conversation (utilisation de l'endpoint conversation/delete/{id})
   removeConversationFromProject: async (projectId: number, convId: number): Promise<void> => {
     try {
-      if (!projectId || !convId) {
-        throw new Error('Invalid project ID or conversation ID');
+      if (!convId) {
+        throw new Error('Invalid conversation ID');
       }
       
       console.log(`Attempting to delete conversation ${convId}`);
-      await apiService.delete(`/project/${projectId}/remove-conversation/${convId}`);
-      console.log('Conversation successfully removed from project');
+      // Utiliser l'endpoint de suppression de conversation standard
+      await apiService.delete(`/conversation/delete/${convId}`);
+      console.log('Conversation successfully deleted');
     } catch (error) {
-      console.error(`Error removing conversation ${convId} from project ${projectId}:`, error);
+      console.error(`Error deleting conversation ${convId}:`, error);
       throw error;
     }
   }

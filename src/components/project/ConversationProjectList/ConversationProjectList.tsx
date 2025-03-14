@@ -1,4 +1,3 @@
-// /src/components/project/ConversationProjectList/ConversationProjectList.tsx
 import React, { useState, useEffect } from 'react';
 import { useConversation } from '../../../hooks/useConversation/useConversation';
 import { useProject } from '../../../hooks/useProject/useProject';
@@ -10,6 +9,11 @@ interface ConversationProjectListProps {
   projectId: number;
   onSelect: (conversationId: number) => void;
   onRemove: (conversationId: number) => void;
+}
+
+// Interface étendue pour supporter les formats variés de l'API
+interface ConversationResponse extends Partial<Conversation> {
+  convId?: number; // Support pour le format alternatif possible
 }
 
 const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
@@ -32,24 +36,24 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
       try {
         if (projectId) {
           // Essayer d'abord fetchProjectConversations (de useConversation)
-          let data;
+          let data: ConversationResponse[] | undefined;
           
           try {
-            data = await fetchProjectConversations(projectId);
+            data = await fetchProjectConversations(projectId) as ConversationResponse[];
           } catch (e) {
             console.warn('Failed to load with fetchProjectConversations, trying getProjectConversations');
             // Essayer la méthode alternative si la première échoue
             if (getProjectConversations) {
-              data = await getProjectConversations(projectId);
+              data = await getProjectConversations(projectId) as ConversationResponse[];
             }
           }
           
           if (data && Array.isArray(data)) {
             const formattedConversations = data.map(conv => ({
-              id: conv.id || conv.convId,
+              id: conv.id || (conv.convId as number), // Cast explicite pour satisfaire TypeScript
               title: conv.title || `Conversation #${conv.id || conv.convId}`,
-              userId: conv.userId,
-              createdAt: conv.createdAt,
+              userId: conv.userId || 0,
+              createdAt: conv.createdAt || new Date().toISOString(),
               updatedAt: conv.updatedAt
             }));
             

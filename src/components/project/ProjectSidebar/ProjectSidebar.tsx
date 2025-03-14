@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useConversation } from '../../../hooks/useConversation/useConversation';
 import { Button } from '../../common/Button';
 import { FaPlus, FaTimes, FaTrash, FaComment } from 'react-icons/fa';
-import { conversationService } from '../../../services/conversation/conversation';
+import { projectService } from '../../../services/project/project';
 import './ProjectSidebar.scss';
 
 interface ProjectSidebarProps {
@@ -23,25 +23,40 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   onClose,
 }) => {
   const { 
-    loading, 
-    error, 
+    loading: convLoading, 
+    error: convError, 
     fetchConversations
   } = useConversation();
 
-  // État local pour stocker les conversations du projet
+  // États locaux
   const [projectConversations, setProjectConversations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Charger toutes les conversations, puis filtrer celles du projet
+  // Charger les conversations du projet
   useEffect(() => {
     const loadProjectConversations = async () => {
+      if (!projectId) return;
+      
+      setLoading(true);
+      setError(null);
+      
       try {
-        if (projectId) {
-          // Utiliser directement le service pour récupérer les conversations du projet
-          const conversations = await conversationService.getProjectConversations(projectId);
+        // Utilisation correcte du service project pour obtenir les conversations
+        const conversations = await projectService.getProjectConversations(projectId);
+        
+        if (Array.isArray(conversations)) {
           setProjectConversations(conversations);
+        } else {
+          console.warn("Format de données inattendu:", conversations);
+          setProjectConversations([]);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Erreur lors du chargement des conversations du projet:", err);
+        setError(err?.message || "Erreur lors du chargement des conversations");
+        setProjectConversations([]);
+      } finally {
+        setLoading(false);
       }
     };
     
@@ -62,6 +77,8 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
   };
 
   const formatDate = (dateString: string): string => {
+    if (!dateString) return 'Date inconnue';
+    
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString();
@@ -93,35 +110,37 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
         <FaPlus /> Nouvelle conversation
       </Button>
       
-      {loading && projectConversations.length === 0 ? (
+      {(loading || (convLoading && projectConversations.length === 0)) ? (
         <div className="sidebar-loading">Chargement des conversations...</div>
-      ) : error ? (
-        <div className="sidebar-error">{error}</div>
+      ) : (error || convError) ? (
+        <div className="sidebar-error">{error || convError}</div>
       ) : (
         <div className="conversations-list">
           {projectConversations && projectConversations.length > 0 ? (
             projectConversations.map((conversation) => (
               <div 
-                key={conversation.id}
-                className={`conversation-item ${selectedConversationId === conversation.id ? 'active' : ''}`}
-                onClick={() => onSelectConversation(conversation.id)}
+                key={conversation.id || conversation.convId}
+                className={`conversation-item ${selectedConversationId === (conversation.id || conversation.convId) ? 'active' : ''}`}
+                onClick={() => onSelectConversation(conversation.id || conversation.convId)}
               >
                 <div className="conversation-info">
                   <div className="conversation-icon">
                     <FaComment />
                   </div>
                   <div className="conversation-details">
-                    <div className="conversation-title">{conversation.title}</div>
+                    <div className="conversation-title">
+                      {conversation.title || `Conversation #${conversation.id || conversation.convId}`}
+                    </div>
                     <div className="conversation-date">
-                      {conversation.createdAt ? formatDate(conversation.createdAt) : 'Date inconnue'}
+                      {formatDate(conversation.createdAt || conversation.created_at)}
                     </div>
                   </div>
                 </div>
                 <button 
                   className="delete-conversation" 
-                  onClick={(e) => handleRemove(e, conversation.id)}
+                  onClick={(e) => handleRemove(e, conversation.id || conversation.convId)}
                   title="Supprimer cette conversation"
-                  aria-label={`Supprimer la conversation ${conversation.title}`}
+                  aria-label={`Supprimer la conversation ${conversation.title || 'sans titre'}`}
                 >
                   <FaTrash />
                 </button>

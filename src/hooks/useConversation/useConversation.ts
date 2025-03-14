@@ -229,6 +229,7 @@ export const useConversation = () => {
     safeSetState(prev => ({ ...prev, loading: true }));
     
     try {
+      // Utilisation de l'endpoint correct pour les conversations d'un projet
       const data = await conversationService.getProjectConversations(projectId);
       
       safeSetState(prev => ({
