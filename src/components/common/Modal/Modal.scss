@@ -7,7 +7,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); // Couleur de l'overlay
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,7 +22,7 @@
   }
 
   .modal-content {
-    background-color: var(--background-color, $background-color);
+    background-color: var(--modal-bg, $background-color);
     border-radius: $radius-lg;
     @include shadow(md);
     width: 90%;
@@ -41,14 +41,14 @@
       max-width: 800px;
     }
 
-    &.active {
+    &.visible {
       transform: translateY(0);
     }
   }
 
   .modal-header {
     padding: $sp-md;
-    border-bottom: 1px solid var(--border-color, $border-color);
+    border-bottom: 1px solid var(--modal-border, $border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -57,7 +57,7 @@
   .modal-title {
     font-size: $fs-lg;
     font-weight: 600;
-    color: var(--color-text-primary, $color-text-primary);
+    color: var(--modal-text, $color-text-primary);
     margin: 0;
   }
 
@@ -65,20 +65,20 @@
     background: none;
     border: none;
     font-size: $fs-xl;
-    color: var(--color-text-secondary, $color-text-secondary);
+    color: var(--modal-text-secondary, $color-text-secondary);
     cursor: pointer;
     padding: $sp-xs;
     transition: color 0.2s ease;
 
     &:hover {
-      color: var(--color-text-primary, $color-text-primary);
+      color: var(--modal-text, $color-text-primary);
     }
   }
 
   .modal-body {
     padding: $sp-lg;
     font-size: $fs-md;
-    color: var(--color-text-primary, $color-text-primary);
+    color: var(--modal-text, $color-text-primary);
   }
 }
 
