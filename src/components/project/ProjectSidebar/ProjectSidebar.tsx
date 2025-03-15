@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { useConversation } from '../../../hooks/useConversation/useConversation';
 import { Button } from '../../common/Button';
-import { FaPlus, FaTimes, FaTrash, FaComment } from 'react-icons/fa';
+import { FaPlus, FaTimes, FaTrash, FaComment, FaEdit, FaHome } from 'react-icons/fa';
 import { projectService } from '../../../services/project/project';
+import { useNavigate } from 'react-router-dom';
 import './ProjectSidebar.scss';
 
 // Type défini pour la conversation pour améliorer la performance du rendu
@@ -16,39 +17,51 @@ interface ConversationItem {
 
 interface ProjectSidebarProps {
   projectId: number;
+  projectData?: {
+    title: string;
+    context?: string;
+  };
   onNewConversation: () => void;
   onSelectConversation: (id: number) => void;
   onRemoveConversation: (id: number) => Promise<boolean>;
   selectedConversationId: number | null;
   onClose: () => void;
+  onEditProject: () => void;
+  onDeleteProject: () => void;
+  error?: string | null;
 }
 
 // Utilisation de memo pour éviter les re-rendus inutiles
 export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
   projectId,
+  projectData,
   onNewConversation,
   onSelectConversation,
   onRemoveConversation,
   selectedConversationId,
   onClose,
+  onEditProject,
+  onDeleteProject,
+  error
 }) => {
   const { 
     loading: convLoading, 
     error: convError, 
     fetchConversations
   } = useConversation();
+  const navigate = useNavigate();
 
   // États locaux
   const [projectConversations, setProjectConversations] = useState<ConversationItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [sidebarError, setSidebarError] = useState<string | null>(null);
   
   // Utilisation de useCallback pour éviter de recréer les fonctions lors des re-rendus
   const loadProjectConversations = useCallback(async () => {
     if (!projectId) return;
     
     setLoading(true);
-    setError(null);
+    setSidebarError(null);
     
     try {
       // Utilisation d'un timeout pour annuler la requête si elle prend trop de temps
@@ -75,7 +88,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
       }
     } catch (err: any) {
       console.error("Erreur lors du chargement des conversations du projet:", err);
-      setError(err?.message || "Erreur lors du chargement des conversations");
+      setSidebarError(err?.message || "Erreur lors du chargement des conversations");
       setProjectConversations([]);
     } finally {
       setLoading(false);
@@ -128,6 +141,10 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
       return 'Date inconnue';
     }
   }, []);
+  
+  const handleGoHome = () => {
+    navigate('/');
+  };
 
   // Optimisation du rendu conditionnel pour éviter les calculs inutiles
   const renderContent = () => {
@@ -135,8 +152,8 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
       return <div className="sidebar-loading" role="status" aria-live="polite">Chargement des conversations...</div>;
     }
     
-    if (error || convError) {
-      return <div className="sidebar-error" role="alert">{error || convError}</div>;
+    if (sidebarError || convError) {
+      return <div className="sidebar-error" role="alert">{sidebarError || convError}</div>;
     }
     
     if (!projectConversations || projectConversations.length === 0) {
@@ -196,6 +213,49 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
 
   return (
     <div className="project-sidebar" role="complementary" aria-label="Conversations du projet">
+      {/* Project Header intégré dans la sidebar */}
+      <div className="project-header">
+        <div className="back-to-home">
+          <Button 
+            variant="ghost" 
+            onClick={handleGoHome}
+            className="home-button"
+            title="Retour à l'accueil"
+          >
+            <FaHome /> Accueil
+          </Button>
+        </div>
+        
+        {projectData && (
+          <>
+            <div className="project-title-container">
+              <h1>{projectData.title}</h1>
+              <div className="project-actions">
+                <Button 
+                  variant="secondary"
+                  onClick={onEditProject}
+                  title="Modifier le projet"
+                >
+                  <FaEdit /> Modifier
+                </Button>
+                <Button 
+                  variant="danger"
+                  onClick={onDeleteProject}
+                  title="Supprimer le projet"
+                >
+                  Supprimer
+                </Button>
+              </div>
+            </div>
+            {projectData.context && (
+              <p className="project-context">{projectData.context}</p>
+            )}
+          </>
+        )}
+        
+        {error && <div className="error-notification">{error}</div>}
+      </div>
+
       <div className="sidebar-header">
         <h2 id="conversation-list-title">Conversations</h2>
         <Button 
@@ -209,8 +269,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
         </Button>
       </div>
 
-    {/* Conditionnellement afficher le bouton uniquement si des conversations existent */}
-    {projectConversations.length > 0 && (
+      {/* Bouton pour nouvelle conversation */}
       <Button 
         variant="primary" 
         className="new-conversation-btn" 
@@ -220,9 +279,8 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
       >
         <FaPlus aria-hidden="true" /> Nouvelle conversation
       </Button>
-    )}
-    
-    {renderContent()}
+      
+      {renderContent()}
     </div>
   );
 });

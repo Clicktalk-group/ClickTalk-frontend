@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProject } from '../../hooks/useProject/useProject';
+import { projectService } from '../../services/project/project';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import ProjectForm from '../../components/project/ProjectForm/ProjectForm';
 import { Modal } from '../../components/common/Modal';
 import { ProjectSidebar } from '../../components/project/ProjectSidebar/ProjectSidebar';
 import { ProjectContextPopup } from '../../components/project/ProjectContextPopup/ProjectContextPopup';
 import { Button } from '../../components/common/Button';
-import { FaEdit, FaHome, FaBars, FaFileAlt } from 'react-icons/fa';
+import { FaBars, FaFileAlt, FaHome } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import './Project.scss';
 
@@ -32,8 +33,7 @@ const Project: React.FC = () => {
     fetchProjects,
     fetchProjectById,
     deleteProject,
-    removeConversationFromProject,
-    getProjectConversations
+    removeConversationFromProject
   } = useProject();
 
   // Charger le projet spécifique quand l'ID est disponible
@@ -60,14 +60,9 @@ const Project: React.FC = () => {
           }
         }
 
-        // Charger les conversations du projet en utilisant le bon endpoint
-        try {
-          // Utiliser la fonction du hook useProject qui utilise l'endpoint correct
-          const conversations = await getProjectConversations(Number(projectId));
-          setProjectConversations(Array.isArray(conversations) ? conversations : []);
-        } catch (convError) {
-          console.error("Error loading project conversations:", convError);
-        }
+        // Charger les conversations du projet
+        const conversations = await projectService.getProjectConversations(Number(projectId));
+        setProjectConversations(conversations);
         
         setError(null);
       } catch (error: any) {
@@ -79,7 +74,7 @@ const Project: React.FC = () => {
     };
     
     loadProject();
-  }, [projectId, navigate, fetchProjectById, fetchProjects, projects, getProjectConversations]);
+  }, [projectId, navigate, fetchProjectById, fetchProjects, projects]);
 
   // Rechercher le projet actuel dans la liste des projets
   const currentProjectData = projectId ? projects.find(p => p.id === Number(projectId)) : null;
@@ -123,8 +118,6 @@ const Project: React.FC = () => {
         throw new Error("Project ID is missing");
       }
       
-      // On utilise maintenant une fonction qui supprime directement la conversation
-      // et non plus une fonction qui essaie de la retirer d'un projet
       await removeConversationFromProject(Number(projectId), conversationId);
       
       // Si c'était la conversation actuellement ouverte, revenir à l'écran de sélection
@@ -139,15 +132,10 @@ const Project: React.FC = () => {
       setError(null);
       return true;
     } catch (error: any) {
-      console.error("Erreur lors de la suppression de la conversation:", error);
+      console.error("Erreur lors de la suppression de la conversation du projet:", error);
       setError(`Erreur de suppression: ${error.message || "Contactez l'administrateur"}`);
       return false;
     }
-  };
-
-  // Naviguer vers la page d'accueil
-  const handleGoHome = () => {
-    navigate('/');
   };
 
   // Ouvrir le modal d'édition
@@ -206,54 +194,23 @@ const Project: React.FC = () => {
 
   return (
     <div className="project-page">
-      <div className="project-header">
-        {/* Bouton de retour à l'accueil */}
-        <div className="back-to-home">
-          <Button 
-            variant="ghost" 
-            onClick={handleGoHome}
-            className="home-button"
-            title="Retour à l'accueil"
-          >
-            <FaHome /> Accueil
-          </Button>
-        </div>
-        
-        <div className="project-title-container">
-          <h1>{currentProjectData.title}</h1>
-          <div className="project-actions">
-            <Button 
-              variant="secondary"
-              onClick={handleEditProject}
-              title="Modifier le projet"
-            >
-              <FaEdit /> Modifier
-            </Button>
-            <Button 
-              variant="danger"
-              onClick={handleDeleteProject}
-              title="Supprimer le projet"
-            >
-              Supprimer
-            </Button>
-          </div>
-        </div>
-        {currentProjectData.context && (
-          <p className="project-context">{currentProjectData.context}</p>
-        )}
-        {error && <div className="error-notification">{error}</div>}
-      </div>
-      
       <div className="project-content">
-        {/* Sidebar rétractable */}
+        {/* Sidebar rétractable avec le project header maintenant à l'intérieur */}
         <div className={`project-sidebar-container ${sidebarOpen ? 'open' : 'closed'}`}>
           <ProjectSidebar
             projectId={Number(projectId)}
+            projectData={currentProjectData ? {
+              title: currentProjectData.title,
+              context: currentProjectData.context
+            } : undefined}
             onNewConversation={handleNewConversation}
             onSelectConversation={handleSelectConversation}
             onRemoveConversation={handleRemoveConversation}
             selectedConversationId={currentConversationId}
             onClose={toggleSidebar}
+            onEditProject={handleEditProject}
+            onDeleteProject={handleDeleteProject}
+            error={error}
           />
         </div>
         
