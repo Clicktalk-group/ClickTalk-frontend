@@ -48,6 +48,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Vérifier si nous sommes sur une page de chat ou de projet
   const isChatPage = location.pathname.includes('/chat');
   const isProjectPage = location.pathname.includes('/project');
+
+  // Extraire les IDs actuels depuis l'URL
+  const currentConversationId = isChatPage ? location.pathname.split('/').pop() : null;
+  const currentProjectId = isProjectPage ? location.pathname.split('/').pop() : null;
   
   // Gestionnaires d'événements - Memoized with useCallback
   const handleToggleSidebar = useCallback(() => {
@@ -197,6 +201,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         onDeleteProject={handleDeleteProject}
         onLogout={handleLogout}
         onToggleSidebar={handleToggleSidebar}
+        selectedConversationId={currentConversationId}
+        selectedProjectId={currentProjectId}
       />
       
       <div className="layout-container">

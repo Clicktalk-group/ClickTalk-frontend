@@ -17,8 +17,11 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
   onDeleteProject,
   onLogout,
   onToggleSidebar,
+  selectedConversationId = null,
+  selectedProjectId = null,
 }) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  console.log("Sidebar props - selected conversation:", selectedConversationId, "selected project:", selectedProjectId);
   
   // Gestionnaire pour la suppression de conversation
   const handleDeleteConversation = useCallback((e: React.MouseEvent, itemId: number | string, itemTitle: string) => {
@@ -78,38 +81,44 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
     }
   }, [onRenameConversation, isProcessing]);
   
-  const renderConversationItem = useCallback((item: any) => (
-    <li
-      key={item.id}
-      className="list-item conversation-item"
-      data-conversation-id={item.id}
-    >
-      <span 
-        className="conversation-title" 
-        onClick={() => onSelectConversation(item.id)}
+  const renderConversationItem = useCallback((item: any) => {
+    // Vérifier si cette conversation est actuellement sélectionnée
+    const isActive = selectedConversationId !== null && 
+                     String(selectedConversationId) === String(item.id);
+    
+    return (
+      <li
+        key={item.id}
+        className={`list-item conversation-item ${isActive ? 'active' : ''}`}
+        data-conversation-id={item.id}
       >
-        {item.title}
-      </span>
-      <div className="conversation-actions">
-        <button 
-          className="action-btn edit-btn" 
-          onClick={(e) => handleRenameConversation(e, item.id, item.title)}
-          title="Modifier la conversation"
-          disabled={isProcessing}
+        <span 
+          className="conversation-title" 
+          onClick={() => onSelectConversation(item.id)}
         >
-          <FaEdit />
-        </button>
-        <button 
-          className="action-btn delete-btn" 
-          onClick={(e) => handleDeleteConversation(e, item.id, item.title)}
-          title="Supprimer la conversation"
-          disabled={isProcessing}
-        >
-          <FaTrash />
-        </button>
-      </div>
-    </li>
-  ), [onSelectConversation, handleRenameConversation, handleDeleteConversation, isProcessing]);
+          {item.title}
+        </span>
+        <div className="conversation-actions">
+          <button 
+            className="action-btn edit-btn" 
+            onClick={(e) => handleRenameConversation(e, item.id, item.title)}
+            title="Modifier la conversation"
+            disabled={isProcessing}
+          >
+            <FaEdit />
+          </button>
+          <button 
+            className="action-btn delete-btn" 
+            onClick={(e) => handleDeleteConversation(e, item.id, item.title)}
+            title="Supprimer la conversation"
+            disabled={isProcessing}
+          >
+            <FaTrash />
+          </button>
+        </div>
+      </li>
+    );
+  }, [onSelectConversation, handleRenameConversation, handleDeleteConversation, isProcessing, selectedConversationId]);
 
   const handleDeleteProject = useCallback((e: React.MouseEvent, itemId: number | string, itemTitle: string) => {
     e.stopPropagation();
@@ -138,41 +147,47 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
     }
   }, [onDeleteProject, isProcessing]);
   
-  const renderProjectItem = useCallback((item: any) => (
-    <li
-      key={item.id}
-      className="list-item project-item"
-      data-project-id={item.id}
-    >
-      <span 
-        className="project-title" 
-        onClick={() => onSelectProject(item.id)}
+  const renderProjectItem = useCallback((item: any) => {
+    // Vérifier si ce projet est actuellement sélectionné
+    const isActive = selectedProjectId !== null && 
+                     String(selectedProjectId) === String(item.id);
+                     
+    return (
+      <li
+        key={item.id}
+        className={`list-item project-item ${isActive ? 'active' : ''}`}
+        data-project-id={item.id}
       >
-        {item.title}
-      </span>
-      <div className="project-actions">
-        <button 
-          className="action-btn edit-btn" 
-          onClick={(e) => {
-            e.stopPropagation();
-            onRenameProject(item);
-          }}
-          title="Modifier le projet"
-          disabled={isProcessing}
+        <span 
+          className="project-title" 
+          onClick={() => onSelectProject(item.id)}
         >
-          <FaEdit />
-        </button>
-        <button 
-          className="action-btn delete-btn" 
-          onClick={(e) => handleDeleteProject(e, item.id, item.title)}
-          title="Supprimer le projet"
-          disabled={isProcessing}
-        >
-          <FaTrash />
-        </button>
-      </div>
-    </li>
-  ), [onSelectProject, onRenameProject, handleDeleteProject, isProcessing]);
+          {item.title}
+        </span>
+        <div className="project-actions">
+          <button 
+            className="action-btn edit-btn" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onRenameProject(item);
+            }}
+            title="Modifier le projet"
+            disabled={isProcessing}
+          >
+            <FaEdit />
+          </button>
+          <button 
+            className="action-btn delete-btn" 
+            onClick={(e) => handleDeleteProject(e, item.id, item.title)}
+            title="Supprimer le projet"
+            disabled={isProcessing}
+          >
+            <FaTrash />
+          </button>
+        </div>
+      </li>
+    );
+  }, [onSelectProject, onRenameProject, handleDeleteProject, isProcessing, selectedProjectId]);
   
   return (
     <div className={`sidebar ${isOpen ? "open" : "closed"}`} role="complementary">

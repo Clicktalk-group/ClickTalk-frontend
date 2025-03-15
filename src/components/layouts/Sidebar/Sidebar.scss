@@ -149,9 +149,20 @@
       cursor: pointer;
       border-radius: 4px;
       margin-bottom: 0.25rem;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      border: 1px solid transparent;
+      will-change: background-color, border-color;
       
       &:hover {
         background-color: var(--color-bg-dark-hover, $color-bg-dark-hover);
+      }
+      
+      // Classe active pour les éléments sélectionnés
+      &.active {
+        border-color: var(--primary-color, $primary-color);
+        // Fallback direct pour rgba si la variable CSS ne fonctionne pas
+        background-color: rgba(124, 58, 237, 0.15); 
+        font-weight: 500;
       }
 
       &.conversation-item,
@@ -204,6 +215,14 @@
             opacity: 1;
           }
         }
+        
+        // Garder les boutons d'action visibles sur les éléments actifs
+        &.active {
+          .conversation-actions,
+          .project-actions {
+            opacity: 0.8;
+          }
+        }
       }
     }
   }
@@ -252,6 +271,22 @@
       .conversation-actions,
       .project-actions {
         opacity: 0.7; // Toujours visible sur mobile
+      }
+    }
+  }
+}
+
+// Optimisation des animations pour les appareils à faible performance
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+    
+    .list-item {
+      transition: none;
+      
+      .conversation-actions,
+      .project-actions {
+        transition: none;
       }
     }
   }

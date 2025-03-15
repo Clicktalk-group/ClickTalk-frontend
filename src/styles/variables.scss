@@ -18,6 +18,10 @@ $color-text-primary-dark: #f9fafb; // Couleur principale texte (mode sombre)
 $color-text-secondary-dark: #d1d5db; // Texte secondaire (mode sombre)
 $border-color-dark: #4b5563; // Couleur des bordures (mode sombre)
 
+// Extraire les valeurs RGB pour les utiliser dans rgba()
+$primary-color-light-rgb: 124, 58, 237; // Valeur RGB de #7c3aed
+$primary-color-dark-rgb: 124, 58, 237;  // Même valeur pour le mode sombre
+
 // Variables utilisées par SASS (toujours utiliser les valeurs par défaut)
 $primary-color: $primary-color-light;
 $primary-hover: $primary-hover-light;
@@ -82,3 +86,31 @@ $desktop: 1024px;
 
 $sidebar-width: 350px;
 $color-light: #ffffff !default;
+
+// Définir les variables CSS pour utilisation dans l'application
+:root {
+  --primary-color: #{$primary-color-light};
+  --primary-hover: #{$primary-hover-light};
+  --secondary-color: #{$secondary-color-light};
+  --background-color: #{$background-color-light};
+  --background-btn: #{$background-btn-light};
+  --color-text-primary: #{$color-text-primary-light};
+  --color-text-secondary: #{$color-text-secondary-light};
+  --border-color: #{$border-color-light};
+  
+  // Variables RGB pour utilisation avec rgba()
+  --primary-color-rgb: #{$primary-color-light-rgb};
+  --primary-color-dark-rgb: #{$primary-color-dark-rgb};
+}
+
+// Variables pour le mode sombre
+html[data-theme="dark"] {
+  --primary-color: #{$primary-color-dark};
+  --primary-hover: #{$primary-hover-dark};
+  --secondary-color: #{$secondary-color-dark};
+  --background-color: #{$background-color-dark};
+  --background-btn: #{$background-btn-dark};
+  --color-text-primary: #{$color-text-primary-dark};
+  --color-text-secondary: #{$color-text-secondary-dark};
+  --border-color: #{$border-color-dark};
+}

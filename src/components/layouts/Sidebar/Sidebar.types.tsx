@@ -13,4 +13,6 @@ export interface SidebarProps {
   onDeleteProject: (id: string | number) => void;
   onLogout: () => void;
   onToggleSidebar: () => void;
+  selectedConversationId?: string | number | null;
+  selectedProjectId?: string | number | null;
 }
