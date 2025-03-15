@@ -209,6 +209,8 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
         </Button>
       </div>
 
+    {/* Conditionnellement afficher le bouton uniquement si des conversations existent */}
+    {projectConversations.length > 0 && (
       <Button 
         variant="primary" 
         className="new-conversation-btn" 
@@ -218,8 +220,9 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
       >
         <FaPlus aria-hidden="true" /> Nouvelle conversation
       </Button>
-      
-      {renderContent()}
+    )}
+    
+    {renderContent()}
     </div>
   );
 });
