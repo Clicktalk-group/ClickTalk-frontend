@@ -4,63 +4,85 @@
 .project-sidebar {
   display: flex;
   flex-direction: column;
-  align-items: center;
   height: 100%;
   width: 100%;
-  overflow-y: auto;
   background-color: var(--background-color, $background-color);
   will-change: transform; // Optimisation pour les animations
+  position: relative;
   
   // Utiliser isolation pour une meilleure compatibilité que contain
   isolation: isolate;
+  overflow: hidden; // Pour empêcher le débordement
   
-  // Style pour le project-header maintenant dans la sidebar
+  // Style pour le project-header maintenant dans la sidebar - fixé en haut
   .project-header {
     padding: 1rem;
     border-bottom: 1px solid var(--border-color, $border-color);
     background-color: var(--background-color, white);
     width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 20;
     
-    // Style adaptatif pour le bouton de retour à l'accueil
-    .back-to-home {
+    // Ajout d'un conteneur pour le bouton d'accueil et la croix
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: $sp-md;
-      
-      .home-button {
-        display: inline-flex;
-        align-items: center;
-        gap: $sp-sm;
-        font-weight: 500;
-        font-size: $fs-md;
-        padding: $sp-xs $sp-md;
-        border-radius: $radius-md;
-        background-color: transparent;
-        color: var(--color-text-secondary, $color-text-secondary);
-        border: 1px solid transparent;
-        transition: all 0.2s ease;
-        
-        // Mode clair (par défaut)
-        background-color: var(--background-btn, $background-btn-light);
-        
-        &:hover {
-          transform: translateX(-3px);
-          background-color: var(--primary-color, $primary-color);
-          color: white;
-          box-shadow: $shadow-sm;
-        }
-        
-        svg {
-          font-size: 1.1em;
-        }
-        
-        // Support du thème sombre
-        .dark-theme & {
-          background-color: var(--background-btn, $background-btn-dark);
-          color: var(--color-text-secondary, $color-text-secondary-dark);
+    
+      // Style adaptatif pour le bouton de retour à l'accueil
+      .back-to-home {
+        .home-button {
+          display: inline-flex;
+          align-items: center;
+          gap: $sp-sm;
+          font-weight: 500;
+          font-size: $fs-md;
+          padding: $sp-xs $sp-md;
+          border-radius: $radius-md;
+          background-color: transparent;
+          color: var(--color-text-secondary, $color-text-secondary);
+          border: 1px solid transparent;
+          transition: all 0.2s ease;
+          
+          // Mode clair (par défaut)
+          background-color: var(--background-btn, $background-btn-light);
           
           &:hover {
-            background-color: var(--primary-color, $primary-color-dark);
+            transform: translateX(-3px);
+            background-color: var(--primary-color, $primary-color);
             color: white;
+            box-shadow: $shadow-sm;
           }
+          
+          svg {
+            font-size: 1.1em;
+          }
+          
+          // Support du thème sombre
+          .dark-theme & {
+            background-color: var(--background-btn, $background-btn-dark);
+            color: var(--color-text-secondary, $color-text-secondary-dark);
+            
+            &:hover {
+              background-color: var(--primary-color, $primary-color-dark);
+              color: white;
+            }
+          }
+        }
+      }
+    
+      // Afficher la croix dans le project header
+      .close-sidebar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text-secondary, $color-text-secondary);
+        transition: color 0.2s ease;
+        
+        &:hover {
+          color: var(--primary-color, $primary-color);
         }
       }
     }
@@ -78,19 +100,25 @@
       }
 
       .project-actions {
+        justify-content: center;
         display: flex;
         gap: 0.5rem;
       }
     }
 
     .project-context {
+      display: block !important; // Toujours afficher le contexte, même en responsive
       color: var(--color-text-secondary, $color-text-secondary);
       font-size: 0.9rem;
       margin: 0;
+      text-align: center;
       margin-top: 0.5rem;
       white-space: normal; // Permettre le retour à la ligne dans la sidebar
       overflow: hidden;
       max-width: 100%;
+      padding: 0.5rem;
+      background-color: rgba(0, 0, 0, 0.02);
+      border-radius: $radius-sm;
     }
     
     .error-notification {
@@ -103,13 +131,18 @@
     }
   }
   
+  // Sidebar header fixé après le project-header
   .sidebar-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: $sp-md;
     border-bottom: 1px solid var(--border-color, $border-color);
     width: 100%;
+    position: sticky;
+    top: var(--project-header-height, 160px); // Utiliser une variable CSS pour ajuster dynamiquement
+    background-color: var(--background-color, white);
+    z-index: 15;
     
     h2 {
       margin: 0;
@@ -117,10 +150,16 @@
       font-weight: 600;
       color: var(--color-text-primary, $color-text-primary);
     }
-    
-    .close-sidebar {
-      display: none; // Masqué par défaut en desktop
-    }
+  }
+  
+  // Conteneur défilant pour les conversations
+  .conversations-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
   }
   
   .new-conversation-btn {
@@ -133,6 +172,10 @@
     border-radius: $radius-md;
     font-weight: 500;
     width: calc(100% - 2 * $sp-md);
+    position: sticky;
+    top: var(--sidebar-header-height, 210px); // Juste après le sidebar-header
+    background-color: var(--primary-color, $primary-color);
+    z-index: 10;
     
     svg {
       font-size: 1rem;
@@ -143,6 +186,7 @@
     padding: 0 $sp-md;
     width: 100%;
     isolation: isolate; // Alternative à contain pour une meilleure compatibilité
+    flex: 1;
     
     .conversation-item {
       display: flex;
@@ -256,13 +300,12 @@
     // Utiliser isolation pour une meilleure compatibilité que contain
     isolation: isolate;
     
-    .sidebar-header {
-      .close-sidebar {
-        display: block; // Afficher sur mobile et tablette uniquement
-      }
-    }
-    
     .project-header {
+      .project-context {
+        display: block !important; // S'assurer que le contexte est toujours visible
+        font-size: 0.85rem; // Réduire légèrement la taille du texte
+      }
+      
       .project-title-container {
         h1 {
           font-size: 1.3rem;
@@ -271,9 +314,18 @@
         .project-actions {
           flex-direction: row;
           width: 100%;
-          justify-content: flex-start;
+          justify-content: center;
         }
       }
+    }
+    
+    // Ajuster les hauteurs pour les éléments fixes
+    .sidebar-header {
+      top: var(--project-header-height-tablet, 140px);
+    }
+    
+    .new-conversation-btn {
+      top: var(--sidebar-header-height-tablet, 190px);
     }
   }
 }
@@ -281,13 +333,22 @@
 @media (max-width: $mobile) {
   .project-sidebar {
     .project-header {
-      .back-to-home {
+      .header-top {
         margin-bottom: $sp-sm;
         
-        .home-button {
-          padding: $sp-xs ($sp-sm + $sp-xs);
-          font-size: $fs-sm;
+        .back-to-home {
+          .home-button {
+            padding: $sp-xs ($sp-sm + $sp-xs);
+            font-size: $fs-sm;
+          }
         }
+      }
+      
+      .project-context {
+        display: block !important; // S'assurer que le contexte est toujours visible
+        font-size: 0.8rem; // Réduire davantage la taille pour mobile
+        max-height: 80px; // Limiter la hauteur
+        overflow-y: auto; // Permettre le défilement si nécessaire
       }
       
       .project-title-container {
@@ -295,6 +356,15 @@
           font-size: 1.2rem;
         }
       }
+    }
+    
+    // Ajuster les hauteurs pour les éléments fixes en mobile
+    .sidebar-header {
+      top: var(--project-header-height-mobile, 120px);
+    }
+    
+    .new-conversation-btn {
+      top: var(--sidebar-header-height-mobile, 170px);
     }
   }
 }

@@ -215,14 +215,26 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
     <div className="project-sidebar" role="complementary" aria-label="Conversations du projet">
       {/* Project Header intégré dans la sidebar */}
       <div className="project-header">
-        <div className="back-to-home">
+        <div className="header-top">
+          <div className="back-to-home">
+            <Button 
+              variant="ghost" 
+              onClick={handleGoHome}
+              className="home-button"
+              title="Retour à l'accueil"
+            >
+              <FaHome /> Accueil
+            </Button>
+          </div>
+          
           <Button 
-            variant="ghost" 
-            onClick={handleGoHome}
-            className="home-button"
-            title="Retour à l'accueil"
+            variant="ghost"
+            className="close-sidebar"
+            onClick={onClose}
+            title="Masquer la liste des conversations"
+            aria-label="Fermer la barre latérale"
           >
-            <FaHome /> Accueil
+            <FaTimes aria-hidden="true" />
           </Button>
         </div>
         
@@ -247,6 +259,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
                 </Button>
               </div>
             </div>
+            
             {projectData.context && (
               <p className="project-context">{projectData.context}</p>
             )}
@@ -258,15 +271,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
 
       <div className="sidebar-header">
         <h2 id="conversation-list-title">Conversations</h2>
-        <Button 
-          variant="ghost"
-          className="close-sidebar"
-          onClick={onClose}
-          title="Masquer la liste des conversations"
-          aria-label="Fermer la barre latérale"
-        >
-          <FaTimes aria-hidden="true" />
-        </Button>
       </div>
 
       {/* Bouton pour nouvelle conversation */}
