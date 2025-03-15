@@ -1,7 +1,9 @@
 import React, { memo, useCallback, useState } from "react";
 import { SidebarProps } from "./Sidebar.types";
+import { useAuth } from "../../../hooks/useAuth/useAuth";
 import "./Sidebar.scss";
 import { FaSignOutAlt, FaComments, FaFolder, FaPlus, FaEdit, FaTrash, FaChevronLeft } from "react-icons/fa";
+import { Modal } from "../../common/Modal/Modal";
 
 export const Sidebar: React.FC<SidebarProps> = memo(({
   isOpen,
@@ -21,7 +23,25 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
   selectedProjectId = null,
 }) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+  const { logout } = useAuth();
+  
   console.log("Sidebar props - selected conversation:", selectedConversationId, "selected project:", selectedProjectId);
+  
+  // Gestionnaire de déconnexion
+  const handleLogoutClick = useCallback(() => {
+    setShowLogoutModal(true);
+  }, []);
+
+  const handleConfirmLogout = useCallback(() => {
+    logout();
+    onLogout(); // Appel de la fonction de déconnexion passée en props
+    setShowLogoutModal(false);
+  }, [logout, onLogout]);
+
+  const handleCancelLogout = useCallback(() => {
+    setShowLogoutModal(false);
+  }, []);
   
   // Gestionnaire pour la suppression de conversation
   const handleDeleteConversation = useCallback((e: React.MouseEvent, itemId: number | string, itemTitle: string) => {
@@ -190,64 +210,94 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
   }, [onSelectProject, onRenameProject, handleDeleteProject, isProcessing, selectedProjectId]);
   
   return (
-    <div className={`sidebar ${isOpen ? "open" : "closed"}`} role="complementary">
-      <div className="sidebar-header">
-        <div className="home-icon-container" onClick={onToggleSidebar}>
-          <FaChevronLeft className="home-icon" />
+    <>
+      <div className={`sidebar ${isOpen ? "open" : "closed"}`} role="complementary">
+        <div className="sidebar-header">
+          <div className="home-icon-container" onClick={onToggleSidebar}>
+            <FaChevronLeft className="home-icon" />
+          </div>
         </div>
+
+        <div className="content">
+          <div className="section">
+            <div className="section-header">
+              <FaComments />
+              <span className="section-title">Conversations</span>
+            </div>
+            <button 
+              className="add-btn" 
+              onClick={onNewConversation} 
+              disabled={isProcessing}
+            >
+              <FaPlus className="add-icon" /> Nouvelle Conversation
+            </button>
+            <div className="section-list-container">
+              <ul className="section-list">
+                {conversations.map(renderConversationItem)}
+              </ul>
+            </div>
+          </div>
+
+          <hr className="divider" />
+
+          <div className="section">
+            <div className="section-header">
+              <FaFolder />
+              <span className="section-title">Projets</span>
+            </div>
+            <button 
+              className="add-btn" 
+              onClick={onNewProject}
+              disabled={isProcessing}
+            >
+              <FaPlus className="add-icon" /> Nouveau Projet
+            </button>
+            <div className="section-list-container">
+              <ul className="section-list">
+                {projects.map(renderProjectItem)}
+              </ul>
+            </div>
+          </div>
+
+          <hr className="divider" />
+        </div>
+
+        <button 
+          className="logout-btn" 
+          onClick={handleLogoutClick}
+          disabled={isProcessing}
+        >
+          <FaSignOutAlt className="logout-icon" /> Déconnexion
+        </button>
       </div>
 
-      <div className="content">
-        <div className="section">
-          <div className="section-header">
-            <FaComments />
-            <span className="section-title">Conversations</span>
-          </div>
-          <button 
-            className="add-btn" 
-            onClick={onNewConversation} 
-            disabled={isProcessing}
-          >
-            <FaPlus className="add-icon" /> Nouvelle Conversation
-          </button>
-          <div className="section-list-container">
-            <ul className="section-list">
-              {conversations.map(renderConversationItem)}
-            </ul>
-          </div>
-        </div>
-
-        <hr className="divider" />
-
-        <div className="section">
-          <div className="section-header">
-            <FaFolder />
-            <span className="section-title">Projets</span>
-          </div>
-          <button 
-            className="add-btn" 
-            onClick={onNewProject}
-            disabled={isProcessing}
-          >
-            <FaPlus className="add-icon" /> Nouveau Projet
-          </button>
-          <div className="section-list-container">
-            <ul className="section-list">
-              {projects.map(renderProjectItem)}
-            </ul>
-          </div>
-        </div>
-
-        <hr className="divider" />
-      </div>
-
-      <button 
-        className="logout-btn" 
-        onClick={onLogout}
-        disabled={isProcessing}
+      {/* Modal de confirmation de déconnexion */}
+      <Modal
+        isOpen={showLogoutModal}
+        onClose={handleCancelLogout}
+        title="Déconnexion"
+        size="sm"
       >
-        <FaSignOutAlt className="logout-icon" /> Déconnexion
-      </button>
-    </div>
+        <div className="logout-modal-content">
+          <p>Êtes-vous sûr de vouloir vous déconnecter ?</p>
+          <div className="button-group">
+            <button 
+              className="cancel-button" 
+              onClick={handleCancelLogout}
+              aria-label="Annuler la déconnexion"
+            >
+              Annuler
+            </button>
+            <button 
+              className="confirm-button" 
+              onClick={handleConfirmLogout}
+              aria-label="Confirmer la déconnexion"
+            >
+              Confirmer
+            </button>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 });

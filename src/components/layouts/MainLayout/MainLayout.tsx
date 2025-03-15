@@ -29,7 +29,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   // Utilisation des hooks réels pour les données
   const { 
@@ -60,8 +60,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   
   const handleLogout = useCallback(() => {
     console.log("Déconnexion");
-    // Logique de déconnexion à implémenter
-  }, []);
+    logout(); // Utiliser la fonction logout du contexte auth
+  }, [logout]);
   
   const handleNewConversation = useCallback(() => {
     console.log("Nouvelle conversation");
