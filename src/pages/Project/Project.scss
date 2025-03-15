@@ -4,9 +4,9 @@
 .project-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
+  height: 100%;
+      width: 100%;
+  overflow: hidden; /* Pour empêcher tout scroll global */
   background-color: var(--background-color, $background-color);
   color: var(--color-text-primary, $color-text-primary);
 
@@ -100,8 +100,9 @@
 
   .project-content {
     display: flex;
-    height: calc(100vh - 150px); // Ajuster selon la hauteur du header
-    overflow: hidden;
+    flex: 1; /* Prend tout l'espace restant */
+    height: calc(100vh - 0px); /* Hauteur fixe sans scroll */
+    overflow: hidden; /* Force aucun scroll ici */
     position: relative;
 
     .project-sidebar-container {
@@ -111,6 +112,7 @@
       background-color: var(--background-color, white);
       transition: all 0.3s ease-in-out;
       z-index: 5;
+      overflow: hidden; /* Contient le scroll interne */
       
       &.closed {
         width: 0;
@@ -122,17 +124,18 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow: hidden; /* Contient le scroll interne */
       background-color: var(--background-color, white);
       position: relative;
 
       .mobile-toolbar {
-        display: flex; // Toujours afficher la toolbar pour permettre la toggle
+        display: flex;
         padding: $sp-sm;
         border-bottom: 1px solid var(--border-color, $border-color);
         background-color: var(--background-color, $background-color);
         justify-content: space-between;
         align-items: center;
+        flex-shrink: 0; /* Empêche la compression */
         
         .sidebar-toggle, .context-toggle {
           padding: $sp-xs;
@@ -171,6 +174,29 @@
         color: var(--color-text-secondary, $color-text-secondary);
         gap: $sp-md;
         padding: $sp-lg;
+      }
+      
+      /* Style pour le ChatContainer */
+      .chat-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden; /* Le chat container ne défile pas */
+        max-height: 100%; /* Limiter à 100% de hauteur */
+        
+        .chat-tools {
+          padding: 8px;
+          flex-shrink: 0; /* Ne pas compresser */
+        }
+        
+        .chat-messages {
+          flex: 1;
+          overflow-y: auto; /* Seule cette partie défile */
+        }
+        
+        .chat-input {
+          flex-shrink: 0; /* Ne pas compresser */
+        }
       }
     }
   }
