@@ -173,7 +173,7 @@
   
   /* Partie 3: Liste des conversations (scrollable) */
   .conversations-list {
-    padding: 0 $sp-md $sp-md;
+    padding: 0.5rem;
     width: 100%;
     overflow-y: auto; /* SEULE PARTIE SCROLLABLE */
     flex: 1; /* Prend tout l'espace restant */

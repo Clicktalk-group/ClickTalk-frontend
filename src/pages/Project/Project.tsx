@@ -192,6 +192,9 @@ const Project: React.FC = () => {
     return activeConversation?.title || "Sélectionner une conversation";
   };
 
+  // Vérifier si on est sur l'écran d'accueil (message "Sélectionnez une conversation...")
+  const isWelcomeScreenShown = !isNewConversation && !currentConversationId;
+
   return (
     <div className="project-page">
       <div className="project-content">
@@ -211,6 +214,7 @@ const Project: React.FC = () => {
             onEditProject={handleEditProject}
             onDeleteProject={handleDeleteProject}
             error={error}
+            showWelcomeScreen={isWelcomeScreenShown} // Passer l'état du message d'accueil à la sidebar
           />
         </div>
         

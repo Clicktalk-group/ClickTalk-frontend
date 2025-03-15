@@ -29,6 +29,7 @@ interface ProjectSidebarProps {
   onEditProject: () => void;
   onDeleteProject: () => void;
   error?: string | null;
+  showWelcomeScreen: boolean; // Nouvelle prop pour savoir si le message d'accueil est affiché
 }
 
 // Utilisation de memo pour éviter les re-rendus inutiles
@@ -42,7 +43,8 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
   onClose,
   onEditProject,
   onDeleteProject,
-  error
+  error,
+  showWelcomeScreen
 }) => {
   const { 
     loading: convLoading, 
@@ -50,12 +52,23 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
     fetchConversations
   } = useConversation();
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // États locaux
   const [projectConversations, setProjectConversations] = useState<ConversationItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [sidebarError, setSidebarError] = useState<string | null>(null);
   
+  // Détecter si on est sur mobile ou non
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Utilisation de useCallback pour éviter de recréer les fonctions lors des re-rendus
   const loadProjectConversations = useCallback(async () => {
     if (!projectId) return;
@@ -211,6 +224,11 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
     );
   };
 
+  // Déterminer si on montre le bouton "Nouvelle conversation" dans la sidebar
+  // En version mobile: toujours afficher le bouton
+  // En version desktop: afficher uniquement si l'écran d'accueil n'est pas visible
+  const shouldShowNewConversationButton = isMobile || !showWelcomeScreen;
+
   return (
     <div className="project-sidebar" role="complementary" aria-label="Conversations du projet">
       {/* Project Header intégré dans la sidebar */}
@@ -273,16 +291,18 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
         <h2 id="conversation-list-title">Conversations</h2>
       </div>
 
-      {/* Bouton pour nouvelle conversation */}
-      <Button 
-        variant="primary" 
-        className="new-conversation-btn" 
-        onClick={onNewConversation}
-        fullWidth
-        aria-label="Créer une nouvelle conversation"
-      >
-        <FaPlus aria-hidden="true" /> Nouvelle conversation
-      </Button>
+      {/* Bouton pour nouvelle conversation - comportement dépendant du device */}
+      {shouldShowNewConversationButton && (
+        <Button 
+          variant="primary" 
+          className="new-conversation-btn" 
+          onClick={onNewConversation}
+          fullWidth
+          aria-label="Créer une nouvelle conversation"
+        >
+          <FaPlus aria-hidden="true" /> Nouvelle conversation
+        </Button>
+      )}
       
       {renderContent()}
     </div>
