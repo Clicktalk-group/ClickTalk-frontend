@@ -6,19 +6,22 @@
 
 ## 🚀 Fonctionnalités
 
-- 💬 **Chat IA**: Conversations dynamiques avec rendu Markdown
-- 🔐 **Authentification**: Système complet (Connexion, Inscription, Déconnexion)
-- 🌓 **Thème sombre/clair**: Interface personnalisable selon vos préférences
-- 📱 **Responsive**: Utilisation optimale sur tous vos appareils
-- 📂 **Projets**: Organisation structurée de vos conversations (en cours)
+- 💬 **Chat IA**: Conversations dynamiques avec rendu Markdown et streaming en direct
+- 🔐 **Authentification**: Système complet sécurisé avec vérification des tokens
+- 🌓 **Thème sombre/clair**: Interface entièrement personnalisable
+- 📱 **Responsive**: Expérience optimisée sur tous vos appareils
+- 📂 **Projets**: Gestion complète avec instructions personnalisées
+- ⚡ **Performance**: Optimisations avancées pour une expérience fluide
 
 ## 🛠️ Stack Technique
 
 - **Frontend**: React, TypeScript, SASS
 - **Gestion d'état**: Context API
 - **Routing**: React Router v6
-- **Authentification**: JWT
+- **Authentification**: JWT avec vérification d'expiration
 - **Styles**: SCSS Modules + Variables
+- **Formatage**: React-Markdown
+- **Optimisation**: Code splitting, mémoïsation, virtualisation
 - **Tests**: Jest + React Testing Library
 
 ## 🏁 Démarrage rapide
@@ -54,9 +57,12 @@ src/
 ├── components/       # Composants réutilisables
 │   ├── common/       # Composants de base (Button, Input, etc.)
 │   ├── layouts/      # Composants de mise en page
+│   ├── chat/         # Composants liés au chat
+│   ├── project/      # Composants de gestion de projets
 │   └── ... 
 ├── contexts/         # Contextes React pour la gestion d'état
 │   ├── auth/         # Contexte d'authentification 
+│   ├── theme/        # Gestion du thème
 │   └── ... 
 ├── hooks/            # Hooks personnalisés
 ├── pages/            # Composants de page
@@ -71,27 +77,43 @@ src/
 ### 🏠 Layout
 
 - **MainLayout**: Structure principale avec Header, Sidebar et zone de contenu
-- **Sidebar**: Navigation et gestion des conversations/projets
+- **Sidebar**: Navigation avancée avec gestion des conversations/projets
+- **Header**: Navigation, menu utilisateur et réglages rapides
 
 ### 💬 Chat
 
-- **ChatContainer**: Gestion des conversations et messages
-- **MessageBubble**: Affichage des messages avec support Markdown
-- **ChatInput**: Saisie et envoi de messages
+- **ChatContainer**: Gestion des conversations et messages avec streaming
+- **MessageBubble**: Affichage des messages avec support Markdown et copie
+- **ChatInput**: Saisie et envoi de messages avec validation
+- **InstructionsPreview**: Affichage des instructions personnalisées par projet
 
 ### 🔐 Auth
 
-- **Login/Register**: Formulaires d'authentification
-- **AuthContext**: Gestion des états d'authentification et tokens
+- **Login/Register**: Formulaires d'authentification avec validation
+- **AuthContext**: Gestion des états d'authentification et vérification des tokens
+- **ProtectedRoute**: Sécurisation des routes avec redirection intelligente
+
+### ⚙️ Settings & Préférences
+
+- **Settings**: Gestion des préférences utilisateur
+- **ThemeToggle**: Basculement entre thèmes clair/sombre
+- **AccountSettings**: Gestion du compte (déconnexion, suppression)
+
+### 📂 Projets
+
+- **ProjectList**: Affichage et gestion des projets
+- **ProjectForm**: Création et modification de projets
+- **ProjectInstructions**: Édition des instructions spécifiques au projet
 
 ## 🎨 Système de design
 
 ClickTalk utilise un système de design cohérent avec:
 
 - **Variables SCSS**: Couleurs, espaces, tailles de police
-- **Thèmes**: Support intégré des thèmes clair/sombre
+- **Thèmes**: Support intégré des thèmes clair/sombre avec persistance
 - **Composants de base**: Boutons, entrées, cartes stylisés uniformément
 - **Responsive**: Mixins pour une adaptation fluide à différents appareils
+- **Animations**: Transitions et animations optimisées pour l'UX
 
 ## 📝 API
 
@@ -101,10 +123,20 @@ BASE_URL = 'https://api.clicktalk.com/v1'
 ```
 
 Points d'accès principaux:
-- `/auth`: Authentification
+- `/auth`: Authentification (login, register, verify)
 - `/conversation`: Gestion des conversations
-- `/messages`: Envoi/réception de messages
-- `/project`: Gestion des projets
+- `/messages`: Envoi/réception de messages (streaming support)
+- `/project`: Gestion des projets avec instructions personnalisées
+- `/user`: Gestion utilisateur et préférences
+
+## 🚀 Optimisations de performance
+
+- **Code Splitting**: Chargement à la demande des composants
+- **Mémoïsation**: Utilisation de React.memo, useCallback et useMemo
+- **Virtualisation**: Gestion efficace des listes longues
+- **Service Worker**: Support offline et chargement accéléré
+- **Optimisation d'images**: Utilisation du format WebP (-30% taille)
+- **Web Vitals**: Surveillance des métriques de performance
 
 ## 🧪 Tests
 
@@ -130,6 +162,10 @@ yarn test
 3. Committez vos changements (`git commit -m 'feat: ajout d'une fonctionnalité incroyable'`)
 4. Poussez vers la branche (`git push origin feature/fonctionnalite-incroyable`)
 5. Ouvrez une Pull Request
+
+## 👥 Contributeurs
+
+- CND - Web Is Yours
 
 ## 📝 License
 
