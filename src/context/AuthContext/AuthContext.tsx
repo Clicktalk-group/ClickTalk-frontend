@@ -21,7 +21,31 @@ type AuthProviderProps = {
   children: ReactNode;
 };
 
-// Provider d'authentification qui encapsule la logique d'authentification
+// Interface pour token décodé
+interface TokenPayload {
+  exp: number;
+  sub: string;
+  [key: string]: any;
+}
+
+// Fonction utilitaire pour décoder le token sans dépendance externe
+function parseJwt(token: string): TokenPayload | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error('Erreur lors du décodage du token', e);
+    return null;
+  }
+}
+
 // Provider d'authentification qui encapsule la logique d'authentification
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Initialisation des valeurs d'état à partir du localStorage
@@ -35,7 +59,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Effet pour vérifier si l'utilisateur est déjà connecté - réduit avec useMemo
+  // Fonction pour vérifier la validité du token
+  const isTokenValid = useCallback((token: string) => {
+    if (!token) return false;
+    
+    try {
+      const decoded = parseJwt(token);
+      if (!decoded) return false;
+      
+      const currentTime = Date.now() / 1000;
+      return decoded.exp > currentTime;
+    } catch (error) {
+      console.error("Erreur de validation du token:", error);
+      return false;
+    }
+  }, []);
+
+  // Fonction de déconnexion définie en amont pour éviter les erreurs de référence circulaire
+  const logout = useCallback(async () => {
+    try {
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Déconnexion de l'utilisateur");
+      }
+      
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      setAccessToken('');
+      setUser(null);
+      setError(null);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Déconnexion réussie");
+      }
+    } catch (err) {
+      console.error("Erreur lors de la déconnexion:", err);
+      setError("Échec de la déconnexion");
+    }
+  }, []);
+
+  // Effet pour vérifier si l'utilisateur est déjà connecté
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -43,26 +106,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const storedToken = localStorage.getItem('token');
         
         if (storedToken) {
-          // Utiliser le token stocké
-          setAccessToken(storedToken);
-          
-          // Récupérer les informations utilisateur du localStorage
-          const storedUser = localStorage.getItem('user');
-          if (storedUser) {
-            setUser(JSON.parse(storedUser));
+          // Vérifier si le token est toujours valide
+          if (isTokenValid(storedToken)) {
+            // Utiliser le token stocké
+            setAccessToken(storedToken);
+            
+            // Récupérer les informations utilisateur du localStorage
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+              setUser(JSON.parse(storedUser));
+            }
+          } else {
+            // Token expiré, déconnexion
+            await logout();
           }
         }
       } catch (err) {
         console.error('Erreur lors de l\'initialisation de l\'authentification:', err);
         setAccessToken('');
         setUser(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       } finally {
         setIsLoading(false);
       }
     };
 
     initAuth();
-  }, []);
+  }, [isTokenValid, logout]);
+
+  // Vérification périodique de l'expiration du token
+  useEffect(() => {
+    if (!accessToken) return;
+    
+    const checkTokenExpiration = () => {
+      if (!isTokenValid(accessToken)) {
+        // Token expiré, déconnexion
+        logout();
+      }
+    };
+    
+    // Vérifier immédiatement
+    checkTokenExpiration();
+    
+    // Puis vérifier périodiquement
+    const intervalId = setInterval(checkTokenExpiration, 60000); // Vérifier chaque minute
+    
+    return () => clearInterval(intervalId);
+  }, [accessToken, isTokenValid, logout]);
 
   // Optimisé avec useCallback pour éviter les recréations de fonctions
   const login = useCallback(async (email: string, password: string) => {
@@ -183,29 +274,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw err;
     } finally {
       setIsLoading(false);
-    }
-  }, []);
-
-  // Optimisé avec useCallback
-  const logout = useCallback(async () => {
-    try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Déconnexion de l'utilisateur");
-      }
-      
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
-      setAccessToken('');
-      setUser(null);
-      setError(null);
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Déconnexion réussie");
-      }
-    } catch (err) {
-      console.error("Erreur lors de la déconnexion:", err);
-      setError("Échec de la déconnexion");
     }
   }, []);
 
