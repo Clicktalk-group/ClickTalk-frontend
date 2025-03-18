@@ -15,13 +15,8 @@ const ConversationList = React.memo(({
   onDelete,
   onEdit 
 }: ConversationListProps) => {
-  const { conversations, fetchConversations, loading, error } = useConversation();
+  const { conversations, loading, error } = useConversation();
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
-  // Utilisation de useEffect avec fetchConversations qui est mémoïsé par le hook
-  useEffect(() => {
-    fetchConversations();
-  }, [fetchConversations]);
 
   // Optimisation du gestionnaire d'événements de sélection de conversation
   const handleSelect = useCallback((id: number) => {
