@@ -1,7 +1,7 @@
 import { createContext, PropsWithChildren, useReducer } from "react";
 import { Conversation, Message } from "../../types/conversation.types";
 
-interface IConversationsContext {
+interface ConversationsContext {
   conversations: Conversation[];
   currentConversation: Conversation | null;
   loading: boolean;
@@ -14,7 +14,7 @@ interface IConversationsContext {
   setError: (error: string) => void;
 }
 
-const defaultContext: IConversationsContext = {
+const defaultContext: ConversationsContext = {
   conversations: [],
   currentConversation: null,
   loading: false,
