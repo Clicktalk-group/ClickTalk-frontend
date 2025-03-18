@@ -196,7 +196,9 @@ const useChat = (conversationId?: number) => {
       recordMessageEnd(tempUserId, content.length);
       
         // Déterminer l'ID de conversation
-        const responseConvId = response?.convId || null;
+        const responseConvId = response?.convId || response?.conversationId ||
+        (response?.id && response?.user ? response.id : null) ||
+        convId || null;
 
         // if first message fetch the conversation
         if (responseConvId && !convId) {
