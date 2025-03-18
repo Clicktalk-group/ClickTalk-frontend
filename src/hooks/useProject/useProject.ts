@@ -183,11 +183,6 @@ export const useProject = () => {
     }
   }, []);
 
-  // Charger les projets au montage du composant
-  useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
-
   return {
     projects,
     currentProject,
