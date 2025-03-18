@@ -152,12 +152,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(
 
   // Optimisation du rendu conditionnel pour éviter les calculs inutiles
   const renderContent = () => {
-    if (loading || (convLoading && projectConversations.length === 0)) {
+    if (loading || (projectConversations.length === 0)) {
       return <div className="sidebar-loading" role="status" aria-live="polite">Chargement des conversations...</div>;
     }
     
-    if (sidebarError || convError) {
-      return <div className="sidebar-error" role="alert">{sidebarError || convError}</div>;
+    if (sidebarError ) {
+      return <div className="sidebar-error" role="alert">{sidebarError}</div>;
     }
     
     if (!projectConversations || projectConversations.length === 0) {
