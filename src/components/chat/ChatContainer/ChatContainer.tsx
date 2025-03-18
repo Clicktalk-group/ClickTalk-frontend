@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import ChatMessages from '../ChatMessages';
-import ChatInput from '../ChatInput';
-import useChat from '../../../hooks/useChat/useChat';
-import PerformanceMonitor from '../PerformanceMonitor';
-import './ChatContainer.scss';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useConversation } from '../../../hooks/useConversation/useConversation';
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ChatMessages from "../ChatMessages";
+import ChatInput from "../ChatInput";
+import useChat from "../../../hooks/useChat/useChat";
+import PerformanceMonitor from "../PerformanceMonitor";
+import "./ChatContainer.scss";
 
 interface ChatContainerProps {
   onMessageSent?: () => void;
