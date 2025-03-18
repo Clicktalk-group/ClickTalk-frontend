@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useCallback, memo } from 'react';
-import { useConversation } from '../../../hooks/useConversation/useConversation';
-import { Button } from '../../common/Button';
+import React, { useEffect, useState, useCallback, memo } from "react";
+import { Button } from "../../common/Button";
 import { FaPlus, FaTimes, FaTrash, FaComment, FaEdit, FaHome } from 'react-icons/fa';
 import { projectService } from '../../../services/project/project';
 import { useNavigate } from 'react-router-dom';
@@ -33,26 +32,22 @@ interface ProjectSidebarProps {
 }
 
 // Utilisation de memo pour éviter les re-rendus inutiles
-export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
-  projectId,
-  projectData,
-  onNewConversation,
-  onSelectConversation,
-  onRemoveConversation,
-  selectedConversationId,
-  onClose,
-  onEditProject,
-  onDeleteProject,
-  error,
-  showWelcomeScreen
-}) => {
-  const { 
-    loading: convLoading, 
-    error: convError, 
-    fetchConversations
-  } = useConversation();
-  const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(
+  ({
+    projectId,
+    projectData,
+    onNewConversation,
+    onSelectConversation,
+    onRemoveConversation,
+    selectedConversationId,
+    onClose,
+    onEditProject,
+    onDeleteProject,
+    error,
+    showWelcomeScreen,
+  }) => {
+    const navigate = useNavigate();
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // États locaux
   const [projectConversations, setProjectConversations] = useState<ConversationItem[]>([]);
@@ -108,25 +103,21 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(({
     }
   }, [projectId]);
 
-  // Charger les conversations du projet
-  useEffect(() => {
-    // Charger les données avec une fonction nettoyable pour éviter les memory leaks
-    let isMounted = true;
-    const load = async () => {
-      await loadProjectConversations();
-      // On charge aussi toutes les conversations au cas où
-      if (isMounted) {
-        fetchConversations();
-      }
-    };
-    
-    load();
-    
-    // Nettoyer pour éviter les memory leaks
-    return () => {
-      isMounted = false;
-    };
-  }, [projectId, fetchConversations, loadProjectConversations]);
+    // Charger les conversations du projet
+    useEffect(() => {
+      // Charger les données avec une fonction nettoyable pour éviter les memory leaks
+      let isMounted = true;
+      const load = async () => {
+        await loadProjectConversations();
+      };
+
+      load();
+
+      // Nettoyer pour éviter les memory leaks
+      return () => {
+        isMounted = false;
+      };
+    }, [projectId, loadProjectConversations]);
 
   const handleRemove = useCallback(async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
