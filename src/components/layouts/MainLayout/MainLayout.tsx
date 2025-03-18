@@ -42,7 +42,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   useEffect(() => {
     fetchConversations();
     fetchProjects();
-  }, [fetchConversations, fetchProjects]);
+  }, []);
 
   // Vérifier si nous sommes sur une page de chat ou de projet
   const isChatPage = location.pathname.includes("/chat");
