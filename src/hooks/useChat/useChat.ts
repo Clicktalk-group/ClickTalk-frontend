@@ -1,9 +1,15 @@
 // src/hooks/useChat/useChat.ts
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Message, Conversation, ChatState, ApiMessageResponse } from '../../types/chat.types';
-import apiService from '../../services/api/api';
-import usePerformanceMetrics from '../usePerformanceMetrics/usePerformanceMetrics';
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import {
+  Message,
+  Conversation,
+  ChatState,
+  ApiMessageResponse,
+} from "../../types/chat.types";
+import apiService from "../../services/api/api";
+import usePerformanceMetrics from "../usePerformanceMetrics/usePerformanceMetrics";
+import { useConversation } from "../useConversation/useConversation";
 
 const useChat = (conversationId?: number) => {
   const [state, setState] = useState<ChatState>({
@@ -13,6 +19,7 @@ const useChat = (conversationId?: number) => {
     error: null,
     streamingMessage: null
   });
+  const { fetchConversationById } = useConversation();
 
   // Extraction des métriques de performance avec mémoïsation
   const metrics = usePerformanceMetrics();
@@ -261,11 +268,13 @@ const useChat = (conversationId?: number) => {
       // Enregistrer la fin du message et sa taille
       recordMessageEnd(tempUserId, content.length);
       
-      // Déterminer l'ID de conversation
-      const responseConvId = response?.convId || response?.conversationId || 
-                            (response?.id && response?.userId ? response.id : null) || 
-                            convId || null;
-      
+        // Déterminer l'ID de conversation
+        const responseConvId = response?.convId || null;
+
+        // if first message fetch the conversation
+        if (responseConvId && !convId) {
+          fetchConversationById(responseConvId);
+        }
       if (responseConvId) {
         // Intégrer le message en streaming dans la liste des messages avec une seule mise à jour d'état
         safeSetState(prevState => {
@@ -342,7 +351,17 @@ const useChat = (conversationId?: number) => {
         messages: currentMessages
       }));
     }
-  }, [handleStreamChunk, recordMessageStart, recordMessageEnd, recordRenderStart, recordRenderEnd, safeSetState]); 
+  },
+    [
+      handleStreamChunk,
+      recordMessageStart,
+      recordMessageEnd,
+      recordRenderStart,
+      recordRenderEnd,
+      safeSetState,
+      fetchConversationById,
+    ]
+  );
 
   // Charger les messages au montage du composant
   useEffect(() => {
