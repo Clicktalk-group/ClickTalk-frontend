@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext/AuthContext";
+import ConversationsContextProvider from "./context/ConversationsContext/ConversationsContext";
 import { ThemeProvider } from "./context/ThemeContext/ThemeContext";
 import { createAppRouter } from "./routes/Routes";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
@@ -23,9 +24,11 @@ const App = () => {
     <ErrorBoundary>
       <ThemeProvider>
         <AuthProvider>
-          <Suspense fallback={<LoadingFallback />}>
-            <AppWithRouter />
-          </Suspense>
+          <ConversationsContextProvider>
+            <Suspense fallback={<LoadingFallback />}>
+              <AppWithRouter />
+            </Suspense>
+          </ConversationsContextProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

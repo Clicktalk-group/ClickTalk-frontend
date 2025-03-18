@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useConversation } from '../../../hooks/useConversation/useConversation';
-import { useProject } from '../../../hooks/useProject/useProject';
-import { Conversation } from '../../../types/conversation.types';
-import './ConversationProjectList.scss';
-import { FaTrash, FaComment } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { useProject } from "../../../hooks/useProject/useProject";
+import { Conversation } from "../../../types/conversation.types";
+import "./ConversationProjectList.scss";
+import { FaTrash, FaComment } from "react-icons/fa";
 
 interface ConversationProjectListProps {
   projectId: number;
@@ -21,7 +20,6 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
   onSelect,
   onRemove
 }) => {
-  const { fetchProjectConversations } = useConversation();
   // Utiliser aussi le hook useProject pour pouvoir utiliser getProjectConversations si disponible
   const { getProjectConversations } = useProject();
   
@@ -35,19 +33,16 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
       setIsLoading(true);
       try {
         if (projectId) {
-          // Essayer d'abord fetchProjectConversations (de useConversation)
           let data: ConversationResponse[] | undefined;
-          
+
           try {
-            data = await fetchProjectConversations(projectId) as ConversationResponse[];
+            data = (await getProjectConversations(
+              projectId
+            )) as ConversationResponse[];
           } catch (e) {
-            console.warn('Failed to load with fetchProjectConversations, trying getProjectConversations');
-            // Essayer la méthode alternative si la première échoue
-            if (getProjectConversations) {
-              data = await getProjectConversations(projectId) as ConversationResponse[];
-            }
+            console.error("Error loading project conversations:", e);
           }
-          
+
           if (data && Array.isArray(data)) {
             const formattedConversations = data.map(conv => ({
               id: conv.id || (conv.convId as number), // Cast explicite pour satisfaire TypeScript
@@ -74,7 +69,7 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
     };
 
     loadConversations();
-  }, [projectId, fetchProjectConversations, getProjectConversations, isRemoving]);
+  }, [projectId, getProjectConversations, isRemoving]);
 
   const handleRemoveClick = async (e: React.MouseEvent, conversationId: number) => {
     e.stopPropagation();
