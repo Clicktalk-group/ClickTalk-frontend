@@ -39,12 +39,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   } = useConversation();
   
   const { projects, fetchProjects, deleteProject } = useProject();
-  
-  // Charger les projets au début
+
+  // fetch the conversations and projects on initial render
   useEffect(() => {
+    fetchConversations();
     fetchProjects();
-  }, [fetchProjects]);
-  
+  }, [fetchConversations, fetchProjects]);
+
   // Vérifier si nous sommes sur une page de chat ou de projet
   const isChatPage = location.pathname.includes('/chat');
   const isProjectPage = location.pathname.includes('/project');
