@@ -11,7 +11,7 @@ export interface Message {
 export interface ChatState {
   messages: Message[];
   isLoading: boolean;
-  currentConversation: Conversation | null;
+  currentConversationId: Number | null;
   error: string | null;
   streamingMessage: string | null; // NOUVEAU: pour suivre le message en streaming
 }

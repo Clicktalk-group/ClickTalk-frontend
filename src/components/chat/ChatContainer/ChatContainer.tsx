@@ -28,20 +28,20 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
     error,
     sendMessage, 
     copyMessage,
-    currentConversation,
+    currentConversationId,
     streamingMessage,
     performanceMetrics // Nouvelle propriété pour les métriques
   } = useChat(convId);
 
   // Si la conversation est créée, naviguer vers son URL
   useEffect(() => {
-    if (isNewConversation && currentConversation?.id) {
+    if (isNewConversation && currentConversationId) {
       setIsNewConversation(false);
       if (!projectId) { // Ne naviguer que s'il ne s'agit pas d'un chat dans un projet
-        navigate(`/chat/${currentConversation.id}`);
+        navigate(`/chat/${currentConversationId}`);
       }
     }
-  }, [currentConversation, isNewConversation, navigate, projectId]);
+  }, [currentConversationId, isNewConversation, navigate, projectId]);
 
   // Utiliser useCallback pour éviter de recréer cette fonction à chaque rendu
   const handleTogglePerformanceMetrics = useCallback(() => {

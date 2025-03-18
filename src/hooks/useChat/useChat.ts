@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   Message,
-  Conversation,
   ChatState,
   ApiMessageResponse,
 } from "../../types/chat.types";
@@ -15,7 +14,7 @@ const useChat = (conversationId?: number) => {
   const [state, setState] = useState<ChatState>({
     messages: [],
     isLoading: false,
-    currentConversation: null,
+    currentConversationId: null,
     error: null,
     streamingMessage: null
   });
@@ -108,49 +107,6 @@ const useChat = (conversationId?: number) => {
     loadMessagesRef.current = loadMessages;
   }, [loadMessages]);
 
-  // Charger une conversation
-  const loadConversation = useCallback(async (convId: number) => {
-    if (!convId) {
-      console.error("No conversation ID provided to loadConversation");
-      return;
-    }
-    
-    safeSetState(prevState => ({ 
-      ...prevState, 
-      isLoading: true, 
-      error: null,
-    }));
-    
-    try {
-      console.log(`🔄 Loading conversation: ${convId}`);
-      recordRenderStart(`loadConversation-${convId}`);
-      const response = await apiService.get<Conversation>(`/conversation/${convId}`);
-      recordRenderEnd(`loadConversation-${convId}`);
-      
-      // Mettre à jour les détails de la conversation
-      safeSetState(prevState => ({
-        ...prevState,
-        currentConversation: response
-      }));
-      
-      // Charger les messages de cette conversation
-      await loadMessages(convId);
-    } catch (error) {
-      console.error("❌ Error loading conversation:", error);
-      
-      safeSetState(prevState => ({
-        ...prevState,
-        error: 'Échec du chargement de la conversation',
-        isLoading: false
-      }));
-    }
-  }, [loadMessages, recordRenderStart, recordRenderEnd, safeSetState]);
-  
-  // Assigner la fonction réelle à la référence
-  useEffect(() => {
-    loadConversationRef.current = loadConversation;
-  }, [loadConversation]);
-
   // Gestionnaire de chunks optimisé
   const handleStreamChunk = useCallback((chunk: string) => {
     // Enregistrer les métriques seulement si nécessaire
@@ -167,35 +123,6 @@ const useChat = (conversationId?: number) => {
       });
     }
   }, [recordStreamingChunk, safeSetState]);
-
-  // Mémoïsation optimisée pour la création de conversation
-  const createConversation = useCallback(async (title: string) => {
-    if (!title.trim()) {
-      console.warn("Empty title, not creating conversation");
-      return null;
-    }
-
-    safeSetState(prevState => ({ ...prevState, isLoading: true, error: null }));
-    
-    try {
-      recordRenderStart('createConversation');
-      const response = await apiService.post<Conversation>('/conversation/add', { title });
-      recordRenderEnd('createConversation');
-      
-      safeSetState(prevState => ({ ...prevState, isLoading: false }));
-      return response;
-    } catch (error) {
-      console.error("❌ Error creating conversation:", error);
-      
-      safeSetState(prevState => ({
-        ...prevState,
-        error: 'Échec de création de la conversation',
-        isLoading: false
-      }));
-      
-      return null;
-    }
-  }, [recordRenderStart, recordRenderEnd, safeSetState]);
 
   // Envoyer un message avec support de streaming et métriques - optimisé
   const sendMessage = useCallback(async (convId: number | undefined, content: string, projectId?: number) => {
@@ -296,6 +223,7 @@ const useChat = (conversationId?: number) => {
           
           return {
             ...prevState,
+            currentConversationId: responseConvId,
             messages: updatedMessages,
             streamingMessage: null,
             isLoading: false
@@ -365,8 +293,8 @@ const useChat = (conversationId?: number) => {
 
   // Charger les messages au montage du composant
   useEffect(() => {
-    if (conversationId && conversationId > 0) {
-      loadConversation(conversationId);
+    if (conversationId) {
+      loadMessages(conversationId);
     } else {
       setState((prevState) => ({
         ...prevState,
@@ -381,7 +309,7 @@ const useChat = (conversationId?: number) => {
     return () => {
       clearMetrics();
     };
-  }, [conversationId, loadConversation, clearMetrics]);
+  }, [conversationId,loadMessages, clearMetrics]);
   
   // Copier un message - optimisé avec mémoïsation
   const copyMessage = useCallback((content: string) => {
@@ -396,15 +324,11 @@ const useChat = (conversationId?: number) => {
   return useMemo(() => ({
     ...state,
     sendMessage,
-    createConversation,
-    loadConversation,
     copyMessage,
     performanceMetrics: metrics.metrics
   }), [
     state,
     sendMessage,
-    createConversation,
-    loadConversation,
     copyMessage,
     metrics.metrics
   ]);
