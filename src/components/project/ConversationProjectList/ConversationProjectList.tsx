@@ -20,7 +20,6 @@ const ConversationProjectList: React.FC<ConversationProjectListProps> = ({
   onSelect,
   onRemove
 }) => {
-  const { fetchProjectConversations } = useConversation();
   // Utiliser aussi le hook useProject pour pouvoir utiliser getProjectConversations si disponible
   const { getProjectConversations } = useProject();
   
