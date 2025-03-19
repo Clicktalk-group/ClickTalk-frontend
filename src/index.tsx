@@ -3,13 +3,12 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext/AuthContext";
 import ConversationsContextProvider from "./context/ConversationsContext/ConversationsContext";
+import  ProjectContextProvider  from "./context/ProjectsContext/ProjectsContext"
 import { ThemeProvider } from "./context/ThemeContext/ThemeContext";
 import { createAppRouter } from "./routes/Routes";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 import "./styles/global.scss";
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-
-
 // Loading fallback optimisé avec animation plus fluide
 const LoadingFallback = () => (
   <div className="global-loader">
@@ -25,9 +24,11 @@ const App = () => {
       <ThemeProvider>
         <AuthProvider>
           <ConversationsContextProvider>
+            <ProjectContextProvider>
             <Suspense fallback={<LoadingFallback />}>
               <AppWithRouter />
             </Suspense>
+            </ProjectContextProvider>
           </ConversationsContextProvider>
         </AuthProvider>
       </ThemeProvider>
