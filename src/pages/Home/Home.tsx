@@ -4,8 +4,6 @@ import './Home.scss';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import { Modal } from '../../components/common/Modal/Modal';
 import ThemeModalContent from '../../components/modals/ThemeModal/ThemeModal';
-import { useAuth } from '../../hooks/useAuth/useAuth';
-import { useProject } from '../../hooks/useProject/useProject';
 
 // Lazy loaded components - identique à MainLayout
 const ProjectForm = lazy(() => import('../../components/project/ProjectForm/ProjectForm'));
@@ -27,9 +25,6 @@ const Home: React.FC = () => {
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [editingProject, setEditingProject] = useState<any>(null);
   
-  const { user } = useAuth();
-  const { fetchProjects } = useProject();
-  
   // Utilisation de useCallback pour optimiser la fonction
   const activateChatMode = useCallback(() => {
     console.log('Activating chat mode');
@@ -49,8 +44,7 @@ const Home: React.FC = () => {
     setShowProjectForm(false);
     setEditingProject(null);
     // Rafraîchir les projets après la fermeture du formulaire
-    fetchProjects();
-  }, [fetchProjects]);
+  }, []);
 
   // Ouverture/fermeture de la modale de thème
   const handleOpenThemeModal = useCallback(() => {
@@ -111,7 +105,6 @@ const Home: React.FC = () => {
             <Suspense fallback={<FormLoading />}>
               <ProjectForm 
                 onClose={handleCloseProjectForm} 
-                userId={user?.id || 0} 
                 initialData={editingProject}
               />
             </Suspense>
