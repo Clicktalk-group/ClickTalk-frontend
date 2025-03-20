@@ -15,7 +15,8 @@ export const projectService = {
         id: project.projectId || project.id,
         userId: project.userId || 0, 
         title: project.title || "Sans titre",
-        context: project.content || project.context || "" 
+        context: project.content || project.context || "",
+        conversations: project.conversations || []
       }));
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -46,7 +47,6 @@ export const projectService = {
     try {
       // Convertir les données pour correspondre au format attendu par l'API
       const requestData = {
-        userId: data.userId,
         title: data.title,
         context: data.context // Le backend attend "context" et non "content"
       };
@@ -63,7 +63,8 @@ export const projectService = {
         id: response.id || response.projectId,
         userId: response.userId,
         title: response.title,
-        context: response.context || ""
+        context: response.context || "",
+        conversations: response.conversations || []
       };
     } catch (error) {
       console.error('Error creating project:', error);
@@ -77,7 +78,6 @@ export const projectService = {
       // IMPORTANT: Le backend attend les mêmes champs que dans l'entité Project
       const requestData = {
         id: data.id,
-        userId: data.userId, 
         title: data.title,
         context: data.context // Utiliser "context" comme dans Project.java
       };
@@ -91,7 +91,8 @@ export const projectService = {
         id: response.id || 0,
         userId: response.userId,
         title: response.title,
-        context: response.context
+        context: response.context,
+        conversations: response.conversations || []
       };
     } catch (error) {
       console.error(`Error updating project with id ${data.id}:`, error);

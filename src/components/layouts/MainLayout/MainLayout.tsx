@@ -31,18 +31,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const {logout } = useAuth();
 
   // Utilisation des hooks réels pour les données
   const { conversations, fetchConversations, deleteConversation } =
     useConversation();
-  const { projects, fetchProjects, deleteProject } = useProject();
-
-  // fetch the conversations and projects on initial render
-  useEffect(() => {
-    fetchConversations();
-    fetchProjects();
-  }, []);
+  const { projects, fetchProjects, deleteProject,setCurrentConversationId } = useProject();
 
   // Vérifier si nous sommes sur une page de chat ou de projet
   const isChatPage = location.pathname.includes("/chat");
@@ -56,6 +50,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     ? location.pathname.split("/").pop()
     : null;
 
+  // fetch the projects and conversations when the component mounts
+  useEffect(() => {
+    fetchProjects();
+    fetchConversations();
+  }, []);
   // Gestionnaires d'événements - Memoized with useCallback
   const handleToggleSidebar = useCallback(() => {
     setSidebarOpen(!sidebarOpen);
@@ -87,9 +86,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const handleCloseProjectForm = useCallback(() => {
     setShowProjectForm(false);
     setEditingProject(null);
-    // Rafraîchir les projets après la fermeture du formulaire
-    fetchProjects();
-  }, [fetchProjects]);
+  
+  }, []);
 
   // Gérer la sélection d'une conversation
   const handleSelectConversation = useCallback(
@@ -110,6 +108,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       const numericId = typeof id === "string" ? parseInt(id, 10) : id;
 
       // Navigation directe
+      setCurrentConversationId(null); // Réinitialiser l'ID de conversation actuelle
       navigate(`/project/${numericId}`);
       setSidebarOpen(false);
     },
@@ -148,24 +147,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       // Convertir en numérique si nécessaire
       const numericId = typeof id === "string" ? parseInt(id, 10) : id;
 
-      deleteProject(numericId)
-        .then(() => {
-          fetchProjects(); // Rafraîchir la liste après suppression
+          deleteProject(numericId);
 
           // Si nous sommes sur la page du projet supprimé, rediriger
           const currentProjectId = location.pathname.split("/").pop();
           if (currentProjectId === String(numericId)) {
             navigate("/projects");
           }
-        })
-        .catch((error: unknown) => {
-          console.error(
-            `Erreur lors de la suppression du projet ${numericId}`,
-            error
-          );
-        });
-    },
-    [deleteProject, fetchProjects, navigate, location.pathname]
+        },
+    [deleteProject, navigate, location.pathname]
   );
 
   const handleCloseSidebar = useCallback(() => {
@@ -228,7 +218,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <Suspense fallback={<FormLoading />}>
               <ProjectForm
                 onClose={handleCloseProjectForm}
-                userId={user?.id || 0}
                 initialData={editingProject}
               />
             </Suspense>

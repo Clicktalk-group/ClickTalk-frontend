@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProject } from '../../hooks/useProject/useProject';
-import { projectService } from '../../services/project/project';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import ProjectForm from '../../components/project/ProjectForm/ProjectForm';
 import { Modal } from '../../components/common/Modal';
@@ -9,79 +8,31 @@ import { ProjectSidebar } from '../../components/project/ProjectSidebar/ProjectS
 import { ProjectContextPopup } from '../../components/project/ProjectContextPopup/ProjectContextPopup';
 import { Button } from '../../components/common/Button';
 import { FaBars, FaFileAlt, FaHome } from 'react-icons/fa';
-import { useAuth } from '../../hooks/useAuth/useAuth';
 import './Project.scss';
+import { conversationService } from '../../services/conversation/conversation';
 
 const Project: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   // États locaux
-  const [isNewConversation, setIsNewConversation] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [currentConversationId, setCurrentConversationId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [contextPopupOpen, setContextPopupOpen] = useState(false);
-  const [projectConversations, setProjectConversations] = useState<any[]>([]);
 
   // Hooks projet et conversations
-  const {
-    projects,
-    fetchProjects,
-    fetchProjectById,
-    deleteProject,
-    removeConversationFromProject
-  } = useProject();
-
-  // Charger le projet spécifique quand l'ID est disponible
-  useEffect(() => {
-    const loadProject = async () => {
-      if (!projectId) {
-        navigate('/');
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        // Chercher d'abord dans la liste existante
-        const existingProject = projects.find(p => p.id === Number(projectId));
-        
-        if (existingProject) {
-          setIsLoading(false);
-        } else {
-          // Si pas trouvé, charger depuis l'API
-          if (fetchProjectById) {
-            await fetchProjectById(Number(projectId));
-          } else {
-            await fetchProjects();
-          }
-        }
-
-        // Charger les conversations du projet
-        const conversations = await projectService.getProjectConversations(Number(projectId));
-        setProjectConversations(conversations);
-        
-        setError(null);
-      } catch (error: any) {
-        console.error("Error loading project:", error);
-        setError(`Erreur de chargement: ${error.message || "Contactez l'administrateur"}`);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadProject();
-  }, [projectId, navigate, fetchProjectById, fetchProjects, projects]);
+  const {projects, deleteProject,currentConversationId,setCurrentConversationId,deleteConversationFromProject,loading } = useProject();
+  
+  const isNewConversation = !currentConversationId;
+  const projectConversations = projects[Number(projectId) - 1]?.conversations || [];
+  
 
   // Rechercher le projet actuel dans la liste des projets
   const currentProjectData = projectId ? projects.find(p => p.id === Number(projectId)) : null;
 
   // Gérer la création de nouvelle conversation
   const handleNewConversation = () => {
-    setIsNewConversation(true);
     setCurrentConversationId(null);
     
     // Fermer la sidebar sur mobile après sélection
@@ -89,6 +40,7 @@ const Project: React.FC = () => {
       setSidebarOpen(false);
     }
   };
+
 
   // Toggle de la sidebar
   const toggleSidebar = () => {
@@ -103,8 +55,6 @@ const Project: React.FC = () => {
   // Sélectionner une conversation existante
   const handleSelectConversation = (conversationId: number) => {
     setCurrentConversationId(conversationId);
-    setIsNewConversation(false);
-    
     // Fermer la sidebar sur mobile après sélection
     if (window.innerWidth <= 768) {
       setSidebarOpen(false);
@@ -118,16 +68,8 @@ const Project: React.FC = () => {
         throw new Error("Project ID is missing");
       }
       
-      await removeConversationFromProject(Number(projectId), conversationId);
-      
-      // Si c'était la conversation actuellement ouverte, revenir à l'écran de sélection
-      if (currentConversationId === conversationId) {
-        setCurrentConversationId(null);
-        setIsNewConversation(false);
-      }
-      
-      // Mettre à jour la liste des conversations du projet
-      setProjectConversations(prev => prev.filter(conv => conv.id !== conversationId));
+      await deleteConversationFromProject(Number(projectId), conversationId);
+      await conversationService.deleteConversation(conversationId);
       
       setError(null);
       return true;
@@ -146,10 +88,6 @@ const Project: React.FC = () => {
   // Fermer le modal d'édition
   const handleCloseEditModal = () => {
     setShowEditModal(false);
-    // Rafraîchir les données du projet après modifications
-    if (projectId && fetchProjectById) {
-      fetchProjectById(Number(projectId));
-    }
   };
 
   // Supprimer le projet
@@ -168,7 +106,7 @@ const Project: React.FC = () => {
   };
 
   // Gestion du chargement
-  if (isLoading) {
+  if (loading) {
     return <div className="loading-container">Chargement du projet...</div>;
   }
 
@@ -206,6 +144,7 @@ const Project: React.FC = () => {
               title: currentProjectData.title,
               context: currentProjectData.context
             } : undefined}
+            projectConversations={projectConversations}
             onNewConversation={handleNewConversation}
             onSelectConversation={handleSelectConversation}
             onRemoveConversation={handleRemoveConversation}
@@ -243,23 +182,7 @@ const Project: React.FC = () => {
               <FaFileAlt />
             </Button>
           </div>
-          
-          {/* Zone de chat */}
-          {isNewConversation ? (
-            <ChatContainer projectId={Number(projectId)} />
-          ) : currentConversationId ? (
-            <ChatContainer projectId={Number(projectId)} conversationId={currentConversationId} />
-          ) : (
-            <div className="select-conversation-msg">
-              <p>Sélectionnez une conversation ou créez-en une nouvelle</p>
-              <Button 
-                variant="primary"
-                onClick={handleNewConversation}
-              >
-                Démarrer une nouvelle conversation
-              </Button>
-            </div>
-          )}
+            <ChatContainer projectId={Number(projectId)} conversationId={currentConversationId|| undefined} />
         </div>
       </div>
 
@@ -268,7 +191,6 @@ const Project: React.FC = () => {
         <Modal isOpen={showEditModal} onClose={handleCloseEditModal} title="Modifier le projet">
           <ProjectForm
             onClose={handleCloseEditModal}
-            userId={user?.id}
             initialData={{
               id: currentProjectData.id,
               title: currentProjectData.title,
