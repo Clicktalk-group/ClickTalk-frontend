@@ -240,16 +240,16 @@ export const apiService = {
   // GET request avec mise en cache
   get: async <T>(url: string, params?: any, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      // Vérifier si la réponse est en cache
-      const cachedResponse = getCachedResponse(url, params);
-      if (cachedResponse) {
-        return cachedResponse as T;
-      }
+     // Vérifier si la réponse est en cache
+      // const cachedResponse = getCachedResponse(url, params);
+      // if (cachedResponse) {
+      //   return cachedResponse as T;
+      // }
       
       const response = await axiosInstance.get(url, { params, ...config });
       
       // Mettre en cache la réponse
-      cacheResponse(url, params, response);
+      // cacheResponse(url, params, response);
       
       return response as T;
     } catch (error: any) {
