@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ConversationsContext } from "../../context/ConversationsContext/ConversationsContext";
 import { conversationService } from "../../services/conversation/conversation";
 
@@ -33,6 +33,12 @@ export const useConversation = () => {
       console.error(`Error deleting conversation ${id}:`, err);
     }
   };
+
+    // load the conversations from the API on mount
+    useEffect(() => {
+        fetchConversations();
+    },[]);
+
   return {
     ...context,
     fetchConversations,
