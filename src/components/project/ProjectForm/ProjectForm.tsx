@@ -1,13 +1,10 @@
-// /src/components/project/ProjectForm/ProjectForm.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useProject } from "../../../hooks/useProject/useProject";
-import { useAuth } from "../../../hooks/useAuth/useAuth";
 import "./ProjectForm.scss";
 import { Button } from "../../../components/common/Button";
 
 interface ProjectFormProps {
   onClose: () => void;
-  userId?: number; // Rendre userId optionnel
   initialData?: {
     id: number;
     title: string;
@@ -15,22 +12,12 @@ interface ProjectFormProps {
   };
 }
 
-const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData }) => {
-  const { user } = useAuth();
+const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
   const [title, setTitle] = useState<string>(initialData?.title || "");
   const [context, setContext] = useState<string>(initialData?.context || "");
   const [error, setError] = useState<string>("");
   
   const { createProject, updateProject, loading } = useProject();
-  
-  // Assurer que nous avons un ID utilisateur valide
-  const effectiveUserId = userId || user?.id || 0;
-  
-  useEffect(() => {
-    if (!effectiveUserId) {
-      console.warn("Attention: UserId non défini dans ProjectForm");
-    }
-  }, [effectiveUserId, user]);
 
   const isEditMode = !!initialData && initialData.id > 0;
 
@@ -48,7 +35,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData 
         // Pour la mise à jour, s'assurer que tous les champs requis sont présents
         const updateData = {
           id: initialData.id,
-          userId: effectiveUserId,
           title: title.trim(),
           context: context.trim()
         };
@@ -60,7 +46,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, userId, initialData 
       } else {
         // Pour la création
         const createData = {
-          userId: effectiveUserId,
           title: title.trim(),
           context: context.trim()
         };
