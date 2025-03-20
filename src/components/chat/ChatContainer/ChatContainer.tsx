@@ -53,11 +53,6 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
     // Pour une nouvelle conversation, créer d'abord la conversation visuellement
     if (isNewConversation) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const messageTitle = content.length > 30 
-          ? content.substring(0, 30) + "..." 
-          : content;
-
         // Envoyer le message qui créera automatiquement la conversation
         sendMessage(undefined, content, projectId);
         
