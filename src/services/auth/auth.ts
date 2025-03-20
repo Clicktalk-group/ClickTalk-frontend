@@ -10,8 +10,10 @@ const AUTH_ENDPOINTS = {
   LOGIN: '/auth/login',
   REGISTER: '/auth/register',
   LOGOUT: '/auth/logout',
-  DELETE_ACCOUNT: '/auth/delete-account',
+  DELETE_ACCOUNT: '/auth/delete',
   UPDATE_PASSWORD: '/auth/update-password',
+  UPDATE_USERNAME: '/auth/update-username',
+  UPDATE_EMAIL: '/auth/update-email',
 };
 
 /**
@@ -39,11 +41,21 @@ export const authService = {
   },
   
   // Mise à jour du mot de passe
-  updatePassword: (oldPassword: string, newPassword: string): Promise<void> => {
+  updatePassword: (currentPassword: string, newPassword: string): Promise<void> => {
     return apiService.put<void>(AUTH_ENDPOINTS.UPDATE_PASSWORD, {
-      oldPassword,
+      currentPassword,
       newPassword
     });
+  },
+  
+  // Mise à jour du nom d'utilisateur
+  updateUsername: (username: string): Promise<void> => {
+    return apiService.put<void>(AUTH_ENDPOINTS.UPDATE_USERNAME, { username });
+  },
+  
+  // Mise à jour de l'email
+  updateEmail: (email: string): Promise<void> => {
+    return apiService.put<void>(AUTH_ENDPOINTS.UPDATE_EMAIL, { email });
   }
 };
 

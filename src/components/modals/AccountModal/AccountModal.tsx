@@ -1,7 +1,7 @@
-// src/components/modals/AccountModal.tsx
 import React, { useState, useCallback, memo } from 'react';
 import { FaSave } from 'react-icons/fa';
 import { useAuth } from '../../../context/AuthContext/AuthContext';
+import authService from '../../../services/auth/auth';
 import './AccountModal.scss';
 
 interface AccountModalContentProps {
@@ -118,8 +118,7 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
     
     try {
       // Appel API pour mettre à jour le nom d'utilisateur
-      // Exemple: await api.post('/auth/update-username', { username: formData.username });
-      console.log('Sauvegarde du nom d\'utilisateur:', formData.username);
+      await authService.updateUsername(formData.username);
       
       // Mise à jour du contexte utilisateur
       updateLocalUserData({ username: formData.username });
@@ -152,8 +151,7 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
     
     try {
       // Appel API pour mettre à jour l'email
-      // Exemple: await api.post('/auth/update-email', { email: formData.email });
-      console.log('Sauvegarde de l\'email:', formData.email);
+      await authService.updateEmail(formData.email);
       
       // Mise à jour du contexte utilisateur
       updateLocalUserData({ email: formData.email });
@@ -195,12 +193,7 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
     
     try {
       // Appel API pour mettre à jour le mot de passe
-      // Utilisation de l'endpoint /auth/update-password
-      // await api.post('/auth/update-password', { 
-      //   currentPassword: formData.currentPassword,
-      //   newPassword: formData.newPassword
-      // });
-      console.log('Sauvegarde du mot de passe');
+      await authService.updatePassword(formData.currentPassword, formData.newPassword);
       
       setStatusMessages(prev => ({ ...prev, password: 'Mot de passe mis à jour!' }));
       
@@ -216,9 +209,12 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
       setTimeout(() => {
         setStatusMessages(prev => ({ ...prev, password: '' }));
       }, 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la mise à jour du mot de passe:', error);
-      setStatusMessages(prev => ({ ...prev, password: 'Erreur lors de la mise à jour' }));
+      setStatusMessages(prev => ({ 
+        ...prev, 
+        password: error.response?.data || 'Erreur lors de la mise à jour' 
+      }));
     }
   }, [formData]);
   
