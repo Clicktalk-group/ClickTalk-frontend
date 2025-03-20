@@ -20,6 +20,7 @@ interface ProjectSidebarProps {
     title: string;
     context?: string;
   };
+  projectConversations: ConversationItem[];
   onNewConversation: () => void;
   onSelectConversation: (id: number) => void;
   onRemoveConversation: (id: number) => Promise<boolean>;
@@ -34,8 +35,8 @@ interface ProjectSidebarProps {
 // Utilisation de memo pour éviter les re-rendus inutiles
 export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(
   ({
-    projectId,
     projectData,
+    projectConversations,
     onNewConversation,
     onSelectConversation,
     onRemoveConversation,
@@ -50,7 +51,6 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // États locaux
-  const [projectConversations, setProjectConversations] = useState<ConversationItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [sidebarError, setSidebarError] = useState<string | null>(null);
   
@@ -64,73 +64,12 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Utilisation de useCallback pour éviter de recréer les fonctions lors des re-rendus
-  const loadProjectConversations = useCallback(async () => {
-    if (!projectId) return;
-    
-    setLoading(true);
-    setSidebarError(null);
-    
-    try {
-      // Utilisation d'un timeout pour annuler la requête si elle prend trop de temps
-      const timeoutPromise = new Promise((_resolve, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 10000);
-      });
-      
-      // Utilisation de Promise.race pour gérer les timeouts
-      const conversationPromise = projectService.getProjectConversations(projectId);
-      const result = await Promise.race([
-        conversationPromise,
-        timeoutPromise
-      ]) as ConversationItem[];
-      
-      if (Array.isArray(result)) {
-        // Filtrer les conversations invalides pour éviter les erreurs
-        const validConversations = result.filter(conv => 
-          (conv.id !== undefined || conv.convId !== undefined)
-        );
-        setProjectConversations(validConversations);
-      } else {
-        console.warn("Format de données inattendu:", result);
-        setProjectConversations([]);
-      }
-    } catch (err: any) {
-      console.error("Erreur lors du chargement des conversations du projet:", err);
-      setSidebarError(err?.message || "Erreur lors du chargement des conversations");
-      setProjectConversations([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
-
-    // Charger les conversations du projet
-    useEffect(() => {
-      // Charger les données avec une fonction nettoyable pour éviter les memory leaks
-      let isMounted = true;
-      const load = async () => {
-        await loadProjectConversations();
-      };
-
-      load();
-
-      // Nettoyer pour éviter les memory leaks
-      return () => {
-        isMounted = false;
-      };
-    }, [projectId, loadProjectConversations]);
-
   const handleRemove = useCallback(async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette conversation ?')) {
-      const success = await onRemoveConversation(id);
-      if (success) {
-        // Mettre à jour la liste des conversations après suppression
-        setProjectConversations(prev => prev.filter(conv => 
-          (conv.id !== id && conv.convId !== id)
-        ));
-      }
+       await onRemoveConversation(id);
     }
-  }, [onRemoveConversation]);
+  }, []);
 
   const formatDate = useCallback((dateString?: string): string => {
     if (!dateString) return 'Date inconnue';
@@ -152,7 +91,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(
 
   // Optimisation du rendu conditionnel pour éviter les calculs inutiles
   const renderContent = () => {
-    if (loading || (projectConversations.length === 0)) {
+    if (loading) {
       return <div className="sidebar-loading" role="status" aria-live="polite">Chargement des conversations...</div>;
     }
     

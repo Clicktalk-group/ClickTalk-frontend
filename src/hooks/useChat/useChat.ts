@@ -1,5 +1,3 @@
-// src/hooks/useChat/useChat.ts
-
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   Message,
@@ -9,6 +7,9 @@ import {
 import apiService from "../../services/api/api";
 import usePerformanceMetrics from "../usePerformanceMetrics/usePerformanceMetrics";
 import { useConversation } from "../useConversation/useConversation";
+import { conversationService } from "../../services/conversation/conversation";
+import { useProject } from "../useProject/useProject";
+import { useNavigate } from "react-router-dom";
 
 const useChat = (conversationId?: number) => {
   const [state, setState] = useState<ChatState>({
@@ -19,6 +20,8 @@ const useChat = (conversationId?: number) => {
     streamingMessage: null
   });
   const { fetchConversationById } = useConversation();
+  const {addConversationToProject} = useProject();
+  const navigate  = useNavigate();
 
   // Extraction des métriques de performance avec mémoïsation
   const metrics = usePerformanceMetrics();
@@ -200,10 +203,26 @@ const useChat = (conversationId?: number) => {
         (response?.id && response?.user ? response.id : null) ||
         convId || null;
 
+        
+
         // if first message fetch the conversation
         if (responseConvId && !convId) {
-          fetchConversationById(responseConvId);
+          if(projectId){
+            try{
+              const conversation = await conversationService.getConversationById(responseConvId)
+              await addConversationToProject(projectId, conversation)
+            }catch(err){
+              console.error("Error fetching conversation:", err);
+            }
+          }else{
+            fetchConversationById(responseConvId);
+            navigate(`/chat/${responseConvId}`);
+          }
         }
+
+      
+
+
       if (responseConvId) {
         // Intégrer le message en streaming dans la liste des messages avec une seule mise à jour d'état
         safeSetState(prevState => {
@@ -290,6 +309,7 @@ const useChat = (conversationId?: number) => {
       recordRenderEnd,
       safeSetState,
       fetchConversationById,
+      addConversationToProject
     ]
   );
 
