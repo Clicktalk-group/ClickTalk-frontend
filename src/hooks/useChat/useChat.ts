@@ -1,5 +1,3 @@
-// src/hooks/useChat/useChat.ts
-
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   Message,
@@ -9,6 +7,8 @@ import {
 import apiService from "../../services/api/api";
 import usePerformanceMetrics from "../usePerformanceMetrics/usePerformanceMetrics";
 import { useConversation } from "../useConversation/useConversation";
+import { conversationService } from "../../services/conversation/conversation";
+import { useProject } from "../useProject/useProject";
 
 const useChat = (conversationId?: number) => {
   const [state, setState] = useState<ChatState>({
@@ -19,6 +19,7 @@ const useChat = (conversationId?: number) => {
     streamingMessage: null
   });
   const { fetchConversationById } = useConversation();
+  const {addConversationToProject} = useProject();
 
   // Extraction des métriques de performance avec mémoïsation
   const metrics = usePerformanceMetrics();
@@ -198,10 +199,27 @@ const useChat = (conversationId?: number) => {
         // Déterminer l'ID de conversation
         const responseConvId = response?.convId || null;
 
+        
+
         // if first message fetch the conversation
         if (responseConvId && !convId) {
-          fetchConversationById(responseConvId);
+          if(projectId){
+            try{
+              const conversation = await conversationService.getConversationById(responseConvId)
+              if(conversation){
+                await addConversationToProject(projectId, conversation)
+              }
+            }catch(err){
+              console.error("Error fetching conversation:", err);
+            }
+          }else{
+            fetchConversationById(responseConvId);
+          }
         }
+
+      
+
+
       if (responseConvId) {
         // Intégrer le message en streaming dans la liste des messages avec une seule mise à jour d'état
         safeSetState(prevState => {
