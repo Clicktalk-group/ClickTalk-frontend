@@ -9,6 +9,7 @@ import usePerformanceMetrics from "../usePerformanceMetrics/usePerformanceMetric
 import { useConversation } from "../useConversation/useConversation";
 import { conversationService } from "../../services/conversation/conversation";
 import { useProject } from "../useProject/useProject";
+import { useNavigate } from "react-router-dom";
 
 const useChat = (conversationId?: number) => {
   const [state, setState] = useState<ChatState>({
@@ -20,6 +21,7 @@ const useChat = (conversationId?: number) => {
   });
   const { fetchConversationById } = useConversation();
   const {addConversationToProject} = useProject();
+  const navigate  = useNavigate();
 
   // Extraction des métriques de performance avec mémoïsation
   const metrics = usePerformanceMetrics();
@@ -206,14 +208,14 @@ const useChat = (conversationId?: number) => {
           if(projectId){
             try{
               const conversation = await conversationService.getConversationById(responseConvId)
-              if(conversation){
-                await addConversationToProject(projectId, conversation)
-              }
+              await addConversationToProject(projectId, conversation)
+              navigate(`/projects/${projectId}`)
             }catch(err){
               console.error("Error fetching conversation:", err);
             }
           }else{
             fetchConversationById(responseConvId);
+            navigate(`/chat/${responseConvId}`);
           }
         }
 
@@ -306,6 +308,7 @@ const useChat = (conversationId?: number) => {
       recordRenderEnd,
       safeSetState,
       fetchConversationById,
+      addConversationToProject
     ]
   );
 
