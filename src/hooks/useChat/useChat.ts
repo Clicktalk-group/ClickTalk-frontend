@@ -209,7 +209,6 @@ const useChat = (conversationId?: number) => {
             try{
               const conversation = await conversationService.getConversationById(responseConvId)
               await addConversationToProject(projectId, conversation)
-              navigate(`/projects/${projectId}`)
             }catch(err){
               console.error("Error fetching conversation:", err);
             }
