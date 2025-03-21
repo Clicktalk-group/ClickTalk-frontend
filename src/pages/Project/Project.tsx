@@ -25,8 +25,8 @@ const Project: React.FC = () => {
   const {projects, deleteProject,currentConversationId,setCurrentConversationId,deleteConversationFromProject,loading } = useProject();
   
   const isNewConversation = !currentConversationId;
-  const projectConversations = projects[Number(projectId) - 1]?.conversations || [];
-  
+  const projectConversations = projects.find(p => p.id === Number(projectId))?.conversations || [];
+
 
   // Rechercher le projet actuel dans la liste des projets
   const currentProjectData = projectId ? projects.find(p => p.id === Number(projectId)) : null;
