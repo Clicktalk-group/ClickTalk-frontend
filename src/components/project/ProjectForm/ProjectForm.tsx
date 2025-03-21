@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useProject } from "../../../hooks/useProject/useProject";
 import "./ProjectForm.scss";
 import { Button } from "../../../components/common/Button";
@@ -17,7 +18,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
   const [context, setContext] = useState<string>(initialData?.context || "");
   const [error, setError] = useState<string>("");
   
-  const { createProject, updateProject, loading } = useProject();
+  const { createProject, updateProject, loading, fetchProjects } = useProject();
+  const navigate = useNavigate();
 
   const isEditMode = !!initialData && initialData.id > 0;
 
@@ -32,34 +34,51 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
     
     try {
       if (isEditMode && initialData) {
-        // Pour la mise à jour, s'assurer que tous les champs requis sont présents
+        // Mise à jour d'un projet existant
         const updateData = {
           id: initialData.id,
           title: title.trim(),
           context: context.trim()
         };
         
-        console.log("Mise à jour du projet avec données:", updateData);
-        
         await updateProject(updateData);
         console.log("Projet mis à jour avec succès");
+        onClose();
       } else {
-        // Pour la création
+        // Création d'un nouveau projet
         const createData = {
           title: title.trim(),
           context: context.trim()
         };
         
-        console.log("Création d'un projet avec données:", createData);
-        
         await createProject(createData);
         console.log("Projet créé avec succès");
+        
+        // Récupérer la liste mise à jour des projets
+        const updatedProjects = await fetchProjects();
+        
+        // Trouver le projet qui a le même titre que celui qu'on vient de créer
+        // On utilise find pour récupérer le premier projet qui a ce titre
+        const newProject = updatedProjects.find(p => p.title === title.trim());
+        
+        if (newProject) {
+          // Rediriger vers le nouveau projet
+          navigate(`/project/${newProject.id}`);
+        } else {
+          // Si on ne trouve pas le projet, fermer le modal
+          console.warn("Projet créé mais non trouvé dans la liste mise à jour");
+          onClose();
+        }
       }
-      onClose();
     } catch (error) {
       console.error(`Erreur lors de ${isEditMode ? 'la modification' : 'la création'} du projet`, error);
       setError(`Une erreur est survenue lors de ${isEditMode ? 'la modification' : 'la création'} du projet.`);
     }
+  };
+
+  // Fonction pour gérer l'annulation
+  const handleCancel = () => {
+    onClose();
   };
 
   return (
@@ -98,7 +117,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
           <Button 
             type="button" 
             variant="secondary"
-            onClick={onClose}
+            onClick={handleCancel}
           >
             Annuler
           </Button>
