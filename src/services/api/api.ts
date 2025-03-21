@@ -12,7 +12,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 60000, // 60s timeout
+  // timeout: 60000, // 60s timeout
 });
 
 // Types pour la réponse API avec botResponse
