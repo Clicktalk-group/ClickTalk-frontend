@@ -75,8 +75,8 @@ const Settings: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // À implémenter: Appel API pour mettre à jour les informations utilisateur
-    console.log('Enregistrement des modifications...', formData);
-    // Afficher une notification de succès
+    // Dans une implémentation complète, nous appellerions un service API ici
+    // et afficherions une notification de succès après la réponse positive
     alert('Modifications enregistrées avec succès');
   };
 
@@ -85,11 +85,11 @@ const Settings: React.FC = () => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
       try {
         // Implémenter l'appel API pour supprimer le compte
-        console.log('Suppression du compte...');
-        // Après suppression, déconnecter l'utilisateur
+        // Dans une implémentation réelle, nous appellerions un service API ici
         await logout();
       } catch (error) {
-        console.error('Erreur lors de la suppression du compte:', error);
+        // Afficher un message d'erreur à l'utilisateur
+        alert('Erreur lors de la suppression du compte. Veuillez réessayer plus tard.');
       }
     }
   };

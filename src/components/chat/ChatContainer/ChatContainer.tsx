@@ -53,7 +53,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
           onMessageSent();
         }
       } catch (error) {
-        console.error("Erreur lors de la création de la conversation:", error);
+        // Gérer l'erreur silencieusement ou via un système de logs approprié
       }
     } else {
       // Conversation existante, envoyer simplement le message

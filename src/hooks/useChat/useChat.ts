@@ -54,7 +54,6 @@ const useChat = (conversationId?: number) => {
       try {
         return updater(prevState);
       } catch (error) {
-        console.error('Error updating state:', error);
         return prevState;
       }
     });
@@ -63,14 +62,12 @@ const useChat = (conversationId?: number) => {
   // Charger les messages d'une conversation - avec memoization optimisée
   const loadMessages = useCallback(async (convId: number) => {
     if (!convId) {
-      console.error("No conversation ID provided to loadMessages");
       return;
     }
     
     safeSetState(prevState => ({ ...prevState, isLoading: true }));
     
     try {
-      console.log(`🔄 Loading messages for conversation ID: ${convId}`);
       recordRenderStart(`loadMessages-${convId}`);
       const response = await apiService.get<Message[]>(`/messages/conv/${convId}`);
       recordRenderEnd(`loadMessages-${convId}`);
@@ -88,7 +85,6 @@ const useChat = (conversationId?: number) => {
           isLoading: false
         }));
       } else {
-        console.error("❌ API returned non-array response for messages:", response);
         safeSetState(prevState => ({
           ...prevState,
           error: 'Format de réponse invalide du serveur',
@@ -96,7 +92,6 @@ const useChat = (conversationId?: number) => {
         }));
       }
     } catch (error) {
-      console.error('❌ Error loading messages:', error);
       safeSetState(prevState => ({
         ...prevState,
         error: 'Échec du chargement des messages',
@@ -130,7 +125,6 @@ const useChat = (conversationId?: number) => {
   // Envoyer un message avec support de streaming et métriques - optimisé
   const sendMessage = useCallback(async (convId: number | undefined, content: string, projectId?: number) => {
     if (!content.trim()) {
-      console.warn("Empty message, not sending");
       return;
     }
     
@@ -198,30 +192,25 @@ const useChat = (conversationId?: number) => {
       // Enregistrer la fin du message et sa taille
       recordMessageEnd(tempUserId, content.length);
       
-        // Déterminer l'ID de conversation
-        const responseConvId = response?.convId || response?.conversationId ||
+      // Déterminer l'ID de conversation
+      const responseConvId = response?.convId || response?.conversationId ||
         (response?.id && response?.user ? response.id : null) ||
         convId || null;
 
-        
-
-        // if first message fetch the conversation
-        if (responseConvId && !convId) {
-          if(projectId){
-            try{
-              const conversation = await conversationService.getConversationById(responseConvId)
-              await addConversationToProject(projectId, conversation)
-            }catch(err){
-              console.error("Error fetching conversation:", err);
-            }
-          }else{
-            fetchConversationById(responseConvId);
-            navigate(`/chat/${responseConvId}`);
+      // if first message fetch the conversation
+      if (responseConvId && !convId) {
+        if(projectId){
+          try{
+            const conversation = await conversationService.getConversationById(responseConvId)
+            await addConversationToProject(projectId, conversation)
+          }catch(err){
+            // Gestion silencieuse des erreurs
           }
+        }else{
+          fetchConversationById(responseConvId);
+          navigate(`/chat/${responseConvId}`);
         }
-
-      
-
+      }
 
       if (responseConvId) {
         // Intégrer le message en streaming dans la liste des messages avec une seule mise à jour d'état
@@ -260,7 +249,7 @@ const useChat = (conversationId?: number) => {
                 loadConversationRef.current(finalConvId);
               }
             } catch (err) {
-              console.error("Error refreshing conversation after send:", err);
+              // Gestion silencieuse des erreurs
             }
           });
         } else {
@@ -271,12 +260,11 @@ const useChat = (conversationId?: number) => {
                 loadConversationRef.current(finalConvId);
               }
             } catch (err) {
-              console.error("Error refreshing conversation after send:", err);
+              // Gestion silencieuse des erreurs
             }
           }, 200);
         }
       } else {
-        console.error("❌ No conversation ID found in response", response);
         safeSetState(prevState => ({
           ...prevState,
           error: "Erreur: Impossible d'identifier la conversation",
@@ -290,8 +278,6 @@ const useChat = (conversationId?: number) => {
         }));
       }
     } catch (error) {
-      console.error("❌ Error sending message:", error);
-      
       safeSetState(prevState => ({
         ...prevState,
         error: "Erreur lors de l'envoi du message. Veuillez réessayer.",
@@ -309,6 +295,7 @@ const useChat = (conversationId?: number) => {
       recordRenderEnd,
       safeSetState,
       fetchConversationById,
+      navigate,
       addConversationToProject
     ]
   );
@@ -331,15 +318,16 @@ const useChat = (conversationId?: number) => {
     return () => {
       clearMetrics();
     };
-  }, [conversationId,loadMessages, clearMetrics]);
+  }, [conversationId, loadMessages, clearMetrics]);
   
   // Copier un message - optimisé avec mémoïsation
   const copyMessage = useCallback((content: string) => {
     if (!content) return;
     
     navigator.clipboard.writeText(content)
-      .then(() => console.log('✅ Message copied to clipboard'))
-      .catch(err => console.error('❌ Could not copy message:', err));
+      .catch(() => {
+        // Gestion silencieuse des erreurs de copie
+      });
   }, []);
 
   // Mémoïsation du résultat final pour éviter les re-rendus inutiles

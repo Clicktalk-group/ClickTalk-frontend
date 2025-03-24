@@ -55,30 +55,27 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     fetchProjects();
     fetchConversations();
   }, []);
+  
   // Gestionnaires d'événements - Memoized with useCallback
   const handleToggleSidebar = useCallback(() => {
     setSidebarOpen(!sidebarOpen);
   }, [sidebarOpen]);
 
   const handleLogout = useCallback(() => {
-    console.log("Déconnexion");
     logout(); // Utiliser la fonction logout du contexte auth
   }, [logout]);
 
   const handleNewConversation = useCallback(() => {
-    console.log("Nouvelle conversation");
     navigate("/chat/new");
     setSidebarOpen(false);
   }, [navigate]);
 
   const handleNewProject = useCallback(() => {
-    console.log("Nouveau projet");
     setEditingProject(null); // Assurez-vous de ne pas être en mode édition
     setShowProjectForm(true); // Afficher le formulaire de création
   }, []);
 
   const handleEditProject = useCallback((project: any) => {
-    console.log("Édition du projet", project);
     setEditingProject(project);
     setShowProjectForm(true);
   }, []);
@@ -92,7 +89,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Gérer la sélection d'une conversation
   const handleSelectConversation = useCallback(
     (id: string | number) => {
-      console.log(`Sélection conversation ${id}`);
       // Si l'ID est une chaîne, convertissez-la en nombre
       const numericId = typeof id === "string" ? parseInt(id, 10) : id;
       navigate(`/chat/${numericId}`);
@@ -121,7 +117,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       // Convertir en numérique si nécessaire
       const numericId = typeof id === "string" ? parseInt(id, 10) : id;
 
-      console.log(`Suppression conversation ${numericId}`);
       deleteConversation(numericId);
 
       // Si nous sommes sur la page de la conversation supprimée, rediriger vers /chat
@@ -137,7 +132,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const handleRenameConversation = useCallback(
     (id: string | number, newTitle: string) => {
       // todo: Implémenter la logique de renommage
-      console.log(`Renommer conversation ${id} en ${newTitle}`);
     },
     []
   );
@@ -147,14 +141,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       // Convertir en numérique si nécessaire
       const numericId = typeof id === "string" ? parseInt(id, 10) : id;
 
-          deleteProject(numericId);
+      deleteProject(numericId);
 
-          // Si nous sommes sur la page du projet supprimé, rediriger
-          const currentProjectId = location.pathname.split("/").pop();
-          if (currentProjectId === String(numericId)) {
-            navigate("/projects");
-          }
-        },
+      // Si nous sommes sur la page du projet supprimé, rediriger
+      const currentProjectId = location.pathname.split("/").pop();
+      if (currentProjectId === String(numericId)) {
+        navigate("/projects");
+      }
+    },
     [deleteProject, navigate, location.pathname]
   );
 
@@ -165,9 +159,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Fonction fictive pour gérer le déplacement de conversation (non implémentée)
   const handleMoveConversation = useCallback(
     (id: string, projectId: string) => {
-      console.log(
-        `Déplacement de la conversation ${id} vers le projet ${projectId}`
-      );
       // Implémentation réelle à faire
     },
     []

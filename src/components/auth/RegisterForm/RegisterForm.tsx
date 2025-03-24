@@ -130,13 +130,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = React.memo(({ className
     if (!validateForm()) return;
     
     try {
-      console.log("Tentative d'inscription avec:", formData.email);
       await register(formData);
       // Si register réussit (pas d'erreur lancée), on navigue vers la page d'accueil
       navigate('/');
     } catch (err) {
       // L'erreur est déjà gérée dans le hook useAuth
-      console.error("Erreur d'inscription:", err);
     }
   }, [clearError, register, formData, navigate, validateForm]);
   

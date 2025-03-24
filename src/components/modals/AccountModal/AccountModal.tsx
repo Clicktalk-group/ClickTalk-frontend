@@ -130,7 +130,6 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
         setStatusMessages(prev => ({ ...prev, username: '' }));
       }, 3000);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde du nom d\'utilisateur:', error);
       setStatusMessages(prev => ({ ...prev, username: 'Erreur lors de la sauvegarde' }));
     }
   }, [formData.username, updateLocalUserData]);
@@ -163,7 +162,6 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
         setStatusMessages(prev => ({ ...prev, email: '' }));
       }, 3000);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de l\'email:', error);
       setStatusMessages(prev => ({ ...prev, email: 'Erreur lors de la sauvegarde' }));
     }
   }, [formData.email, updateLocalUserData]);
@@ -210,7 +208,6 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
         setStatusMessages(prev => ({ ...prev, password: '' }));
       }, 3000);
     } catch (error: any) {
-      console.error('Erreur lors de la mise à jour du mot de passe:', error);
       setStatusMessages(prev => ({ 
         ...prev, 
         password: error.response?.data || 'Erreur lors de la mise à jour' 

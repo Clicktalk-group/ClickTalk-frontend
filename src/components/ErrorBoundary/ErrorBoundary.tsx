@@ -25,7 +25,8 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Journaliser l'erreur
+    // Ce console.error est intentionnellement conservé pour journaliser les erreurs
+    // critiques qui doivent être visibles dans la console de production
     console.error("Uncaught error:", error, errorInfo);
     
     // Appeler le gestionnaire d'erreurs personnalisé si fourni

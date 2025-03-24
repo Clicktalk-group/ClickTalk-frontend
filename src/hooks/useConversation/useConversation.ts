@@ -10,7 +10,7 @@ export const useConversation = () => {
       const data = await conversationService.getAllConversations();
       context.setConversations(data);
     } catch (err) {
-      console.error("Error fetching conversations:", err);
+      // Erreur silencieuse - possibilité d'implémenter un système de logs centralisé ici
     }
   };
 
@@ -20,7 +20,7 @@ export const useConversation = () => {
       const conversation = await conversationService.getConversationById(id);
       context.addToConversations(conversation);
     } catch (err) {
-      console.error(`Error fetching conversation ${id}:`, err);
+      // Erreur silencieuse - possibilité d'implémenter un système de logs centralisé ici
     }
   };
 
@@ -30,14 +30,14 @@ export const useConversation = () => {
       await conversationService.deleteConversation(id);
       context.deleteConversation(id);
     } catch (err) {
-      console.error(`Error deleting conversation ${id}:`, err);
+      // Erreur silencieuse - possibilité d'implémenter un système de logs centralisé ici
     }
   };
 
-    // load the conversations from the API on mount
-    useEffect(() => {
-        fetchConversations();
-    },[]);
+  // load the conversations from the API on mount
+  useEffect(() => {
+    fetchConversations();
+  },[]);
 
   return {
     ...context,

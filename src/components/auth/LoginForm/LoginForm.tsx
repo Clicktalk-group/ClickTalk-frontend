@@ -66,13 +66,12 @@ export const LoginForm: React.FC<LoginFormProps> = React.memo(({ className = '',
     if (!validateForm()) return;
     
     try {
-      console.log('Tentative de connexion avec:', formState.email);
       await login(formState.email, formState.password);
       // Si login réussit (pas d'erreur lancée), on navigue vers la page d'accueil
       navigate('/');
     } catch (err) {
-      console.error("Erreur de connexion:", err);
       // L'erreur est déjà gérée dans le hook useAuth
+      // Pas besoin de traitement supplémentaire ici
     }
   }, [clearError, login, formState, navigate, validateForm]);
   

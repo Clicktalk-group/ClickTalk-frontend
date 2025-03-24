@@ -42,7 +42,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
         };
         
         await updateProject(updateData);
-        console.log("Projet mis à jour avec succès");
         onClose();
       } else {
         // Création d'un nouveau projet
@@ -52,7 +51,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
         };
         
         await createProject(createData);
-        console.log("Projet créé avec succès");
         
         // Récupérer la liste mise à jour des projets
         const updatedProjects = await fetchProjects();
@@ -68,12 +66,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
           onClose();
         } else {
           // Si on ne trouve pas le projet, fermer le modal
-          console.warn("Projet créé mais non trouvé dans la liste mise à jour");
           onClose();
         }
       }
     } catch (error) {
-      console.error(`Erreur lors de ${isEditMode ? 'la modification' : 'la création'} du projet`, error);
       setError(`Une erreur est survenue lors de ${isEditMode ? 'la modification' : 'la création'} du projet.`);
     }
   };

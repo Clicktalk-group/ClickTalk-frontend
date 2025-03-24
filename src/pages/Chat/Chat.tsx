@@ -7,8 +7,6 @@ import './Chat.scss';
 const Chat: React.FC = memo(() => {
   // Pas d'état ou de logique complexe ici, ce qui fait de ce composant
   // un bon candidat pour la mémoïsation directe
-
-  console.log('Rendering Chat page');
   
   return (
     <div className="chat-page">

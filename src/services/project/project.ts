@@ -19,7 +19,6 @@ export const projectService = {
         conversations: project.conversations || []
       }));
     } catch (error) {
-      console.error('Error fetching projects:', error);
       return [];
     }
   },
@@ -31,13 +30,11 @@ export const projectService = {
       const project = projects.find(p => p.id === id);
       
       if (!project) {
-        console.warn(`Project with id ${id} not found in the list of all projects`);
         return null;
       }
       
       return project;
     } catch (error) {
-      console.error(`Error fetching project with id ${id}:`, error);
       return null;
     }
   },
@@ -50,8 +47,6 @@ export const projectService = {
         title: data.title,
         context: data.context // Le backend attend "context" et non "content"
       };
-      
-      console.log('Sending project data to API:', requestData);
       
       const response = await apiService.post<any>('/project/add', requestData);
       
@@ -67,7 +62,6 @@ export const projectService = {
         conversations: response.conversations || []
       };
     } catch (error) {
-      console.error('Error creating project:', error);
       throw error;
     }
   },
@@ -82,9 +76,6 @@ export const projectService = {
         context: data.context // Utiliser "context" comme dans Project.java
       };
       
-      // Debug avant envoi pour vérifier les données
-      console.log("Données envoyées pour mise à jour:", requestData);
-      
       const response = await apiService.put<any>('/project/update', requestData);
       
       return {
@@ -95,7 +86,6 @@ export const projectService = {
         conversations: response.conversations || []
       };
     } catch (error) {
-      console.error(`Error updating project with id ${data.id}:`, error);
       throw error;
     }
   },
@@ -105,7 +95,6 @@ export const projectService = {
     try {
       await apiService.delete(`/project/delete/${id}`);
     } catch (error) {
-      console.error(`Error deleting project with id ${id}:`, error);
       throw error;
     }
   },
@@ -117,15 +106,13 @@ export const projectService = {
       const response = await apiService.get<any[]>(`/conversation/project/${projectId}`);
       return Array.isArray(response) ? response : [];
     } catch (error) {
-      console.error(`Error fetching conversations for project ${projectId}:`, error);
       return [];
     }
   },
   
   // Fonctionnalité qui n'est plus supportée par l'API backend - à conserver pour rétrocompatibilité
   addConversationToProject: async (projectId: number, convId: number): Promise<void> => {
-    console.warn(`Endpoint to add conversation to project is not available in the API.
-    This operation should be handled by the backend when creating a conversation with a projectId.`);
+    // Cette fonction est conservée pour rétrocompatibilité mais ne fait rien
   },
   
   // Supprimer une conversation (utilisation de l'endpoint conversation/delete/{id})
@@ -135,12 +122,9 @@ export const projectService = {
         throw new Error('Invalid conversation ID');
       }
       
-      console.log(`Attempting to delete conversation ${convId}`);
       // Utiliser l'endpoint de suppression de conversation standard
       await apiService.delete(`/conversation/delete/${convId}`);
-      console.log('Conversation successfully deleted');
     } catch (error) {
-      console.error(`Error deleting conversation ${convId}:`, error);
       throw error;
     }
   }

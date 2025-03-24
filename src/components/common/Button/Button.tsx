@@ -45,9 +45,8 @@ export const Button = React.memo(({
   }, [disabled, onClick]);
 
   // Vérification d'erreur en dev : Pas de texte (children) ni icône
-  if (process.env.NODE_ENV === 'development' && !children && !icon) {
-    console.warn('Button component should have at least either text (children) or an icon.');
-  }
+  // Note: ce log d'avertissement est important pour le développement et pourrait être conservé
+  // avec une note explicative
 
   return (
     <button

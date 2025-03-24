@@ -32,16 +32,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = memo(({
     }
   }, [messages, streamingMessage, isLoading]); 
 
-  // Developpement logs uniquement en environnement de développement
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Rendering ${messages.length} messages`);
-      if (streamingMessage) {
-        console.log(`Current streaming message: ${streamingMessage.substring(0, 30)}...`);
-      }
-    }
-  }, [messages, streamingMessage]);
-
   // Trouver le dernier message bot temporaire de manière optimisée
   const lastBotMessage = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {

@@ -178,7 +178,7 @@ function ProjectContextProvider({ children }: PropsWithChildren) {
       );
 
       if (!project) {
-        console.error(`Project with ID ${projectId} not found`);
+        // Projet avec l'ID spécifié non trouvé
         return;
       }
 

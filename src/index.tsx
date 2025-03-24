@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext/AuthContext";
 import ConversationsContextProvider from "./context/ConversationsContext/ConversationsContext";
-import  ProjectContextProvider  from "./context/ProjectsContext/ProjectsContext"
+import ProjectContextProvider from "./context/ProjectsContext/ProjectsContext"
 import { ThemeProvider } from "./context/ThemeContext/ThemeContext";
 import { createAppRouter } from "./routes/Routes";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
@@ -68,9 +68,6 @@ const reportWebVitals = async () => {
     
     // Fonction d'envoi de métriques - pourrait être remplacée par un envoi à un service d'analytics
     const sendMetric = (metric: WebVitalMetric) => {
-      // Log local pour debug
-      console.log(metric);
-      
       // Pour envoyer à un service d'analyse externe (Google Analytics, etc.)
       // window.gtag && window.gtag('event', name, metric);
       
@@ -78,8 +75,7 @@ const reportWebVitals = async () => {
       // Exemple: utilisation d'un service custom d'analytics
       // Si votre mesurement ID est défini, envoyez les données
       if (process.env.REACT_APP_MEASUREMENT_ID) {
-        // Simulation d'envoi d'analytics
-        console.log(`[Analytics] Sending metric ${metric.name}: ${metric.value}`);
+        // Simulation d'envoi d'analytics - implémentez votre logique d'envoi ici
       }
     };
     
@@ -93,12 +89,12 @@ const reportWebVitals = async () => {
     // Charger dynamiquement notre module personnalisé de métriques
     import('./utils/performance/metrics').then(({ trackCustomMetrics }) => {
       trackCustomMetrics();
-    }).catch(err => {
-      console.warn('Custom metrics module not loaded:', err);
+    }).catch(() => {
+      // Module de métriques personnalisées non chargé
     });
     
   } catch (error) {
-    console.warn('Error loading web-vitals:', error);
+    // Erreur lors du chargement des web-vitals
   }
 };
 
@@ -113,7 +109,6 @@ if (document.readyState === 'loading') {
 function initApp() {
   const rootElement = document.getElementById("root");
   if (!rootElement) {
-    console.error("Root element not found!");
     return;
   }
   

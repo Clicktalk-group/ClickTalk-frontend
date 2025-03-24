@@ -70,50 +70,23 @@ axiosInstance.interceptors.request.use(
       // S'assurer que le token est correctement formaté (sans guillemets)
       const cleanToken = token.replace(/^"|"$/g, '');
       config.headers.Authorization = `Bearer ${cleanToken}`;
-      
-      // Log pour déboguer (uniquement en développement)
-      if (process.env.NODE_ENV === 'development') {
-        console.log("🔑 Token utilisé:", cleanToken.slice(0, 15) + "...");
-      }
-    } else if (!token && config.url && !config.url.includes('/auth/') && process.env.NODE_ENV === 'development') {
-      // Avertissement si token manquant pour requête authentifiée (uniquement en développement)
-      console.warn("⚠️ Requête authentifiée sans token:", config.url);
     }
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log("📤 Requête API envoyée:", { 
-        url: config.url, 
-        method: config.method
-      });
-    }
     return config;
   },
   (error) => {
-    console.error("❌ Erreur lors de l'envoi de la requête:", error);
     return Promise.reject(error);
   }
 );
+
 // Intercepteur pour gérer les erreurs de réponse (ex: token expiré)
 axiosInstance.interceptors.response.use(
   (response: any) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log("📩 Réponse API reçue:", { 
-        url: response.config.url, 
-        status: response.status
-      });
-    }
-    
-    // Vérification simplifiée des données renvoyées
-    if (response.data === undefined || response.data === null) {
-      console.warn("⚠️ La réponse API ne contient pas de données");
-    }
-    
     return response.data; // Simplification: renvoyer directement response.data
   },
   (error) => {
     // Gérer le cas de token expiré (code 401)
     if (error.response?.status === 401) {
-      console.error("🔒 Erreur d'authentification (401) - Session expirée");
       // Déconnecter l'utilisateur
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -122,24 +95,6 @@ axiosInstance.interceptors.response.use(
       if (window.location.pathname !== '/auth/login') {
         window.location.href = '/auth/login';
       }
-    } 
-    // Gérer le cas d'accès refusé (code 403)
-    else if (error.response?.status === 403) {
-      console.error("🚫 Erreur d'autorisation (403) - Accès refusé");
-    }
-    // Gestion spécifique des erreurs 500
-    else if (error.response?.status === 500) {
-      console.error("⛔ Erreur serveur (500):", {
-        url: error.config?.url,
-        message: error.response?.data?.message || error.message
-      });
-    }
-    else {
-      console.error("❌ Erreur API:", {
-        url: error.config?.url,
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message
-      });
     }
     
     return Promise.reject(error);
@@ -150,11 +105,6 @@ axiosInstance.interceptors.response.use(
  * Fonction utilitaire optimisée pour trouver le contenu du message dans différentes structures
  */
 const extractMessageContent = (response: ApiResponse): string => {
-  // Éviter le log en production
-  if (process.env.NODE_ENV === 'development') {
-    console.log('API Response Structure:', Object.keys(response));
-  }
-  
   // Fonction optimisée pour trouver le contenu plus efficacement
   if (response) {
     // Vérifications les plus courantes en premier pour une performance optimale
@@ -240,7 +190,7 @@ export const apiService = {
   // GET request avec mise en cache
   get: async <T>(url: string, params?: any, config?: AxiosRequestConfig): Promise<T> => {
     try {
-     // Vérifier si la réponse est en cache
+      // Vérifier si la réponse est en cache
       // const cachedResponse = getCachedResponse(url, params);
       // if (cachedResponse) {
       //   return cachedResponse as T;
@@ -253,7 +203,6 @@ export const apiService = {
       
       return response as T;
     } catch (error: any) {
-      console.error(`❌ GET error for ${url}:`, error.message);
       throw error;
     }
   },
@@ -264,7 +213,6 @@ export const apiService = {
       const response = await axiosInstance.post(url, data, config);
       return response as T;
     } catch (error: any) {
-      console.error(`❌ POST error for ${url}:`, error.message);
       throw error;
     }
   },
@@ -275,7 +223,6 @@ export const apiService = {
       const response = await axiosInstance.put(url, data, config);
       return response as T;
     } catch (error: any) {
-      console.error(`❌ PUT error for ${url}:`, error.message);
       throw error;
     }
   },
@@ -283,10 +230,6 @@ export const apiService = {
   // DELETE request - amélioré
   delete: async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🗑️ Sending DELETE request to: ${url}`);
-      }
-      
       const response = await axiosInstance.delete(url, config);
       
       // Invalider tout cache lié à cette URL
@@ -299,22 +242,8 @@ export const apiService = {
       
       cacheKeysToDelete.forEach(key => requestCache.delete(key));
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ DELETE success for ${url}`);
-      }
-      
       return response as T;
     } catch (error: any) {
-      console.error(`❌ DELETE error for ${url}:`, error.message);
-      
-      // Gestion spécifique des erreurs 500
-      if (error.response?.status === 500) {
-        console.error('Détails de l\'erreur 500:', {
-          responseData: error.response?.data,
-          message: error.response?.data?.message || error.message
-        });
-      }
-      
       throw error;
     }
   },
@@ -322,10 +251,6 @@ export const apiService = {
   // AMÉLIORÉ: Streaming request avec meilleure extraction de contenu
   stream: async <T>(url: string, data?: any, onChunk?: (chunk: string) => void, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🔄 Streaming request to ${url} initiated`);
-      }
-      
       // Envoi de la requête normale d'abord
       const response = await axiosInstance.post(url, data, config) as unknown as ApiResponse;
       
@@ -335,10 +260,6 @@ export const apiService = {
       // Si du contenu a été trouvé, simuler le streaming
       if (messageContent && messageContent.length > 0) {
         const totalLength = messageContent.length;
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`✅ Simulating stream for message with ${totalLength} characters`);
-        }
         
         // Simuler le streaming en divisant le message en plusieurs parties
         // Calcul dynamique de la taille des morceaux basé sur la longueur du message
@@ -380,10 +301,6 @@ export const apiService = {
           await sendNextChunk();
         }
       } else {
-        if (process.env.NODE_ENV === 'development') {
-          console.warn("⚠️ Stream simulation not applicable - No valid message content found");
-        }
-        
         // Même sans contenu identifié, essayer d'envoyer quelque chose
         if (onChunk && typeof onChunk === 'function') {
           onChunk("Désolé, une erreur est survenue lors de la génération de la réponse.");
@@ -394,8 +311,6 @@ export const apiService = {
       return response as unknown as T;
       
     } catch (error: any) {
-      console.error(`❌ STREAM error for ${url}:`, error.message);
-      
       // Même en cas d'erreur, envoyer un message à l'utilisateur
       if (onChunk && typeof onChunk === 'function') {
         onChunk("Désolé, une erreur est survenue lors de la communication avec le serveur.");

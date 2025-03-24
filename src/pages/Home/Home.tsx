@@ -28,14 +28,12 @@ const Home: React.FC = () => {
   
   // Utilisation de useCallback pour optimiser la fonction
   const activateChatMode = useCallback(() => {
-    console.log('Activating chat mode');
     // Utilisation d'une fonction d'état pour être sûr d'avoir la valeur la plus récente
     setChatMode(true);
   }, []);
 
   // Fonction pour créer un nouveau projet
   const handleCreateProject = useCallback(() => {
-    console.log("Nouveau projet");
     setEditingProject(null); // Assurez-vous de ne pas être en mode édition
     setShowProjectForm(true); // Afficher le formulaire de création
   }, []);
@@ -87,8 +85,6 @@ const Home: React.FC = () => {
     `home-page ${chatMode ? 'chat-mode' : ''}`,
     [chatMode]
   );
-
-  console.log('Rendering Home page, chat mode:', chatMode);
 
   return (
     <div className={pageClassName}>

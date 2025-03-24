@@ -15,7 +15,6 @@ export const useProject = () => {
       return data;
     } catch (err) {
       context.setError("error while fetching projects");
-      console.error(err);
       return [];
     } finally {
       context.setLoading(false);
@@ -30,7 +29,6 @@ export const useProject = () => {
       context.setError(null);
     } catch (err) {
       context.setError(`Erreur while deleting project ${id}`);
-      console.error(err);
     } finally {
       context.setLoading(false);
     }
@@ -70,7 +68,6 @@ export const useProject = () => {
       context.setError(null);
       return updatedProject;
     } catch (err) {
-      console.error(err);
       context.setError("Error while updating project");
     } finally {
       context.setLoading(false);
@@ -86,12 +83,11 @@ export const useProject = () => {
       return newProject;
     } catch (err) {
       context.setError("Error while creating project");
-      console.error(err);
     } finally {
       context.setLoading(false);
     }
   }
-  console.log(context.projects)
+
   return {
     ...context,
     fetchProjects,

@@ -74,10 +74,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Ajouter la nouvelle classe de couleur
     document.body.classList.add(`theme-color-${themeColor}`);
     
-    // Logs uniquement en développement
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Theme updated: ${themeMode}, color: ${themeColor}`);
-    }
+    // Logs supprimés pour la production
   }, [themeMode, themeColor]);
 
   return (

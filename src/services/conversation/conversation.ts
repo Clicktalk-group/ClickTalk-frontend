@@ -8,7 +8,6 @@ export const conversationService = {
       const response = await apiService.get<Conversation[]>('/conversation/all');
       return response;
     } catch (error) {
-      console.error('Error fetching conversations:', error);
       throw error;
     }
   },
@@ -19,7 +18,6 @@ export const conversationService = {
       const response = await apiService.get<Conversation>(`/conversation/${id}`);
       return response;
     } catch (error) {
-      console.error(`Error fetching conversation with id ${id}:`, error);
       throw error;
     }
   },
@@ -30,7 +28,6 @@ export const conversationService = {
       const response = await apiService.post<Conversation>('/conversation/add', data);
       return response;
     } catch (error) {
-      console.error('Error creating conversation:', error);
       throw error;
     }
   },
@@ -40,7 +37,6 @@ export const conversationService = {
     try {
       await apiService.delete(`/conversation/delete/${id}`);
     } catch (error) {
-      console.error(`Error deleting conversation with id ${id}:`, error);
       throw error;
     }
   },
@@ -51,7 +47,6 @@ export const conversationService = {
       const response = await apiService.get<Message[]>(`/messages/conv/${convId}`);
       return response;
     } catch (error) {
-      console.error(`Error fetching messages for conversation ${convId}:`, error);
       throw error;
     }
   },
@@ -62,7 +57,6 @@ export const conversationService = {
       const response = await apiService.post<Message>('/messages/add', data);
       return response;
     } catch (error) {
-      console.error('Error sending message:', error);
       throw error;
     }
   },
@@ -73,7 +67,6 @@ export const conversationService = {
       const response = await apiService.get<Conversation[]>(`/conversation/project/${projectId}`);
       return response;
     } catch (error) {
-      console.error(`Error fetching conversations for project ${projectId}:`, error);
       throw error;
     }
   }

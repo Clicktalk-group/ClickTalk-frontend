@@ -38,11 +38,9 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   // Optimisation des fonctions avec useCallback
   const openModal = useCallback((type: string, data?: ModalData) => {
     if (!type) {
-      console.error('Modal type is required');
+      // Erreur silencieuse - retour anticipé si type manquant
       return;
     }
-
-    console.log(`Opening modal: ${type}`, data);
     
     // Utiliser une fonction pour garantir un état à jour
     setModalState({
@@ -56,8 +54,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   }, []);
 
   const closeModal = useCallback(() => {
-    console.log('Closing modal');
-    
     setModalState({
       isOpen: false,
       modalType: null,

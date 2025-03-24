@@ -74,7 +74,6 @@ const Project: React.FC = () => {
       setError(null);
       return true;
     } catch (error: any) {
-      console.error("Erreur lors de la suppression de la conversation du projet:", error);
       setError(`Erreur de suppression: ${error.message || "Contactez l'administrateur"}`);
       return false;
     }
@@ -99,7 +98,6 @@ const Project: React.FC = () => {
           navigate('/');
         }
       } catch (error: any) {
-        console.error("Erreur lors de la suppression du projet:", error);
         setError(`Erreur lors de la suppression: ${error.message || "Contactez l'administrateur"}`);
       }
     }

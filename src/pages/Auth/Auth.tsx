@@ -24,11 +24,8 @@ export const Auth = () => {
     }
   }, [activeTab, navigate]);
   
-  console.log("État Auth.tsx:", { isAuthenticated, isLoading });
-
   // Rediriger si déjà authentifié
   if (!isLoading && isAuthenticated) {
-    console.log("Utilisateur authentifié, redirection vers la page d'accueil");
     return <Navigate to="/" replace />;
   }
 

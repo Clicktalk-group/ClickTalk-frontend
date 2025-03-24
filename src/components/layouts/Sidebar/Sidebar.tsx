@@ -26,8 +26,6 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const { logout } = useAuth();
   
-  console.log("Sidebar props - selected conversation:", selectedConversationId, "selected project:", selectedProjectId);
-  
   // Gestionnaire de déconnexion
   const handleLogoutClick = useCallback(() => {
     setShowLogoutModal(true);
@@ -66,7 +64,6 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
         setIsProcessing(false);
       }
     } catch (error) {
-      console.error("Erreur lors de la suppression de la conversation:", error);
       setIsProcessing(false);
     }
   }, [onDeleteConversation, isProcessing]);
@@ -96,7 +93,6 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
         setIsProcessing(false);
       }
     } catch (error) {
-      console.error("Erreur lors du renommage de la conversation:", error);
       setIsProcessing(false);
     }
   }, [onRenameConversation, isProcessing]);
@@ -162,7 +158,6 @@ export const Sidebar: React.FC<SidebarProps> = memo(({
         setIsProcessing(false);
       }
     } catch (error) {
-      console.error("Erreur lors de la suppression du projet:", error);
       setIsProcessing(false);
     }
   }, [onDeleteProject, isProcessing]);

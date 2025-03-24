@@ -41,7 +41,6 @@ function parseJwt(token: string): TokenPayload | null {
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
-    console.error('Erreur lors du décodage du token', e);
     return null;
   }
 }
@@ -70,7 +69,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const currentTime = Date.now() / 1000;
       return decoded.exp > currentTime;
     } catch (error) {
-      console.error("Erreur de validation du token:", error);
       return false;
     }
   }, []);
@@ -78,22 +76,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Fonction de déconnexion définie en amont pour éviter les erreurs de référence circulaire
   const logout = useCallback(async () => {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Déconnexion de l'utilisateur");
-      }
-      
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       
       setAccessToken('');
       setUser(null);
       setError(null);
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Déconnexion réussie");
-      }
     } catch (err) {
-      console.error("Erreur lors de la déconnexion:", err);
       setError("Échec de la déconnexion");
     }
   }, []);
@@ -122,7 +111,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }
       } catch (err) {
-        console.error('Erreur lors de l\'initialisation de l\'authentification:', err);
         setAccessToken('');
         setUser(null);
         localStorage.removeItem('token');
@@ -161,15 +149,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       setError(null);
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Tentative de connexion avec:", { email, password: '********' });
-      }
-      
       const response = await authService.login({ email, password });
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Réponse de connexion reçue");
-      }
       
       let tokenValue = '';
       let userData: User | null = null;
@@ -205,12 +185,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAccessToken(tokenValue);
       setUser(userData);
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Connexion réussie");
-      }
-      
     } catch (err: any) {
-      console.error("Erreur de connexion:", err);
       setError(err.response?.data?.message || "Échec de la connexion");
       throw err;
     } finally {
@@ -223,10 +198,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Tentative d'inscription");
-      }
       
       const response = await authService.register(credentials);
       
@@ -264,12 +235,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAccessToken(tokenValue);
       setUser(userData);
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Inscription réussie");
-      }
-      
     } catch (err: any) {
-      console.error("Erreur d'inscription:", err);
       setError(err.response?.data?.message || "Échec de l'inscription");
       throw err;
     } finally {
@@ -280,12 +246,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Optimisé avec useCallback
   const refreshUserData = useCallback(async () => {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Rafraîchissement des données utilisateur");
-      }
       // Implémentation du rafraîchissement des données utilisateur
     } catch (err) {
-      console.error("Erreur lors du rafraîchissement des données utilisateur:", err);
+      // Gestion silencieuse des erreurs
     }
   }, []);
 
@@ -321,12 +284,6 @@ export const useAuth = () => {
     throw new Error('useAuth doit être utilisé à l\'intérieur d\'un AuthProvider');
   }
   
-  if (process.env.NODE_ENV === 'development') {
-    console.log("État d'authentification actuel:", { 
-      isAuth: context.isAuthenticated, 
-      user: context.user ? 'présent' : 'absent' 
-    });
-  }
   return context;
 };
 
