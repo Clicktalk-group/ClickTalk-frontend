@@ -136,7 +136,6 @@ Points d'accès principaux:
 - **Virtualisation**: Gestion efficace des listes longues
 - **Service Worker**: Support offline et chargement accéléré
 - **Optimisation d'images**: Utilisation du format WebP (-30% taille)
-- **Web Vitals**: Surveillance des métriques de performance
 
 ## 🧪 Tests
 

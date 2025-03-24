@@ -5,7 +5,6 @@ import {
   ApiMessageResponse,
 } from "../../types/chat.types";
 import apiService from "../../services/api/api";
-import usePerformanceMetrics from "../usePerformanceMetrics/usePerformanceMetrics";
 import { useConversation } from "../useConversation/useConversation";
 import { conversationService } from "../../services/conversation/conversation";
 import { useProject } from "../useProject/useProject";
@@ -22,20 +21,7 @@ const useChat = (conversationId?: number) => {
   const { fetchConversationById } = useConversation();
   const {addConversationToProject} = useProject();
   const navigate  = useNavigate();
-
-  // Extraction des métriques de performance avec mémoïsation
-  const metrics = usePerformanceMetrics();
   
-  // Mémoïsation des fonctions de métriques pour éviter les re-rendus
-  const {
-    recordMessageStart,
-    recordMessageEnd,
-    recordStreamingChunk,
-    recordRenderStart,
-    recordRenderEnd,
-    clearMetrics
-  } = useMemo(() => metrics, [metrics]);
-
   // Ref pour accéder aux messages actuels sans créer de dépendances
   const messagesRef = useRef<Message[]>([]);
   
@@ -68,9 +54,7 @@ const useChat = (conversationId?: number) => {
     safeSetState(prevState => ({ ...prevState, isLoading: true }));
     
     try {
-      recordRenderStart(`loadMessages-${convId}`);
       const response = await apiService.get<Message[]>(`/messages/conv/${convId}`);
-      recordRenderEnd(`loadMessages-${convId}`);
       
       if (Array.isArray(response)) {
         safeSetState(prevState => ({
@@ -98,7 +82,7 @@ const useChat = (conversationId?: number) => {
         isLoading: false
       }));
     }
-  }, [safeSetState, recordRenderStart, recordRenderEnd]);
+  }, [safeSetState]);
 
   // Assigner la fonction réelle à la référence
   useEffect(() => {
@@ -109,8 +93,6 @@ const useChat = (conversationId?: number) => {
   const handleStreamChunk = useCallback((chunk: string) => {
     // Enregistrer les métriques seulement si nécessaire
     if (chunk.length > 0) {
-      recordStreamingChunk(chunk);
-      
       safeSetState(prevState => {
         // Ajouter le nouveau morceau au message en streaming
         const newStreamingContent = (prevState.streamingMessage || '') + chunk;
@@ -120,7 +102,7 @@ const useChat = (conversationId?: number) => {
         };
       });
     }
-  }, [recordStreamingChunk, safeSetState]);
+  }, [safeSetState]);
 
   // Envoyer un message avec support de streaming et métriques - optimisé
   const sendMessage = useCallback(async (convId: number | undefined, content: string, projectId?: number) => {
@@ -134,9 +116,6 @@ const useChat = (conversationId?: number) => {
     
     // Garder une copie des messages actuels pour restaurer en cas d'erreur
     const currentMessages = [...messagesRef.current];
-    
-    // Commencer à mesurer le temps de livraison du message
-    recordMessageStart(tempUserId);
     
     // Ajouter le message utilisateur immédiatement à l'UI
     safeSetState(prevState => ({
@@ -181,16 +160,11 @@ const useChat = (conversationId?: number) => {
       };
       
       // Appel API avec streaming
-      recordRenderStart(`apiCall-${tempBotId}`);
       const response = await apiService.stream<ApiMessageResponse>(
         '/messages/add', 
         payload,
         handleStreamChunk
       );
-      recordRenderEnd(`apiCall-${tempBotId}`);
-      
-      // Enregistrer la fin du message et sa taille
-      recordMessageEnd(tempUserId, content.length);
       
       // Déterminer l'ID de conversation
       const responseConvId = response?.convId || response?.conversationId ||
@@ -225,11 +199,6 @@ const useChat = (conversationId?: number) => {
             }
             return msg;
           });
-          
-          // Enregistrer la taille finale du message reçu
-          if (prevState.streamingMessage) {
-            recordMessageEnd(tempBotId, prevState.streamingMessage.length);
-          }
           
           return {
             ...prevState,
@@ -289,10 +258,6 @@ const useChat = (conversationId?: number) => {
   },
     [
       handleStreamChunk,
-      recordMessageStart,
-      recordMessageEnd,
-      recordRenderStart,
-      recordRenderEnd,
       safeSetState,
       fetchConversationById,
       navigate,
@@ -311,14 +276,11 @@ const useChat = (conversationId?: number) => {
       }))
     }
     
-    // Clear metrics when conversation changes
-    clearMetrics();
-    
     // Cleanup function to cancel any pending operations
     return () => {
-      clearMetrics();
+      // Cleanup code
     };
-  }, [conversationId, loadMessages, clearMetrics]);
+  }, [conversationId, loadMessages]);
   
   // Copier un message - optimisé avec mémoïsation
   const copyMessage = useCallback((content: string) => {
@@ -334,13 +296,11 @@ const useChat = (conversationId?: number) => {
   return useMemo(() => ({
     ...state,
     sendMessage,
-    copyMessage,
-    performanceMetrics: metrics.metrics
+    copyMessage
   }), [
     state,
     sendMessage,
-    copyMessage,
-    metrics.metrics
+    copyMessage
   ]);
 };
 
