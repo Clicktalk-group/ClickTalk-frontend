@@ -1,3 +1,6 @@
+/* This code snippet is defining an interface named `InputProps` in TypeScript. Interfaces in
+TypeScript are used to define the structure of an object. In this case, `InputProps` is defining the
+expected properties and their types for an input component in a React application. */
 import React, { forwardRef, useMemo, useCallback } from 'react';
 import classNames from 'classnames';
 import { InputProps } from './Input.types';
