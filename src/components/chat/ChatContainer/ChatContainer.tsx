@@ -3,13 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import ChatMessages from "../ChatMessages";
 import ChatInput from "../ChatInput";
 import useChat from "../../../hooks/useChat/useChat";
-import PerformanceMonitor from "../PerformanceMonitor";
 import "./ChatContainer.scss";
 
 interface ChatContainerProps {
   onMessageSent?: () => void;
   projectId?: number;
-  conversationId?: number; // Ajout de cette prop pour résoudre l'erreur
+  conversationId?: number;
 }
 
 const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId, conversationId }) => {
@@ -20,7 +19,6 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
   const navigate = useNavigate();
   
   const [isNewConversation, setIsNewConversation] = useState(!convId);
-  const [showPerformanceMetrics, setShowPerformanceMetrics] = useState(false);
   
   const { 
     messages, 
@@ -29,8 +27,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
     sendMessage, 
     copyMessage,
     currentConversationId,
-    streamingMessage,
-    performanceMetrics // Nouvelle propriété pour les métriques
+    streamingMessage
   } = useChat(convId);
 
   // Si la conversation est créée, naviguer vers son URL
@@ -42,11 +39,6 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
       }
     }
   }, [currentConversationId, isNewConversation, navigate, projectId]);
-
-  // Utiliser useCallback pour éviter de recréer cette fonction à chaque rendu
-  const handleTogglePerformanceMetrics = useCallback(() => {
-    setShowPerformanceMetrics(prev => !prev);
-  }, []);
 
   // Fonction pour envoyer un message
   const handleSendMessage = useCallback(async (content: string) => {
@@ -76,23 +68,6 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onMessageSent, projectId,
 
   return (
     <div className="chat-container">
-      <div className="chat-tools">
-        <button 
-          onClick={handleTogglePerformanceMetrics}
-          className="performance-toggle-btn"
-        >
-          {showPerformanceMetrics ? 'Hide Performance Metrics' : 'Show Performance Metrics'}
-        </button>
-      </div>
-      
-      {/* Utiliser le composant PerformanceMonitor uniquement si visible */}
-      {showPerformanceMetrics && (
-        <PerformanceMonitor 
-          metrics={performanceMetrics} 
-          visible={true}
-        />
-      )}
-      
       <ChatMessages 
         messages={messages} 
         isLoading={isLoading} 
