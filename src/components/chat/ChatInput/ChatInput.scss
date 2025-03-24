@@ -12,52 +12,6 @@
   box-shadow: $shadow-sm;
 }
 
-.formatting-toolbar {
-  display: flex;
-  gap: $sp-xs;
-  padding: $sp-xs 0;
-  margin-bottom: $sp-xs;
-  overflow-x: auto;
-  
-  // Style de scrollbar universel avec WebKit
-  &::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-text-secondary, $color-text-secondary);
-    border-radius: $radius-sm;
-  }
-}
-
-.formatting-button {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary, $color-text-secondary);
-  font-size: $fs-sm;
-  padding: $sp-xs;
-  border-radius: $radius-sm;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    color: var(--color-text-primary, $color-text-primary);
-    background-color: var(--background-btn, $background-btn);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
 .message-form {
   display: flex;
   align-items: flex-end;
@@ -155,12 +109,6 @@
 @media screen and (max-width: $tablet) {
   .chat-input-container {
     padding: $sp-xs $sp-sm;
-  }
-  
-  .formatting-toolbar {
-    overflow-x: auto;
-    padding-bottom: $sp-xs;
-    margin-bottom: $sp-xs;
   }
   
   .message-textarea {
