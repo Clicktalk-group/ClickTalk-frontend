@@ -79,7 +79,7 @@ export const ProjectSidebar: React.FC<ProjectSidebarProps> = memo(
       // Vérifier si la date est valide
       if (isNaN(date.getTime())) return 'Date inconnue';
       
-      return date.toLocaleDateString();
+      return date.toLocaleDateString("fr-FR");
     } catch (e) {
       return 'Date inconnue';
     }
