@@ -49,6 +49,8 @@
           cursor: pointer;
           position: relative;
           padding-left: 25px;
+          display: flex;
+          align-items: center;
           
           &:hover {
             text-shadow:
@@ -71,6 +73,13 @@
           &:hover::before {
             opacity: 1;
             transform: translateX(5px);
+          }
+          
+          .action-icon {
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            color: var(--primary-color, $primary-color);
           }
         }
       }

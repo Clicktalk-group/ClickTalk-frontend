@@ -4,6 +4,7 @@ import './Home.scss';
 import ChatContainer from '../../components/chat/ChatContainer/ChatContainer';
 import { Modal } from '../../components/common/Modal/Modal';
 import ThemeModalContent from '../../components/modals/ThemeModal/ThemeModal';
+import { FaFolder, FaPalette } from 'react-icons/fa'; // Importation des icônes
 
 // Lazy loaded components - identique à MainLayout
 const ProjectForm = lazy(() => import('../../components/project/ProjectForm/ProjectForm'));
@@ -67,8 +68,14 @@ const Home: React.FC = () => {
         <div className="quick-actions">
           <h2>Actions rapides</h2>
           <ul>
-            <li className="action-item" onClick={handleCreateProject}>Créer un nouveau projet</li>
-            <li className="action-item" onClick={handleOpenThemeModal}>Configurer vos préférences</li>
+            <li className="action-item" onClick={handleCreateProject}>
+              <span className="action-icon"><FaFolder /></span>
+              Créer un nouveau projet
+            </li>
+            <li className="action-item" onClick={handleOpenThemeModal}>
+              <span className="action-icon"><FaPalette /></span>
+              Configurer vos préférences
+            </li>
           </ul>
         </div>
       </>
