@@ -263,12 +263,7 @@
       }
     }
     
-    .empty-conversations {
-      padding: $sp-md;
-      text-align: center;
-      color: var(--color-text-secondary, $color-text-secondary);
-      font-style: italic;
-    }
+ 
   }
   
   .sidebar-loading,
@@ -283,7 +278,12 @@
     }
   }
 }
-
+.empty-conversations {
+  padding: $sp-md;
+  text-align: center;
+  color: var(--color-text-secondary, $color-text-secondary);
+  font-style: italic;
+}
 // Utilisation de media queries pour augmenter la performance
 @media (max-width: $tablet) {
   .project-sidebar {
