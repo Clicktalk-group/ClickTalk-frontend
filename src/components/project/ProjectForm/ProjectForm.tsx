@@ -48,7 +48,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
         // Création d'un nouveau projet
         const createData = {
           title: title.trim(),
-          context: context.trim()
+          context: context.trim() || "you are a helpful assistant",
         };
         
         await createProject(createData);
@@ -64,6 +64,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, initialData }) => {
         if (newProject) {
           // Rediriger vers le nouveau projet
           navigate(`/project/${newProject.id}`);
+          // Fermer le modal
+          onClose();
         } else {
           // Si on ne trouve pas le projet, fermer le modal
           console.warn("Projet créé mais non trouvé dans la liste mise à jour");
