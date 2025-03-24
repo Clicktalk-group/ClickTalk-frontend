@@ -168,7 +168,41 @@
       100% { transform: rotate(360deg); }
     }
   }
+  // style for mobile 
+  @media (max-width: 425px ) {
+    padding: 10px 5px ;
+    text-align: center;
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+    
+    p {
+      font-size: 1rem;
+    }
+    
+    .quick-actions {
+      padding: 15px;
+      
+      h2 {
+        font-size: 1.2rem;
+      }
+      
+      ul li {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+    }
+    .chat-container {
+      flex: 1;
+      padding:10px 0px;
+    }
+    .chat-input-container {
+      padding-top:10px
+    }
+  }
 }
+
 
 // Support pour le mode sombre
 html[data-theme="dark"] .home-page {
