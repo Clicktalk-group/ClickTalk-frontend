@@ -1,4 +1,3 @@
-// src/pages/Auth/Auth.tsx
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import LoginForm from '../../components/auth/LoginForm/LoginForm';
@@ -38,6 +37,7 @@ export const Auth = () => {
       <Card className="auth-card">
         <div className="app-branding">
           <h1 className="app-title">ClickTalk</h1>
+          <p className="app-tagline">Votre assistant IA personnalisé</p>
           <img src="/assets/images/logo.webp" alt="ClickTalk Logo" className="app-logo" />
         </div>
         

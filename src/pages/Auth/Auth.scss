@@ -24,7 +24,14 @@
         font-size: 2rem;
         font-weight: 700;
         color: var(--primary-color, $primary-color);
+        margin-bottom: $sp-xs;
+      }
+      
+      .app-tagline {
+        font-size: $fs-md;
+        color: var(--color-text-secondary, $color-text-secondary);
         margin-bottom: $sp-sm;
+        font-weight: 400;
       }
       
       .app-logo {
@@ -123,6 +130,10 @@ body.dark-mode {
     
     .app-title {
       color: var(--primary-color-light, lighten($primary-color, 15%));
+    }
+    
+    .app-tagline {
+      color: var(--color-text-light, $color-text-light);
     }
   }
 }
