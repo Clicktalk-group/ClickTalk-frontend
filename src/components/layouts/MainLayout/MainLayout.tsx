@@ -146,7 +146,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       // Si nous sommes sur la page du projet supprimé, rediriger
       const currentProjectId = location.pathname.split("/").pop();
       if (currentProjectId === String(numericId)) {
-        navigate("/projects");
+        navigate("/");
+        setSidebarOpen(false);
       }
     },
     [deleteProject, navigate, location.pathname]
