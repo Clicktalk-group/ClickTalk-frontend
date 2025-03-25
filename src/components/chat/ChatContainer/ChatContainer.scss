@@ -1,0 +1,23 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--background-color, $background-color);
+  border-radius: $radius-lg; 
+  overflow: hidden;
+  box-shadow: $shadow-lg;
+  border: 1px solid var(--border-color, darken($background-color, 5%));
+  border-bottom: none;
+  padding: $sp-md;
+  margin-top: $sp-xs;
+
+  .chat-error {
+    padding: $sp-md;
+    color: var(--danger-color, $danger-color);
+    text-align: center;
+    margin: auto;
+  }
+}

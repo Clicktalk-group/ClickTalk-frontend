@@ -1,0 +1,126 @@
+@import 'variables';
+@import 'mixins';
+
+// Reset CSS de base
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  @supports (scroll-behavior: smooth) {
+    scroll-behavior: smooth;
+  }
+}
+
+// Body global
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-size: $fs-md;
+  color: $color-text-primary;
+  background-color: $background-color;
+  line-height: 1.6;
+  transition: all 0.3s ease-in-out;
+}
+
+// Définitions des thèmes - Clair et Sombre avec CSS variables
+body.theme-light {
+  --primary-color: #{$primary-color-light};
+  --primary-hover: #{$primary-hover-light};
+  --secondary-color: #{$secondary-color-light};
+  --background-color: #{$background-color-light};
+  --color-text-primary: #{$color-text-primary-light};
+  --color-text-secondary: #{$color-text-secondary-light};
+  --border-color: #{$border-color-light};
+  --background-btn: #{$background-btn-light};
+  --color-bg-light: #{darken($background-color-light, 5%)};
+}
+
+body.theme-dark {
+  --primary-color: #{$primary-color-dark};
+  --primary-hover: #{$primary-hover-dark};
+  --secondary-color: #{$secondary-color-dark};
+  --background-color: #{$background-color-dark};
+  --color-text-primary: #{$color-text-primary-dark};
+  --color-text-secondary: #{$color-text-secondary-dark};
+  --border-color: #{$border-color-dark};
+  --background-btn: #{$background-btn-dark};
+  --color-bg-light: #{darken($background-color-dark, 5%)};
+}
+
+// Thèmes de couleurs
+body.theme-color-default {
+  --primary-color: #{$primary-color-light};
+  --primary-hover: #{$primary-hover-light};
+  --secondary-color: #{$secondary-color-light};
+}
+
+body.theme-color-blue {
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --secondary-color: #60a5fa;
+}
+
+body.theme-color-green {
+  --primary-color: #10b981;
+  --primary-hover: #059669;
+  --secondary-color: #34d399;
+}
+
+body.theme-color-purple {
+  --primary-color: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --secondary-color: #a78bfa;
+}
+
+body.theme-color-orange {
+  --primary-color: #f59e0b;
+  --primary-hover: #d97706;
+  --secondary-color: #fbbf24;
+}
+
+// Titres généraux (h1 à h6)
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary, $color-text-primary);
+}
+
+// Liens généraux
+a {
+  text-decoration: none;
+  color: var(--primary-color, $primary-color);
+  transition: color 0.2s ease-in-out;
+  &:hover {
+    color: var(--primary-hover, $primary-hover);
+  }
+}
+
+// Boutons par défaut
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Conteneurs réutilisables
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// Application du thème par défaut
+body {
+  background-color: var(--background-color, $background-color);
+  color: var(--color-text-primary, $color-text-primary);
+}

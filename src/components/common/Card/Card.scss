@@ -1,0 +1,79 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+
+.card {
+  background-color: var(--message-bg-bot, $message-bg-bot);
+  border: 1px solid var(--border-color, $border-color);
+  border-radius: $radius-md;
+  @include shadow(sm);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &--hover {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      @include shadow(md);
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $sp-md;
+    padding: $sp-md;
+    border-bottom: 1px solid var(--border-color, $border-color);
+    background-color: $background-btn-grey;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    font-size: $fs-lg;
+    color: var(--primary-color, $primary-color);
+    @include shadow(sm);
+  }
+
+  &__titles {
+    flex: 1;
+    min-width: 0; // Fix overflow issue
+  }
+
+  &__title {
+    font-size: $fs-lg;
+    font-weight: 600;
+    color: var(--color-text-primary, $color-text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__subtitle {
+    font-size: $fs-sm;
+    color: var(--color-text-secondary, $color-text-secondary);
+    margin: $sp-xs 0 0;
+  }
+
+  &__content {
+    padding: $sp-md;
+    font-size: $fs-md;
+    color: var(--color-text-primary, $color-text-primary);
+    background-color: var(--background-color, $background-color);
+  }
+
+  &__footer {
+    padding: $sp-md;
+    border-top: 1px solid var(--border-color, $border-color);
+    background-color: var(--background-btn, $background-btn);
+    text-align: center;
+
+    button {
+      margin-top: $sp-sm;
+    }
+  }
+}

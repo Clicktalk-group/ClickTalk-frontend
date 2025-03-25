@@ -1,0 +1,75 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $sp-md;
+
+  button {
+    margin-top: $sp-md;
+  }
+
+  // Champs regroupant input + lien
+  &__field {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: $sp-xs;
+  }
+
+  // Styles pour les liens centrés
+  &__link-centered {
+    background: none;
+    border: none;
+    color: var(--primary-color, $primary-color);
+    font-size: 0.875rem;
+    text-decoration: underline;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+      color: var(--primary-hover, $primary-hover);
+    }
+  }
+
+  .form-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: bold;
+    color: var(--primary-color, $primary-color);
+    text-align: center;
+    margin-bottom: $sp-sm;
+  }
+  
+  .form-logo {
+    width: clamp(70px, 10vw, 120px);
+    height: auto;
+    margin-bottom: $sp-md;
+    display: block;
+  }
+  
+  .link-button {
+    background: none;
+    border: none;
+    color: var(--primary-color, $primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: $fs-sm;
+    padding: 0;
+    margin: 0 0 0 $sp-xs;
+    
+    &:hover {
+      color: var(--primary-hover, $primary-hover);
+    }
+  }
+  
+  .form-footer {
+    margin-top: $sp-sm;
+    text-align: center;
+    
+    p {
+      color: var(--color-text-secondary, $color-text-secondary);
+    }
+  }
+}

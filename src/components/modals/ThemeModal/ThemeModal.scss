@@ -1,0 +1,97 @@
+// src/components/modals/ThemeModal/ThemeModal.scss
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+@import '../Modals.scss';
+
+.theme-modal-content {
+  background-color: var(--modal-bg);
+  color: var(--modal-text);
+  
+  .theme-section {
+    margin-bottom: $sp-lg;
+    
+    h3 {
+      margin-bottom: $sp-sm;
+      font-size: $fs-md;
+      color: var(--modal-text);
+    }
+  }
+  
+  .theme-options {
+    display: flex;
+    gap: $sp-md;
+    
+    .theme-button {
+      padding: $sp-sm $sp-lg;
+      border: 1px solid var(--modal-border);
+      border-radius: $radius-sm;
+      cursor: pointer;
+      flex: 1;
+      background-color: transparent;
+      color: var(--modal-text);
+      
+      &.active {
+        background-color: var(--modal-primary-color);
+        color: white;
+        border-color: var(--modal-primary-color);
+      }
+      
+      &:hover:not(.active) {
+        background-color: var(--modal-button-bg);
+      }
+    }
+  }
+  
+  .color-options {
+    display: flex;
+    gap: $sp-md;
+    margin-top: $sp-sm;
+    
+    .color-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &.active {
+        border-color: var(--modal-text);
+        transform: scale(1.1);
+      }
+      
+      &:hover:not(.active) {
+        transform: scale(1.05);
+      }
+    }
+  }
+    
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: $sp-lg;
+    
+    .cancel-button {
+      padding: $sp-sm $sp-lg;
+      border-radius: $radius-sm;
+      border: none;
+      background-color: var(--modal-button-bg);
+      color: var(--modal-text);
+      font-weight: 500;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: var(--modal-button-hover);
+      }
+    }
+  }
+}
+
+// Maintenir les couleurs des boutons de thème intactes
+.theme-modal-content .color-button {
+  &.color-default { background-color: #7c3aed; }
+  &.color-blue { background-color: #3b82f6; }
+  &.color-green { background-color: #10b981; }
+  &.color-purple { background-color: #8b5cf6; }
+  &.color-orange { background-color: #f59e0b; }
+}

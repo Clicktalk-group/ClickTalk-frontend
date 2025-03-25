@@ -1,0 +1,141 @@
+// src/components/modals/AccountModal/AccountModal.scss
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+@import '../Modals.scss';
+
+.account-modal-content {
+  background-color: var(--modal-bg);
+  color: var(--modal-text);
+  
+  .field-container {
+    margin-bottom: $sp-md;
+  }
+  
+  .form-group {
+    margin-bottom: $sp-md;
+    
+    label {
+      display: block;
+      margin-bottom: $sp-xs;
+      font-weight: 500;
+      color: var(--modal-text);
+    }
+    
+    .input-with-icon {
+      display: flex;
+      align-items: center;
+      
+      input {
+        flex: 1;
+        padding: $sp-sm;
+        border: 1px solid var(--modal-border);
+        border-radius: $radius-sm;
+        font-size: $fs-md;
+        background-color: var(--modal-bg);
+        color: var(--modal-text);
+        
+        &:focus {
+          border-color: var(--modal-primary-color);
+          outline: none;
+        }
+      }
+      
+      .edit-button {
+        background: none;
+        border: none;
+        margin-left: $sp-sm;
+        color: var(--modal-primary-color);
+        cursor: pointer;
+        
+        &:hover {
+          color: var(--modal-primary-hover);
+        }
+      }
+    }
+  }
+  
+  .form-hint {
+    display: block;
+    margin-top: $sp-xs;
+    color: var(--modal-text-secondary);
+    font-size: $fs-sm;
+  }
+  
+  .password-section {
+    border-top: 1px solid var(--modal-border);
+    padding-top: $sp-md;
+    margin-top: $sp-md;
+    position: relative;
+  }
+  
+  .status-message {
+    margin-top: $sp-xs;
+    padding: $sp-xs;
+    font-size: $fs-sm;
+    border-radius: $radius-sm;
+    background-color: rgba(var(--modal-primary-color-rgb, 124, 58, 237), 0.1);
+    color: var(--modal-primary-color);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+    
+    &.password-status {
+      margin-top: $sp-md;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .password-actions {
+    margin-top: $sp-md;
+    display: flex;
+    justify-content: flex-end;
+    
+    .save-password-button {
+      padding: $sp-sm $sp-lg;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      font-weight: 500;
+      background-color: var(--modal-primary-color);
+      border: none;
+      color: white;
+      
+      &:hover:not(:disabled) {
+        background-color: var(--modal-primary-hover);
+      }
+      
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: $sp-lg;
+    gap: $sp-md;
+    border-top: 1px solid var(--modal-border);
+    padding-top: $sp-md;
+    
+    button {
+      padding: $sp-sm $sp-lg;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .cancel-button {
+      background-color: var(--modal-button-bg);
+      border: none;
+      color: var(--modal-text);
+      
+      &:hover {
+        background-color: var(--modal-button-hover);
+      }
+    }
+  }
+}

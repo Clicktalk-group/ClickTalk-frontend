@@ -1,0 +1,35 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-color, $primary-color);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+    will-change: transform; // Optimisation performance
+    
+    &:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+    
+    &:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+  }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}

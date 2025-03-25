@@ -1,0 +1,164 @@
+// src/components/common/HeaderMenu/HeaderMenu.scss
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.header-menu-container {
+  position: absolute;
+  top: 60px;
+  right: 15px;
+  z-index: 1000;
+}
+
+.header-menu-dropdown {
+  background-color: $border-color-dark;
+  border: 1px solid;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  min-width: 200px;
+  overflow: hidden;
+  .menu-items {
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: $sp-md $sp-lg;
+      text-decoration: none;
+      color: $color-text-primary-dark;
+      border: none;
+      background: none;
+      text-align: left;
+      font-size: $fs-md;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      
+      svg {
+        font-size: 1.2rem;
+        margin-right: $sp-md;
+        // color: $background-btn-grey;
+      }
+      
+      &:hover {
+        background-color: var(--primary-color, #7c3aed);
+      }
+      
+      &:last-child {
+        svg {
+          color: $danger-color;
+        }
+        
+        &:hover {
+          background-color: var(--primary-color, #7c3aed);
+        }
+      }
+    }
+  }
+}
+
+  /* Séparateur */
+  .divider {
+    width: 90%;
+    border: none;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0.05rem auto;
+  }
+
+// Styles pour le contenu des modales
+.settings-modal-content, 
+.help-modal-content, 
+.logout-modal-content {
+  h3 {
+    margin-bottom: $sp-md;
+  }
+  
+  h4 {
+    margin: $sp-md 0 $sp-sm;
+  }
+  
+  p {
+    margin-bottom: $sp-md;
+    line-height: 1.5;
+  }
+  
+  ul {
+    margin: $sp-sm 0;
+    padding-left: $sp-lg;
+    
+    li {
+      margin-bottom: $sp-xs;
+    }
+  }
+}
+
+.settings-section {
+  margin-top: $sp-lg;
+  
+  .theme-options {
+    display: flex;
+    gap: $sp-md;
+    margin-top: $sp-sm;
+    
+    .theme-button {
+      padding: $sp-sm $sp-md;
+      border: 1px solid $border-color;
+      border-radius: $radius-sm;
+      background: none;
+      cursor: pointer;
+      
+      &.active {
+        background-color: $primary-color;
+        color: white;
+        border-color: $primary-color;
+      }
+      
+      &:hover:not(.active) {
+        background-color: $background-btn;
+      }
+    }
+  }
+}
+
+.logout-modal-content {
+  text-align: center;
+  
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: $sp-md;
+    margin-top: $sp-lg;
+    
+    button {
+      padding: $sp-sm $sp-xl;
+      border-radius: $radius-sm;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .cancel-button {
+      background-color: $background-btn;
+      color: $color-text-primary;
+      
+      &:hover {
+        background-color: darken($background-btn, 5%);
+      }
+    }
+    
+    .confirm-button {
+      background-color: $danger-color;
+      color: white;
+      
+      &:hover {
+        background-color: darken($danger-color, 10%);
+      }
+    }
+  }
+}
+
+@include responsive($mobile) {
+  .header-menu-dropdown {
+    width: 200px;
+    right: 10px;
+  }
+}

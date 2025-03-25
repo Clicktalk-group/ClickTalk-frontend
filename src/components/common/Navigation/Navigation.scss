@@ -1,0 +1,69 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.navigation {
+  width: 100%;
+
+  .navigation-list {
+    @include flex-center;
+    flex-direction: column;
+    list-style: none;
+    gap: $sp-sm;
+    padding: 0;
+    margin: 0;
+  }
+
+  .navigation-item {
+    @include flex-between;
+    align-items: center;
+    padding: $sp-sm $sp-md;
+    color: $color-text-secondary;
+    text-decoration: none;
+    border-radius: $radius-md;
+    transition: all 0.3s ease;
+    font-size: $fs-sm;
+
+    &:hover,
+    &:focus {
+      background-color: $dropdown-hover;
+      color: white;
+      outline: none;
+    }
+
+    &.active {
+      background-color: $primary-color;
+      color: white;
+
+      .navigation-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  .navigation-icon {
+    @include flex-center;
+    margin-right: $sp-sm;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+
+    .active & {
+      opacity: 1;
+    }
+  }
+
+  .navigation-label {
+    font-size: $fs-sm;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: $tablet) {
+  .navigation-label {
+    display: none;
+  }
+
+  .navigation-item {
+    justify-content: center;
+    padding: $sp-xs;
+  }
+}

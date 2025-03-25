@@ -1,0 +1,108 @@
+// /src/components/project/ProjectForm/ProjectForm.scss
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.project-form {
+  padding: $sp-lg;
+  
+  h3 {
+    font-size: $fs-lg;
+    margin-bottom: $sp-md;
+    color: var(--color-text-primary, $color-text-primary);
+  }
+  
+  .error-message {
+    padding: $sp-sm;
+    margin-bottom: $sp-md;
+    background-color: rgba($danger-color, 0.1);
+    color: $danger-color;
+    border-radius: $radius-sm;
+    font-size: $fs-sm;
+  }
+  
+  .form-group {
+    margin-bottom: $sp-md;
+    
+    label {
+      display: block;
+      margin-bottom: $sp-xs;
+      font-weight: 500;
+      color: var(--color-text-secondary, $color-text-secondary);
+    }
+    
+    .textarea-input {
+      width: 100%;
+      padding: $sp-sm;
+      border: 1px solid var(--border-color, darken($background-color, 10%));
+      border-radius: $radius-md;
+      font-size: $fs-md;
+      transition: border-color 0.2s ease;
+      background-color: var(--background-color, $background-color);
+      color: var(--color-text-primary, $color-text-primary);
+      
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color, $primary-color);
+      }
+    }
+    
+    textarea.textarea-input {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .context-hint {
+      font-size: $fs-sm;
+      color: var(--color-text-secondary, $color-text-secondary);
+      margin-top: $sp-xs;
+      font-style: italic;
+    }
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $sp-sm;
+    margin-top: $sp-lg;
+    
+    .btn-cancel {
+      @include button($background-btn-grey, $color-text-secondary, $background-btn);
+      border: 1px solid var(--border-color, darken($background-btn-grey, 10%));
+      background-color: var(--background-btn-grey, $background-btn-grey);
+      color: var(--color-text-secondary, $color-text-secondary);
+      
+      &:hover {
+        background-color: var(--background-btn, $background-btn);
+      }
+    }
+    
+    .btn-submit {
+      @include button($primary-color, $color-light, $primary-hover);
+      background-color: var(--primary-color, $primary-color);
+      color: $color-light;
+      
+      &:hover {
+        background-color: var(--primary-hover, $primary-hover);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .project-form {
+    padding: $sp-md;
+    
+    .form-actions {
+      flex-direction: column-reverse;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

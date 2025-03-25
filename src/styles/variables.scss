@@ -1,0 +1,116 @@
+// Palette de couleurs principales - valeurs fixes pour SASS
+$primary-color-light: #7c3aed; // Couleur principale (violet)
+$primary-hover-light: #6d28d9; // Hover sur boutons principaux
+$secondary-color-light: #9333ea; // Couleur secondaire
+$background-color-light: #f3f4f6; // Arrière-plan principal clair
+$background-btn-light: #e7e7e7; // Fond pour boutons (gris clair)
+$color-text-primary-light: #111827; // Couleur principale texte (mode clair)
+$color-text-secondary-light: #4b5563; // Texte secondaire (mode clair)
+$border-color-light: #e5e7eb; // Couleur des bordures (mode clair)
+
+// Variables mode sombre
+$primary-color-dark: #7c3aed; // Même couleur principale (violet)
+$primary-hover-dark: #6d28d9; // Même hover
+$secondary-color-dark: #9333ea; // Même couleur secondaire
+$background-color-dark: #1f2937; // Arrière-plan principal sombre
+$background-btn-dark: #374151; // Fond pour boutons (mode sombre)
+$color-text-primary-dark: #f9fafb; // Couleur principale texte (mode sombre)
+$color-text-secondary-dark: #d1d5db; // Texte secondaire (mode sombre)
+$border-color-dark: #4b5563; // Couleur des bordures (mode sombre)
+
+// Extraire les valeurs RGB pour les utiliser dans rgba()
+$primary-color-light-rgb: 124, 58, 237; // Valeur RGB de #7c3aed
+$primary-color-dark-rgb: 124, 58, 237;  // Même valeur pour le mode sombre
+
+// Variables utilisées par SASS (toujours utiliser les valeurs par défaut)
+$primary-color: $primary-color-light;
+$primary-hover: $primary-hover-light;
+$secondary-color: $secondary-color-light;
+$background-color: $background-color-light;
+$background-btn: $background-btn-light;
+$background-btn-grey: #f9fafb;
+$color-bg-dark: #1f2937;
+$color-bg-dark-hover: #374151;
+$color-bg-light: darken($background-color-light, 5%); // Utilise la valeur fixe
+$sidebar-color: $color-bg-dark;
+
+// Texte et bordures
+$color-text-primary: $color-text-primary-light;
+$color-text-secondary: $color-text-secondary-light;
+$color-text-light: #9ca3af;
+$border-color: $border-color-light;
+
+// Messages
+$message-bg-user: #eef2ff;
+$message-bg-bot: #ffffff;
+
+// Variables pour les messages en mode sombre
+$message-bg-user-dark: #333a47;
+$message-bg-bot-dark: #2d333e; 
+
+// Menus déroulants (dropdown)
+$dropdown-bg: #ffffff;
+$dropdown-hover: #f3f4f6;
+
+// Danger et états d'alerte
+$danger-color: #ef4444 !default;
+$danger-hover: darken($danger-color, 10%);
+
+// Ombres
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
+
+// Radius (coins arrondis)
+$radius-sm: 0.25rem;
+$radius-md: 0.5rem;
+$radius-lg: 0.75rem;
+
+// Espacements
+$sp-xs: 0.25rem;
+$sp-sm: 0.5rem;
+$sp-md: 1rem;
+$sp-lg: 1.5rem;
+$sp-xl: 2rem;
+
+// Typographie
+$fs-sm: 0.875rem;
+$fs-md: 1rem;
+$fs-lg: 1.25rem;
+$fs-xl: 1.5rem;
+
+// Points de rupture (breakpoints)
+$mobile: 480px;
+$tablet: 768px;
+$desktop: 1024px;
+
+$sidebar-width: 350px;
+$color-light: #ffffff !default;
+
+// Définir les variables CSS pour utilisation dans l'application
+:root {
+  --primary-color: #{$primary-color-light};
+  --primary-hover: #{$primary-hover-light};
+  --secondary-color: #{$secondary-color-light};
+  --background-color: #{$background-color-light};
+  --background-btn: #{$background-btn-light};
+  --color-text-primary: #{$color-text-primary-light};
+  --color-text-secondary: #{$color-text-secondary-light};
+  --border-color: #{$border-color-light};
+  
+  // Variables RGB pour utilisation avec rgba()
+  --primary-color-rgb: #{$primary-color-light-rgb};
+  --primary-color-dark-rgb: #{$primary-color-dark-rgb};
+}
+
+// Variables pour le mode sombre
+html[data-theme="dark"] {
+  --primary-color: #{$primary-color-dark};
+  --primary-hover: #{$primary-hover-dark};
+  --secondary-color: #{$secondary-color-dark};
+  --background-color: #{$background-color-dark};
+  --background-btn: #{$background-btn-dark};
+  --color-text-primary: #{$color-text-primary-dark};
+  --color-text-secondary: #{$color-text-secondary-dark};
+  --border-color: #{$border-color-dark};
+}

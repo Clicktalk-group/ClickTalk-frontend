@@ -1,0 +1,283 @@
+@import '../../styles/variables.scss';
+@import '../../styles/mixins';
+
+.project-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+      width: 100%;
+  overflow: hidden; /* Pour empêcher tout scroll global */
+  background-color: var(--background-color, $background-color);
+  color: var(--color-text-primary, $color-text-primary);
+
+  .project-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color, $border-color);
+    background-color: var(--background-color, white);
+    z-index: 10;
+
+    // Style adaptatif pour le bouton de retour à l'accueil
+    .back-to-home {
+      margin-bottom: $sp-md;
+      
+      .home-button {
+        display: inline-flex;
+        align-items: center;
+        gap: $sp-sm;
+        font-weight: 500;
+        font-size: $fs-md;
+        padding: $sp-xs $sp-md;
+        border-radius: $radius-md;
+        background-color: transparent;
+        color: var(--color-text-secondary, $color-text-secondary);
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        
+        // Mode clair (par défaut)
+        background-color: var(--background-btn, $background-btn-light);
+        
+        &:hover {
+          transform: translateX(-3px);
+          background-color: var(--primary-color, $primary-color);
+          color: white;
+          box-shadow: $shadow-sm;
+        }
+        
+        svg {
+          font-size: 1.1em;
+        }
+        
+        // Support du thème sombre
+        .dark-theme & {
+          background-color: var(--background-btn, $background-btn-dark);
+          color: var(--color-text-secondary, $color-text-secondary-dark);
+          
+          &:hover {
+            background-color: var(--primary-color, $primary-color-dark);
+            color: white;
+          }
+        }
+      }
+    }
+
+    .project-title-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+
+      h1 {
+        text-align: center;
+        margin: 0;
+        color: var(--color-text-primary, $color-text-primary);
+      }
+
+      .project-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+
+    .project-context {
+      color: var(--color-text-secondary, $color-text-secondary);
+      font-size: 0.9rem;
+      margin: 0;
+      margin-top: 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .error-notification {
+      margin-top: $sp-sm;
+      padding: $sp-sm;
+      background-color: rgba($danger-color, 0.1);
+      color: $danger-color;
+      border-radius: $radius-sm;
+      font-size: $fs-sm;
+    }
+  }
+
+  .project-content {
+    display: flex;
+    flex: 1; /* Prend tout l'espace restant */
+    height: calc(100vh - 0px); /* Hauteur fixe sans scroll */
+    overflow: hidden; /* Force aucun scroll ici */
+    position: relative;
+
+    .project-sidebar-container {
+      height: 100%;
+      width: $sidebar-width;
+      border-right: 1px solid var(--border-color, $border-color);
+      background-color: var(--background-color, white);
+      transition: all 0.3s ease-in-out;
+      z-index: 5;
+      overflow: hidden; /* Contient le scroll interne */
+      
+      &.closed {
+        width: 0;
+        overflow: hidden;
+      }
+    }
+
+    .project-chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* Contient le scroll interne */
+      background-color: var(--background-color, white);
+      position: relative;
+
+      .mobile-toolbar {
+        display: flex;
+        padding: $sp-sm;
+        border-bottom: 1px solid var(--border-color, $border-color);
+        background-color: var(--background-color, $background-color);
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0; /* Empêche la compression */
+        
+        .sidebar-toggle, .context-toggle {
+          padding: $sp-xs;
+          background: none;
+          color: var(--color-text-secondary, $color-text-secondary);
+          border: none;
+          border-radius: $radius-sm;
+          cursor: pointer;
+          
+          &:hover {
+            background-color: var(--background-btn, $background-btn);
+          }
+          
+          svg {
+            font-size: 1.2rem;
+          }
+        }
+        
+        .active-conversation-title {
+          font-weight: 600;
+          color: var(--color-text-primary, $color-text-primary);
+          max-width: 70%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .select-conversation-msg {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: var(--color-text-secondary, $color-text-secondary);
+        gap: $sp-md;
+        padding: $sp-lg;
+      }
+      
+      /* Style pour le ChatContainer */
+      .chat-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden; /* Le chat container ne défile pas */
+        max-height: 100%; /* Limiter à 100% de hauteur */
+        
+        .chat-tools {
+          padding: 8px;
+          flex-shrink: 0; /* Ne pas compresser */
+        }
+        
+        .chat-messages {
+          flex: 1;
+          overflow-y: auto; /* Seule cette partie défile */
+        }
+        
+        .chat-input {
+          flex-shrink: 0; /* Ne pas compresser */
+        }
+      }
+    }
+  }
+
+  .loading-container, 
+  .error-container, 
+  .project-not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+    color: var(--color-text-secondary, $color-text-secondary);
+    
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--primary-color, $primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: var(--primary-hover, $primary-hover);
+      }
+    }
+  }
+}
+
+/* Media queries pour la responsivité */
+@media (max-width: $tablet) {
+  .project-page {
+    .project-header {
+      .project-context {
+        display: none; // Masquer le contexte sur tablette/mobile, remplacé par le popup
+      }
+    }
+    
+    .project-content {
+      .project-sidebar-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        z-index: 10;
+        box-shadow: $shadow-lg;
+        
+        &.open {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .project-page {
+    .project-header {
+      .back-to-home {
+        margin-bottom: $sp-sm;
+        
+        .home-button {
+          padding: $sp-xs ($sp-sm + $sp-xs);
+          font-size: $fs-sm;
+        }
+      }
+      
+      .project-title-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        
+        .project-actions {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}

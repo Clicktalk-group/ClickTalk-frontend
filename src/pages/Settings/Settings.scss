@@ -1,0 +1,342 @@
+// src/pages/Settings/Settings.scss
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.settings-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $sp-lg;
+  background-color: var(--background-color, $background-color);
+  color: var(--color-text-primary, $color-text-primary);
+  
+  h1 {
+    font-size: $fs-xl;
+    margin-bottom: $sp-xl;
+    color: var(--color-text-primary, $color-text-primary);
+  }
+}
+
+.settings-section {
+  margin-bottom: $sp-xl;
+  background: var(--card-background, $color-light);
+  border-radius: $radius-md;
+  padding: $sp-lg;
+  box-shadow: $shadow-sm;
+  
+  h2 {
+    font-size: $fs-lg;
+    margin-bottom: $sp-md;
+    color: var(--color-text-primary, $color-text-primary);
+  }
+  
+  // Note: Ce bloc peut être conservé pour la compatibilité, mais n'est plus
+  // nécessaire avec l'utilisation des variables CSS pour le thème
+  body.dark-mode & {
+    background: var(--color-bg-dark-hover, $color-bg-dark-hover);
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: $sp-lg;
+  
+  .avatar {
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary-color, $primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: $sp-md;
+    
+    svg {
+      color: $color-light;
+      font-size: 28px;
+    }
+  }
+  
+  .user-details {
+    h3 {
+      margin-bottom: $sp-xs;
+      color: var(--color-text-primary, $color-text-primary);
+    }
+    
+    p {
+      color: var(--color-text-secondary, $color-text-secondary);
+    }
+  }
+}
+
+.account-form {
+  .form-group {
+    margin-bottom: $sp-md;
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: $sp-xs;
+      color: var(--color-text-primary, $color-text-primary);
+    }
+    
+    input {
+      width: 100%;
+      padding: $sp-sm;
+      border: 1px solid var(--border-color, $border-color);
+      border-radius: $radius-sm;
+      font-size: $fs-md;
+      transition: border-color 0.2s ease;
+      background-color: var(--background-color, $background-color);
+      color: var(--color-text-primary, $color-text-primary);
+      
+      &:focus {
+        border-color: var(--primary-color, $primary-color);
+        outline: none;
+      }
+    }
+  }
+  
+  .save-button {
+    background-color: var(--primary-color, $primary-color);
+    color: white;
+    border: none;
+    padding: $sp-md $sp-lg;
+    border-radius: $radius-md;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: var(--primary-hover, $primary-hover);
+    }
+  }
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $sp-md 0;
+  border-bottom: 1px solid var(--border-color-transparent, rgba($border-color, 0.1));
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .setting-label {
+    flex: 1;
+    
+    span {
+      display: block;
+      font-weight: 500;
+      margin-bottom: $sp-xs;
+      color: var(--color-text-primary, $color-text-primary);
+    }
+    
+    .setting-description {
+      font-size: $fs-sm;
+      color: var(--color-text-secondary, $color-text-secondary);
+    }
+  }
+  
+  .setting-control {
+    min-width: 120px;
+  }
+}
+
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $sp-xs;
+  max-width: 240px;
+  
+  .color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border: 2px solid transparent;
+    
+    &.active {
+      border-color: white;
+      box-shadow: 0 0 0 2px var(--primary-color, $primary-color);
+      transform: scale(1.1);
+    }
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  padding: $sp-sm $sp-md;
+  border-radius: $radius-md;
+  transition: all 0.3s ease;
+  
+  svg {
+    margin-right: $sp-sm;
+  }
+  
+  &.theme-light {
+    background-color: var(--background-color, $background-color);
+    color: var(--color-text-primary, $color-text-primary);
+    
+    svg {
+      color: #f39c12;
+    }
+  }
+  
+  &.theme-dark {
+    background-color: var(--color-bg-dark, $color-bg-dark);
+    color: var(--color-text-light, $color-text-light);
+    
+    svg {
+      color: #f1c40f;
+    }
+  }
+}
+
+.help-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  
+  p {
+    margin-bottom: $sp-md;
+    color: var(--color-text-primary, $color-text-primary);
+  }
+  
+  .help-button {
+    display: flex;
+    align-items: center;
+    gap: $sp-sm;
+    background-color: var(--background-btn, $background-btn);
+    border: none;
+    padding: $sp-sm $sp-md;
+    border-radius: $radius-md;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    color: var(--color-text-primary, $color-text-primary);
+    
+    &:hover {
+      background-color: var(--background-btn-hover, darken($background-btn, 5%));
+    }
+    
+    svg {
+      color: var(--primary-color, $primary-color);
+    }
+  }
+}
+
+.help-modal-content {
+  h3 {
+    margin-bottom: $sp-md;
+    color: var(--color-text-primary, $color-text-primary);
+  }
+  
+  h4 {
+    margin: $sp-md 0 $sp-sm;
+    color: var(--color-text-primary, $color-text-primary);
+  }
+  
+  p {
+    margin-bottom: $sp-md;
+    line-height: 1.5;
+    color: var(--color-text-primary, $color-text-primary);
+  }
+  
+  ul {
+    margin: $sp-sm 0;
+    padding-left: $sp-lg;
+    
+    li {
+      margin-bottom: $sp-xs;
+      color: var(--color-text-primary, $color-text-primary);
+    }
+  }
+  
+  a {
+    color: var(--primary-color, $primary-color);
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.danger-zone {
+  .danger-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $sp-md;
+  }
+  
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $sp-md;
+    border-radius: $radius-md;
+    border: none;
+    gap: $sp-sm;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    
+    svg {
+      font-size: 16px;
+    }
+  }
+  
+  .logout-button {
+    background-color: var(--background-btn, $background-btn);
+    color: var(--color-text-primary, $color-text-primary);
+    
+    &:hover {
+      background-color: var(--background-btn-hover, darken($background-btn, 5%));
+    }
+  }
+  
+  .delete-account-button {
+    background-color: rgba($danger-color, 0.1);
+    color: $danger-color;
+    
+    &:hover {
+      background-color: $danger-color;
+      color: $color-light;
+    }
+  }
+}
+
+// Responsive
+@include responsive($tablet) {
+  .settings-page {
+    padding: $sp-md;
+  }
+  
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .setting-label {
+      margin-bottom: $sp-sm;
+    }
+  }
+  
+  .danger-zone {
+    .danger-actions {
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

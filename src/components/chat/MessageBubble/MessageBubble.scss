@@ -1,0 +1,324 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.message-bubble {
+  max-width: 75%;
+  padding-left: $sp-md;
+  padding-right: $sp-md;
+  padding-bottom: 0;
+  padding-top: $sp-xs;
+  border-radius: $radius-md;
+  position: relative;
+  margin-bottom: $sp-md;
+  
+  .message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: $sp-sm;
+    
+    .avatar {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-right: $sp-sm;
+      background-color: var(--avatar-background, $color-bg-dark);
+      color: var(--avatar-color, $color-light);
+    }
+    
+    .sender {
+      font-weight: bold;
+      margin-right: $sp-sm;
+    }
+    
+    .time {
+      font-size: $fs-sm;
+      color: var(--color-text-secondary, $color-text-secondary);
+    }
+  }
+  
+  // User message styling
+  &.user {
+    align-self: flex-end;
+    background-color: var(--primary-color, $primary-color);
+    color: var(--color-on-primary, white);
+    border-top-right-radius: 0;
+    
+    .message-header {
+      .avatar {
+        background-color: var(--primary-hover, $primary-hover);
+      }
+      .time {
+        color: var(--color-on-primary-secondary, rgba(255, 255, 255, 0.8));
+      }
+    }
+  }
+  
+  // Bot message styling
+  &.bot {
+    align-self: flex-start;
+    background-color: var(--input-background, rgba($background-color-dark, 0.1));
+    color: var(--color-text-primary, $color-text-primary);
+    box-shadow: $shadow-sm;
+    border-top-left-radius: 0;
+    border: 1px solid var(--border-color, $border-color);
+    
+    // NOUVEAU: Style pour le streaming
+    &.streaming {
+      animation: pulseHighlight 2s infinite;
+    }
+    
+    // NOUVEAU: Style pour l'indicateur de typing
+    &.typing {
+      padding: $sp-sm;
+      
+      .typing-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        
+        p {
+          margin: 0;
+          color: var(--color-text-secondary, $color-text-secondary);
+          font-size: 0.9rem;
+          font-style: italic;
+        }
+      }
+      
+      animation: pulseHighlight 2s infinite;
+    }
+    
+    // Markdown content styling
+    p, h1, h2, h3, h4, h5, h6, ul, ol {
+      margin-bottom: $sp-sm;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 600;
+    }
+    
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.3rem; }
+    h3 { font-size: 1.2rem; }
+    h4 { font-size: 1.1rem; }
+    h5, h6 { font-size: 1rem; }
+    
+    ul, ol {
+      padding-left: 20px;
+      
+      li {
+        margin-bottom: $sp-xs;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+    
+    a {
+      color: var(--primary-color, $primary-color);
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    
+    code {
+      background-color: var(--code-background, rgba(0, 0, 0, 0.05));
+      padding: 2px 4px;
+      border-radius: $radius-sm;
+      font-family: 'Fira Code', monospace, 'Courier New';
+      font-size: 0.9em;
+    }
+    
+    pre {
+      background-color: #2d2d2d;
+      color: #f8f8f2;
+      padding: $sp-sm;
+      border-radius: $radius-sm;
+      overflow-x: auto;
+      margin-bottom: $sp-sm;
+      position: relative;
+      
+      code {
+        background-color: transparent;
+        padding: 0;
+        color: inherit;
+        white-space: pre-wrap;
+      }
+    }
+    
+    blockquote {
+      border-left: 3px solid var(--border-color, $border-color);
+      padding-left: $sp-md;
+      color: var(--color-text-secondary, $color-text-secondary);
+      font-style: italic;
+      margin: $sp-md 0;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: $sp-md 0;
+      display: block;
+      overflow-x: auto;
+      
+      th {
+        background-color: var(--table-header-bg, $background-color);
+        font-weight: bold;
+      }
+      
+      th, td {
+        border: 1px solid var(--border-color, $border-color);
+        padding: $sp-sm;
+        text-align: left;
+      }
+      
+      tr:nth-child(even) {
+        background-color: var(--table-row-even, rgba(0, 0, 0, 0.02));
+      }
+    }
+    
+    hr {
+      border: 0;
+      height: 1px;
+      background: var(--border-color, $border-color);
+      opacity: 0.2;
+      margin: $sp-md 0;
+    }
+  }
+  
+  .message-content {
+    margin-bottom: $sp-sm;
+    position: relative;
+  }
+  
+  // Icône à l'extérieur de la bulle de message
+  .message-actions-outside {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    
+    .copy-button {
+      background-color: transparent;
+      border: none;
+      color: var(--color-text-secondary, $color-text-secondary);
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      background-color: var(--background-color, $background-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      opacity: 0.7;
+      transition: all 0.2s ease;
+      position: relative;
+      
+      &:hover {
+        opacity: 1;
+        color: var(--primary-color, $primary-color);
+      }
+
+      // Tooltip au survol
+      &::after {
+        content: "copier";
+        position: absolute;
+        background-color: var(--primary-color, $primary-color);
+        color: white;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        z-index: 10;
+      }
+      
+      &:hover::after {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// NOUVEAU: Animations pour le streaming
+@keyframes pulseHighlight {
+  0%, 100% { box-shadow: 0 0 0 rgba(124, 58, 237, 0); }
+  50% { box-shadow: 0 0 5px rgba(124, 58, 237, 0.3); }
+}
+
+// Ajout des styles spécifiques pour le mode sombre
+:root.dark-theme {
+  .message-bubble {
+    &.bot {
+      background-color: var(--message-bg-bot, lighten($background-color-dark, 5%));
+      color: var(--color-text-primary, $color-text-primary-dark);
+      border-color: var(--border-color-dark, $border-color-dark);
+      
+      .message-actions-outside .copy-button {
+        background-color: var(--background-color-dark, $background-color-dark);
+        color: var(--color-text-secondary, $color-text-secondary-dark);
+        
+        &:hover {
+          color: var(--primary-color, lighten($primary-color, 10%));
+        }
+      }
+      
+      code {
+        background-color: var(--code-background, rgba(255, 255, 255, 0.1));
+      }
+      
+      a {
+        color: var(--primary-color, lighten($primary-color, 10%));
+      }
+      
+      blockquote {
+        border-left-color: var(--border-color-dark, $border-color-dark);
+        color: var(--color-text-secondary, $color-text-secondary-dark);
+      }
+      
+      table {
+        th {
+          background-color: var(--table-header-bg, darken($background-color-dark, 3%));
+        }
+        
+        th, td {
+          border-color: var(--border-color-dark, $border-color-dark);
+        }
+        
+        tr:nth-child(even) {
+          background-color: var(--table-row-even, rgba(255, 255, 255, 0.03));
+        }
+      }
+      
+      hr {
+        background: var(--border-color-dark, $border-color-dark);
+      }
+    }
+  }
+}
+
+@media (max-width: $tablet) {
+  .message-bubble {
+    max-width: 85%;
+    
+    .message-actions-outside {
+      .copy-button {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

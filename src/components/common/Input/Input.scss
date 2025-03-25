@@ -1,0 +1,88 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: $sp-md; // Ajout d'une marge inférieure constante pour l'espace des messages d'erreur
+
+  .input-label {
+    display: block;
+    margin-bottom: $sp-xs;
+    color: var(--color-text-primary, $color-text-primary);
+    font-size: $fs-sm;
+    font-weight: 500;
+    transition: color 0.2s ease;
+
+    .required-star {
+      color: $danger-color;
+      margin-left: 2px;
+    }
+  }
+
+  .input-container {
+    position: relative;
+    min-height: 40px; // Hauteur minimale fixe pour le conteneur
+
+    .input-field {
+      width: 100%;
+      height: 40px; // Hauteur fixe pour tous les inputs
+      padding: $sp-sm;
+      border: 1px solid var(--border-color, $border-color);
+      border-radius: $radius-md;
+      background-color: var(--background-color, $background-color);
+      color: var(--color-text-primary, $color-text-primary);
+      font-size: $fs-md;
+      line-height: 1.5;
+      transition: all 0.2s ease;
+      box-sizing: border-box; // S'assurer que padding et border sont inclus dans la largeur/hauteur
+
+      &.with-icon {
+        padding-right: 2.5rem;
+      }
+
+      &::placeholder {
+        color: var(--color-text-secondary, $color-text-secondary);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color, $primary-color);
+        box-shadow: 0 0 0 2px rgba(var(--primary-color, $primary-color), 0.2);
+      }
+
+      &:disabled {
+        background-color: var(--background-btn, $background-btn);
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      &.error {
+        border-color: $danger-color;
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba($danger-color, 0.2);
+        }
+      }
+    }
+
+    .input-icon {
+      position: absolute;
+      right: $sp-sm;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-secondary, $color-text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .error-message {
+    color: $danger-color;
+    font-size: $fs-sm;
+    min-height: 1.5rem; // Hauteur minimale pour le message d'erreur
+    margin-top: $sp-xs;
+    position: absolute; // Position absolue pour ne pas affecter la disposition
+  }
+}

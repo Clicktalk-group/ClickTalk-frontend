@@ -1,0 +1,354 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+
+.project-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Prend toute la hauteur disponible */
+  width: 100%;
+  background-color: var(--background-color, $background-color);
+  will-change: transform; /* Optimisation pour les animations */
+  overflow: hidden; /* Éviter le scrolling global */
+  
+  /* Structure en 3 parties: header, content, footer */
+  .project-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color, $border-color);
+    background-color: var(--background-color, white);
+    width: 100%;
+    flex-shrink: 0; /* Ne pas compresser */
+    
+    // Ajout d'un conteneur pour le bouton d'accueil et la croix
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $sp-md;
+    
+      // Style adaptatif pour le bouton de retour à l'accueil
+      .back-to-home {
+        .home-button {
+          display: inline-flex;
+          align-items: center;
+          gap: $sp-sm;
+          font-weight: 500;
+          font-size: $fs-md;
+          padding: $sp-xs $sp-md;
+          border-radius: $radius-md;
+          background-color: transparent;
+          color: var(--color-text-secondary, $color-text-secondary);
+          border: 1px solid transparent;
+          transition: all 0.2s ease;
+          
+          // Mode clair (par défaut)
+          background-color: var(--background-btn, $background-btn-light);
+          
+          &:hover {
+            transform: translateX(-3px);
+            background-color: var(--primary-color, $primary-color);
+            color: white;
+            box-shadow: $shadow-sm;
+          }
+          
+          svg {
+            font-size: 1.1em;
+          }
+          
+          // Support du thème sombre
+          .dark-theme & {
+            background-color: var(--background-btn, $background-btn-dark);
+            color: var(--color-text-secondary, $color-text-secondary-dark);
+            
+            &:hover {
+              background-color: var(--primary-color, $primary-color-dark);
+              color: white;
+            }
+          }
+        }
+      }
+    
+      // Afficher la croix dans le project header
+      .close-sidebar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text-secondary, $color-text-secondary);
+        transition: color 0.2s ease;
+        
+        &:hover {
+          color: var(--primary-color, $primary-color);
+        }
+      }
+    }
+
+    .project-title-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+
+      h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--color-text-primary, $color-text-primary);
+      }
+
+      .project-actions {
+        justify-content: center;
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+
+    .project-context {
+      display: block !important; // Toujours afficher le contexte, même en responsive
+      color: var(--color-text-secondary, $color-text-secondary);
+      font-size: 0.9rem;
+      margin: 0;
+      text-align: center;
+      margin-top: 0.5rem;
+      white-space: normal; // Permettre le retour à la ligne dans la sidebar
+      overflow: hidden;
+      max-width: 100%;
+      padding: 0.5rem;
+      background-color: rgba(0, 0, 0, 0.02);
+      border-radius: $radius-sm;
+    }
+    
+    .error-notification {
+      margin-top: $sp-sm;
+      padding: $sp-sm;
+      background-color: rgba($danger-color, 0.1);
+      color: $danger-color;
+      border-radius: $radius-sm;
+      font-size: $fs-sm;
+    }
+  }
+  
+  /* Section centrale avec les 3 parties: header, button, list */
+  .conversations-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Prend tout l'espace disponible */
+    overflow: hidden; /* Éviter le scroll global */
+  }
+  
+  /* Partie 1: Titre Conversations (fixe) */
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $sp-md;
+    border-bottom: 1px solid var(--border-color, $border-color);
+    width: 100%;
+    background-color: var(--background-color, white);
+    flex-shrink: 0; /* Ne pas compresser */
+    
+    h2 {
+      margin: 0;
+      font-size: $fs-lg;
+      font-weight: 600;
+      color: var(--color-text-primary, $color-text-primary);
+    }
+  }
+  
+  /* Partie 2: Bouton Nouvelle conversation (fixe) */
+  .new-conversation-btn {
+    margin: $sp-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $sp-sm;
+    padding: $sp-sm $sp-md;
+    border-radius: $radius-md;
+    font-weight: 500;
+    width: calc(100% - 2 * $sp-md);
+    background-color: var(--primary-color, $primary-color);
+    flex-shrink: 0; /* Ne pas compresser */
+    
+    svg {
+      font-size: 1rem;
+    }
+  }
+  
+  /* Partie 3: Liste des conversations (scrollable) */
+  .conversations-list {
+    padding: 0.5rem;
+    width: 100%;
+    overflow-y: auto; /* SEULE PARTIE SCROLLABLE */
+    flex: 1; /* Prend tout l'espace restant */
+    
+    .conversation-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: $sp-md;
+      border-radius: $radius-md;
+      margin-bottom: $sp-sm;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      background-color: var(--background-btn, $background-btn-light);
+      border: 1px solid transparent;
+      will-change: background-color, border-color; /* Optimisation pour les transitions */
+      
+      &:hover {
+        background-color: var(--background-btn, darken($background-btn-light, 5%));
+      }
+      
+      &:focus-visible {
+        outline: 2px solid var(--primary-color, $primary-color);
+        outline-offset: 2px;
+      }
+      
+      &.active {
+        border-color: var(--primary-color, $primary-color);
+        background-color: rgba(var(--primary-color-rgb, 0, 123, 255), 0.05);
+      }
+      
+      .conversation-info {
+        display: flex;
+        align-items: center;
+        gap: $sp-md;
+        flex: 1;
+        min-width: 0; /* Pour que l'ellipsis fonctionne correctement */
+        
+        .conversation-icon {
+          color: var(--color-text-secondary, $color-text-secondary);
+          font-size: $fs-lg;
+          flex-shrink: 0;
+        }
+        
+        .conversation-details {
+          flex: 1;
+          min-width: 0; /* Pour que l'ellipsis fonctionne correctement */
+          
+          .conversation-title {
+            font-weight: 500;
+            color: var(--color-text-primary, $color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          
+          .conversation-date {
+            font-size: $fs-sm;
+            color: var(--color-text-secondary, $color-text-secondary);
+          }
+        }
+      }
+      
+      .delete-conversation {
+        background: none;
+        border: none;
+        color: var(--color-text-secondary, $color-text-secondary);
+        cursor: pointer;
+        padding: $sp-xs;
+        border-radius: $radius-sm;
+        opacity: 0.7;
+        transition: color 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+        flex-shrink: 0;
+        transform: translateZ(0); /* Optimisation pour les appareils mobiles */
+        
+        &:hover {
+          color: $danger-color;
+          background-color: rgba($danger-color, 0.1);
+          opacity: 1;
+        }
+        
+        &:focus-visible {
+          outline: 2px solid $danger-color;
+          outline-offset: 2px;
+          opacity: 1;
+        }
+      }
+    }
+    
+ 
+  }
+  
+  .sidebar-loading,
+  .sidebar-error {
+    padding: $sp-md;
+    text-align: center;
+    color: var(--color-text-secondary, $color-text-secondary);
+    width: 100%;
+    
+    &.sidebar-error {
+      color: $danger-color;
+    }
+  }
+}
+.empty-conversations {
+  padding: $sp-md;
+  text-align: center;
+  color: var(--color-text-secondary, $color-text-secondary);
+  font-style: italic;
+}
+// Utilisation de media queries pour augmenter la performance
+@media (max-width: $tablet) {
+  .project-sidebar {
+    isolation: isolate;
+    
+    .project-header {
+      .project-context {
+        display: block !important; 
+        font-size: 0.85rem;
+      }
+      
+      .project-title-container {
+        h1 {
+          font-size: 1.3rem;
+        }
+        
+        .project-actions {
+          flex-direction: row;
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $mobile) {
+  .project-sidebar {
+    .project-header {
+      .header-top {
+        margin-bottom: $sp-sm;
+        
+        .back-to-home {
+          .home-button {
+            padding: $sp-xs ($sp-sm + $sp-xs);
+            font-size: $fs-sm;
+          }
+        }
+      }
+      
+      .project-context {
+        display: block !important;
+        font-size: 0.8rem;
+        max-height: 80px;
+        overflow-y: auto;
+      }
+      
+      .project-title-container {
+        h1 {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+}
+
+// Optimiser les animations pour les appareils à faible performance
+@media (prefers-reduced-motion: reduce) {
+  .project-sidebar {
+    .conversation-item {
+      transition: none;
+    }
+    
+    .delete-conversation {
+      transition: none;
+    }
+  }
+}

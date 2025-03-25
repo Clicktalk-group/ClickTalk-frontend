@@ -1,0 +1,54 @@
+// src/components/modals/Modals.scss
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+// Variables CSS communes pour les modales
+:root {
+  // Mode clair (valeurs par défaut)
+  --modal-bg: #{$background-color-light};
+  --modal-text: #{$color-text-primary-light};
+  --modal-text-secondary: #{$color-text-secondary-light};
+  --modal-border: #{$border-color-light};
+  --modal-button-bg: #{$background-btn-light};
+  --modal-button-hover: #{darken($background-btn-light, 5%)};
+  --modal-primary-color: #{$primary-color-light};
+  --modal-primary-hover: #{$primary-hover-light};
+  
+  // Couleurs d'accentuation spécifiques ici...
+}
+
+// Thème sombre
+.theme-dark {
+  --modal-bg: #{$background-color-dark};
+  --modal-text: #{$color-text-primary-dark};
+  --modal-text-secondary: #{$color-text-secondary-dark};
+  --modal-border: #{$border-color-dark};
+  --modal-button-bg: #{$background-btn-dark};
+  --modal-button-hover: #{darken($background-btn-dark, 5%)};
+}
+
+// Couleurs d'accentuation
+.theme-color-default {
+  --modal-primary-color: #7c3aed;
+  --modal-primary-hover: #6d28d9;
+}
+
+.theme-color-blue {
+  --modal-primary-color: #3b82f6;
+  --modal-primary-hover: #2563eb;
+}
+
+.theme-color-green {
+  --modal-primary-color: #10b981;
+  --modal-primary-hover: #059669;
+}
+
+.theme-color-purple {
+  --modal-primary-color: #8b5cf6;
+  --modal-primary-hover: #7c3aed;
+}
+
+.theme-color-orange {
+  --modal-primary-color: #f59e0b;
+  --modal-primary-hover: #d97706;
+}

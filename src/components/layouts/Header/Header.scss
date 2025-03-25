@@ -1,0 +1,105 @@
+@import "../../../styles/variables.scss"; // Variables SCSS globales
+@import '../../../styles/mixins';
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: var(--background-color, $background-color);
+  border-bottom: 1px solid var(--border-color, $border-color);
+  height: 60px;
+  position: relative;
+  width: 100%;
+  z-index: 100;
+
+  /* Icône Home et titre */
+  .homeIconContainer {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    &:hover {
+      .homeIcon {
+        background-color: var(--primary-hover, $primary-hover);
+      }
+    }
+    
+    .homeIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color, $primary-color);
+      color: white;
+      width: 40px;
+      height: 40px;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 1.2rem;
+    }
+
+    .pageTitle {
+      margin-left: 0.5rem;
+      font-weight: 500;
+      color: var(--color-text-primary, $color-text-primary);
+      
+      @media (max-width: 768px) {
+        display: none; /* Cacher le texte sur mobile */
+      }
+    }
+  }
+
+  /* Logo centré */
+  .logoContainer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    
+    .logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: none;
+    }
+  }
+
+  /* Menu burger à droite */
+  .menuButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--color-text-primary, $color-text-primary);
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: var(--primary-hover, $primary-hover);
+    }
+    
+    &.active {
+      color: var(--primary-color, $primary-color);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    
+    .homeIconContainer .homeIcon {
+      width: 36px;
+      height: 36px;
+      font-size: 1.1rem;
+    }
+    
+    .logoContainer .logo {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .menuButton {
+      font-size: 1.4rem;
+    }
+  }
+}

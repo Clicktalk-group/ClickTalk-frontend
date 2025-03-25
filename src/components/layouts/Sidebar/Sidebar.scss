@@ -1,0 +1,293 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 240px; // Largeur fixe
+  background-color: var(--color-bg-dark, $color-bg-dark); // Utiliser la variable pour le mode sombre
+  color: $color-text-primary-dark;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-in-out;
+  z-index: 10000; // Pour passer au-dessus des autres éléments
+  
+  &.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  &.closed {
+    transform: translateX(-100%); // Cache complètement la sidebar
+  }
+
+  /* Partie supérieure avec l'icône Home */
+  .sidebar-header {
+    padding: 1rem;
+    padding-top: 1.5rem;
+    
+    .home-icon-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      &:hover {
+        .home-icon {
+          background-color: var(--primary-hover, $primary-hover);
+        }
+      }
+
+      .home-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--primary-color, $primary-color);
+        color: white;
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 1.2rem;
+      }
+      
+      .home-title {
+        margin-left: 0.5rem;
+        font-weight: 500;
+        color: white;
+      }
+    }
+  }
+
+  /* Contenu principal */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  /* Sections (conversations, projets) */
+  .section {
+    margin-bottom: 1rem;
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      
+      .section-title {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+
+  /* Bouton d'ajout */
+  .add-btn {
+    width: 100%;
+    background-color: var(--primary-color, $primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    
+    .add-icon {
+      margin-right: 0.25rem;
+      font-size: 0.8rem;
+    }
+    
+    &:hover {
+      background-color: var(--primary-hover, $primary-hover);
+    }
+  }
+
+  .section-list-container {
+    max-height: 234px; 
+    overflow-y: auto;
+    margin-top: 10px;
+    
+    // Style du scrollbar
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+
+    &:hover::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+
+  /* Liste des éléments */
+  .section-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    .list-item {
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-bottom: 0.25rem;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      border: 1px solid transparent;
+      will-change: background-color, border-color;
+      
+      &:hover {
+        background-color: var(--color-bg-dark-hover, $color-bg-dark-hover);
+      }
+      
+      // Classe active pour les éléments sélectionnés
+      &.active {
+        border-color: var(--primary-color, $primary-color);
+        // Fallback direct pour rgba si la variable CSS ne fonctionne pas
+        background-color: rgba(124, 58, 237, 0.15); 
+        font-weight: 500;
+      }
+
+      &.conversation-item,
+      &.project-item {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        
+        .conversation-title,
+        .project-title {
+          flex: 1;
+          cursor: pointer;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        .conversation-actions,
+        .project-actions {
+          display: flex;
+          gap: 4px;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+          
+          .action-btn {
+            background: none;
+            border: none;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: white;
+            padding: 3px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            &.edit-btn:hover {
+              background-color: rgba(255, 255, 255, 0.2);
+            }
+            
+            &.delete-btn:hover {
+              background-color: rgba(175, 30, 30, 0.3);
+            }
+          }
+        }
+        
+        &:hover {
+          .conversation-actions,
+          .project-actions {
+            opacity: 1;
+          }
+        }
+        
+        // Garder les boutons d'action visibles sur les éléments actifs
+        &.active {
+          .conversation-actions,
+          .project-actions {
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+  }
+
+  /* Séparateur */
+  .divider {
+    border: none;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
+  }
+
+  /* Bouton de déconnexion */
+  .logout-btn {
+    width: 100%;
+    background-color: rgba(175, 30, 30, 0.3); // Rouge foncé
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    cursor: pointer;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .logout-icon {
+      margin-right: 0.5rem;
+    }
+    
+    &:hover {
+      background-color: rgba(222, 30, 30, 0.705);
+    }
+  }
+  
+  
+  /* Sur mobile, prendre toute la largeur */
+  @media (max-width: 768px) {
+    width: 100%; // Plein écran sur mobile
+    
+    &.open {
+      transform: translateX(0);
+    }
+    
+    .list-item.conversation-item,
+    .list-item.project-item {
+      .conversation-actions,
+      .project-actions {
+        opacity: 0.7; // Toujours visible sur mobile
+      }
+    }
+  }
+}
+
+// Optimisation des animations pour les appareils à faible performance
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+    
+    .list-item {
+      transition: none;
+      
+      .conversation-actions,
+      .project-actions {
+        transition: none;
+      }
+    }
+  }
+}

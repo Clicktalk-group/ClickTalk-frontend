@@ -1,47 +1,175 @@
-# Getting Started with Create React App
+# ClickTalk - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![ClickTalk Logo](./src/assets/logo.png)
 
-## Available Scripts
+> Une application React de chat IA enrichie d'outils collaboratifs adaptée aux équipes techniques.
 
-In the project directory, you can run:
+## 🚀 Fonctionnalités
 
-### `npm start`
+- 💬 **Chat IA**: Conversations dynamiques avec rendu Markdown et streaming en direct
+- 🔐 **Authentification**: Système complet sécurisé avec vérification des tokens
+- 🌓 **Thème sombre/clair**: Interface entièrement personnalisable
+- 📱 **Responsive**: Expérience optimisée sur tous vos appareils
+- 📂 **Projets**: Gestion complète avec instructions personnalisées
+- ⚡ **Performance**: Optimisations avancées pour une expérience fluide
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 🛠️ Stack Technique
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- **Frontend**: React, TypeScript, SASS
+- **Gestion d'état**: Context API
+- **Routing**: React Router v6
+- **Authentification**: JWT avec vérification d'expiration
+- **Styles**: SCSS Modules + Variables
+- **Formatage**: React-Markdown
+- **Optimisation**: Code splitting, mémoïsation, virtualisation
+- **Tests**: Jest + React Testing Library
 
-### `npm test`
+## 🏁 Démarrage rapide
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. **Cloner le projet**
+   ```bash
+   git clone https://github.com/your-username/clicktalk-frontend.git
+   cd clicktalk-frontend
+   ```
 
-### `npm run build`
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   # ou
+   yarn
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. **Démarrer le serveur de développement**
+   ```bash
+   npm start
+   # ou
+   yarn start
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. **Ouvrir le navigateur**
+   L'application sera disponible à l'adresse [http://localhost:3000](http://localhost:3000)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 📁 Structure du projet
 
-### `npm run eject`
+```
+src/
+├── assets/           # Images, logos, etc.
+├── components/       # Composants réutilisables
+│   ├── common/       # Composants de base (Button, Input, etc.)
+│   ├── layouts/      # Composants de mise en page
+│   ├── chat/         # Composants liés au chat
+│   ├── project/      # Composants de gestion de projets
+│   └── ... 
+├── contexts/         # Contextes React pour la gestion d'état
+│   ├── auth/         # Contexte d'authentification 
+│   ├── theme/        # Gestion du thème
+│   └── ... 
+├── hooks/            # Hooks personnalisés
+├── pages/            # Composants de page
+├── services/         # Services pour l'API, etc.
+├── styles/           # Styles globaux, variables, mixins
+├── types/            # Types TypeScript
+└── utils/            # Fonctions utilitaires
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 🧩 Composants principaux
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 🏠 Layout
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- **MainLayout**: Structure principale avec Header, Sidebar et zone de contenu
+- **Sidebar**: Navigation avancée avec gestion des conversations/projets
+- **Header**: Navigation, menu utilisateur et réglages rapides
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### 💬 Chat
 
-## Learn More
+- **ChatContainer**: Gestion des conversations et messages avec streaming
+- **MessageBubble**: Affichage des messages avec support Markdown et copie
+- **ChatInput**: Saisie et envoi de messages avec validation
+- **InstructionsPreview**: Affichage des instructions personnalisées par projet
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 🔐 Auth
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-# ClickTalk-frontend
+- **Login/Register**: Formulaires d'authentification avec validation
+- **AuthContext**: Gestion des états d'authentification et vérification des tokens
+- **ProtectedRoute**: Sécurisation des routes avec redirection intelligente
+
+### ⚙️ Settings & Préférences
+
+- **Settings**: Gestion des préférences utilisateur
+- **ThemeToggle**: Basculement entre thèmes clair/sombre
+- **AccountSettings**: Gestion du compte (déconnexion, suppression)
+
+### 📂 Projets
+
+- **ProjectList**: Affichage et gestion des projets
+- **ProjectForm**: Création et modification de projets
+- **ProjectInstructions**: Édition des instructions spécifiques au projet
+
+## 🎨 Système de design
+
+ClickTalk utilise un système de design cohérent avec:
+
+- **Variables SCSS**: Couleurs, espaces, tailles de police
+- **Thèmes**: Support intégré des thèmes clair/sombre avec persistance
+- **Composants de base**: Boutons, entrées, cartes stylisés uniformément
+- **Responsive**: Mixins pour une adaptation fluide à différents appareils
+- **Animations**: Transitions et animations optimisées pour l'UX
+
+## 📝 API
+
+L'application communique avec une API REST sur:
+```
+BASE_URL = 'https://api.clicktalk.com/v1'
+```
+
+Points d'accès principaux:
+- `/auth`: Authentification (login, register, verify)
+- `/conversation`: Gestion des conversations
+- `/messages`: Envoi/réception de messages (streaming support)
+- `/project`: Gestion des projets avec instructions personnalisées
+- `/user`: Gestion utilisateur et préférences
+
+## 🚀 Optimisations de performance
+
+- **Code Splitting**: Chargement à la demande des composants
+- **Mémoïsation**: Utilisation de React.memo, useCallback et useMemo
+- **Virtualisation**: Gestion efficace des listes longues
+- **Service Worker**: Support offline et chargement accéléré
+- **Optimisation d'images**: Utilisation du format WebP (-30% taille)
+
+## 🧪 Tests
+
+Lancer les tests:
+```bash
+npm test
+# ou
+yarn test
+```
+
+## 🔧 Scripts disponibles
+
+- `npm start`: Lancer le serveur de développement
+- `npm build`: Créer une version de production
+- `npm test`: Exécuter les tests
+- `npm lint`: Vérifier le code avec ESLint
+- `npm format`: Formater le code avec Prettier
+
+## 🤝 Contribution
+
+1. Forkez le projet
+2. Créez votre branche (`git checkout -b feature/fonctionnalite-incroyable`)
+3. Committez vos changements (`git commit -m 'feat: ajout d'une fonctionnalité incroyable'`)
+4. Poussez vers la branche (`git push origin feature/fonctionnalite-incroyable`)
+5. Ouvrez une Pull Request
+
+## 👥 Contributeurs
+
+- CND - Web Is Yours
+
+## 📝 License
+
+MIT © [ClickTalk Team]
+
+---
+
+<p align="center">Made with ☕ and ❤️ by the ClickTalk Team</p>

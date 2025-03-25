@@ -1,0 +1,68 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: $sp-xs;
+  padding: $sp-xs;
+  background-color: var(--background-color, $background-color);
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 0;
+    
+    p {
+      margin-top: $sp-xs;
+      margin-bottom: $sp-xs;
+      color: var(--color-text-light, $color-text-light);
+      font-size: $fs-lg;
+    }
+  }
+  
+  .loading-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0;
+    
+    p {
+      color: var(--text-secondary, #666);
+      font-size: 0.9rem;
+      font-style: italic;
+      margin: 0;
+    }
+  }
+
+  
+  // Override MessageBubble styles within this container
+  .message-bubble {
+    max-width: 75%;
+    
+    &.user {
+      align-self: flex-end;
+    }
+    
+    &.bot {
+      align-self: flex-start;
+    }
+  }
+}
+
+@media (max-width: $tablet) {
+  .chat-messages {
+    padding: $sp-sm;
+    
+    .message-bubble {
+      max-width: 85%;
+    }
+  }
+}

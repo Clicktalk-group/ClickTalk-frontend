@@ -1,0 +1,58 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/mixins';
+@import '../Modals.scss';
+
+.help-modal-content {
+    background-color: var(--modal-bg);
+    color: var(--modal-text);
+
+    h3, h4 {
+      color: var(--modal-text);
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      margin-top: $sp-lg;
+      
+      .close-button {
+        padding: $sp-sm $sp-lg;
+        border-radius: $radius-sm;
+        border: none;
+        background-color: var(--modal-primary-color);
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        
+        &:hover {
+          background-color: var(--modal-primary-hover);
+        }
+      }
+    }
+
+    .help-list {
+      padding-left: 25px;
+      padding-right: 25px;
+      margin-left: 20px;
+      color: var(--modal-text);
+    }
+
+    ul, ol {
+      margin-bottom: $sp-md;
+    }
+
+    a {
+      color: var(--modal-primary-color);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        color: var(--modal-primary-hover);
+      }
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--modal-primary-color);
+    }
+}
