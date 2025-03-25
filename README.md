@@ -1,6 +1,8 @@
 # ClickTalk - Frontend
 
-![ClickTalk Logo](./src/assets/logo.png)
+<div style="display: flex; justify-content: center;">
+  <img src="./public/assets/images/logo.png" alt="Page mobile properties" width="100px"/>
+</div>
 
 > Une application React de chat IA enrichie d'outils collaboratifs adaptée aux équipes techniques.
 
