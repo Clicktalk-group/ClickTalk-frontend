@@ -184,8 +184,13 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
       return;
     }
     
-    if (formData.newPassword.length < 8) {
-      setStatusMessages(prev => ({ ...prev, password: 'Le mot de passe doit contenir au moins 8 caractères' }));
+    // Nouvelle validation avec la regex pour le mot de passe
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{14,25}$/;
+    if (!passwordRegex.test(formData.newPassword)) {
+      setStatusMessages(prev => ({ 
+        ...prev, 
+        password: 'Le mot de passe doit contenir au moins une majuscule, un chiffre, un caractère spécial et faire entre 14 et 25 caractères.'
+      }));
       return;
     }
     
@@ -289,7 +294,7 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
               />
             </div>
             <small id="passwordHint" className="form-hint">
-              Le mot de passe doit contenir au moins 8 caractères
+              Le mot de passe doit contenir au moins une majuscule, un chiffre, un caractère spécial et faire entre 14 et 25 caractères.
             </small>
           </div>
           
@@ -298,7 +303,12 @@ const AccountModalContent: React.FC<AccountModalContentProps> = memo(({ onClose 
               type="button" 
               className="save-password-button"
               onClick={savePassword}
-              disabled={!formData.currentPassword || !formData.newPassword || formData.newPassword !== formData.confirmPassword || formData.newPassword.length < 8}
+              disabled={
+                !formData.currentPassword || 
+                !formData.newPassword || 
+                formData.newPassword !== formData.confirmPassword || 
+                !/^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{14,25}$/.test(formData.newPassword)
+              }
               aria-label="Sauvegarder le mot de passe"
             >
               Sauvegarder le mot de passe

@@ -23,9 +23,14 @@ export const validatePassword = (password: string): string | undefined => {
   if (!password.trim()) {
     return "Le mot de passe est requis.";
   }
-  if (password.length < 8) {
-    return "Le mot de passe doit comporter au moins 8 caractères.";
+  
+  // Nouvelle regex pour les exigences de mot de passe
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{14,25}$/;
+  
+  if (!passwordRegex.test(password)) {
+    return "Le mot de passe doit contenir au moins une majuscule, un chiffre, un caractère spécial et faire entre 14 et 25 caractères.";
   }
+  
   return undefined; // Pas d'erreur
 };
 

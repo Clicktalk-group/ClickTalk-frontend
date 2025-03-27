@@ -200,7 +200,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = React.memo(({ className
         'password', 
         'Mot de passe', 
         'password', 
-        'Votre mot de passe (8 caractères min.)', 
+        'Votre mot de passe (14-25 caractères avec majuscule, chiffre et caractère spécial)', 
         'new-password'
       )}
       
